@@ -1,5 +1,5 @@
-import 'package:DealConnect/api/server_config.dart';
-import 'package:DealConnect/model/file.dart';
+import 'package:Deal_Connect/api/server_config.dart';
+import 'package:Deal_Connect/model/file.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;

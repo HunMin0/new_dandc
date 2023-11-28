@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:DealConnect/model/user.dart';
+import 'package:Deal_Connect/model/user.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';

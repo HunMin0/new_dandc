@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:DealConnect/model/response_data.dart';
+import 'package:Deal_Connect/model/response_data.dart';
 // ignore: unnecessary_import
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';

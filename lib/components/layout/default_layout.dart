@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:DealConnect/components/const/setting_colors.dart';
+import 'package:Deal_Connect/components/const/setting_colors.dart';
 
 class DefaultLayout extends StatelessWidget {
   final Widget child;
@@ -11,7 +11,12 @@ class DefaultLayout extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: backgroundColor ?? SettingColors.primaryMeterialColor,
-      body: child,
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: child,
+        ),
+      ),
     );
   }
 }

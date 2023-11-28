@@ -1,4 +1,4 @@
-import 'package:DealConnect/model/user.dart';
+import 'package:Deal_Connect/model/user.dart';
 
 class LoginResponseData {
   final String tokenType;

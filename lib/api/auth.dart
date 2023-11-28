@@ -1,9 +1,9 @@
 import 'dart:convert';
-import 'package:DealConnect/Utils/custom_dialog.dart';
-import 'package:DealConnect/Utils/shared_pref_utils.dart';
-import 'package:DealConnect/api/server_config.dart';
-import 'package:DealConnect/model/response_data.dart';
-import 'package:DealConnect/model/user.dart';
+import 'package:Deal_Connect/Utils/custom_dialog.dart';
+import 'package:Deal_Connect/Utils/shared_pref_utils.dart';
+import 'package:Deal_Connect/api/server_config.dart';
+import 'package:Deal_Connect/model/response_data.dart';
+import 'package:Deal_Connect/model/user.dart';
 import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
 
