@@ -1,6 +1,8 @@
+import 'package:Deal_Connect/api/auth.dart';
 import 'package:Deal_Connect/components/const/setting_colors.dart';
 import 'package:Deal_Connect/components/custom/join_text_form_field.dart';
 import 'package:Deal_Connect/components/layout/default_logo_layout.dart';
+import 'package:Deal_Connect/utils/custom_dialog.dart';
 import 'package:flutter/material.dart';
 
 class JoinIndex extends StatefulWidget {
@@ -28,6 +30,14 @@ class _JoinIndexState extends State<JoinIndex> {
 
   String? selectedTelecom; // 선택된 통신사
   List<String> telecomList = ['선택', 'KT', 'SKT', 'LGT']; // 통신사 목록
+
+  Map joinFormData = {
+    'userName': '',
+    'userID': '',
+    'userpassword': '',
+    'userEmail': '',
+    'userPhone': '',
+  };
 
   String userName = '';
   String userID = '';
@@ -170,7 +180,7 @@ class _JoinIndexState extends State<JoinIndex> {
                   SizedBox(
                     height: 30.0,
                   ),
-                  _formSubmit(formKey: _formKey),
+                  _formSubmit(formKey: _formKey, formData: joinFormData),
                 ],
               ),
             ),
@@ -208,7 +218,7 @@ class _JoinIndexState extends State<JoinIndex> {
       },
       onChanged: (String value) {
         setState(() {
-          userID = value;
+          joinFormData['userID'] = value;
           _isIDValid = false;
         });
       },
@@ -244,12 +254,12 @@ class _JoinIndexState extends State<JoinIndex> {
           return '연속되거나 동일한 문자(4개 이상)의 입력을 제한합니다.';
         }
 
-        userpassword = value; // 비밀번호 저장
+        joinFormData['userpassword'] = value; // 비밀번호 저장
         return null;
       },
       onChanged: (String value) {
         setState(() {
-          userpassword = value;
+          joinFormData['userpassword'] = value;
         });
       },
     );
@@ -266,7 +276,7 @@ class _JoinIndexState extends State<JoinIndex> {
         }
 
         // 비밀번호와 일치하지 않는 경우 에러 메시지 추가
-        if (value != userpassword) {
+        if (value != joinFormData['userpassword']) {
           return '비밀번호를 다시 확인 해주세요.';
         }
 
@@ -274,7 +284,7 @@ class _JoinIndexState extends State<JoinIndex> {
       },
       onChanged: (String value) {
         setState(() {
-          userpassword = value;
+          joinFormData['userpassword'] = value;
         });
       },
     );
@@ -294,7 +304,8 @@ class _JoinIndexState extends State<JoinIndex> {
         return null; // 유효한 경우 null 반환
       },
       onChanged: (String value) {
-        userName = value;
+        joinFormData['userName'] = value;
+        print(joinFormData);
       },
     );
   }
@@ -320,7 +331,7 @@ class _JoinIndexState extends State<JoinIndex> {
         return null; // 유효한 경우 null 반환
       },
       onChanged: (String value) {
-        userPhone = value;
+        joinFormData['userPhone'] = value;
       },
     );
   }
@@ -343,7 +354,7 @@ class _JoinIndexState extends State<JoinIndex> {
         return null; // 유효한 경우 null 반환
       },
       onChanged: (String value) {
-        userEmail = value;
+        joinFormData['userEmail'] = value;
       },
     );
   }
@@ -353,10 +364,12 @@ class _formSubmit extends StatelessWidget {
   const _formSubmit({
     Key? key,
     required GlobalKey<FormState> formKey,
+    required this.formData,
   })  : _formKey = formKey,
         super(key: key);
 
   final GlobalKey<FormState> _formKey;
+  final Map<dynamic, dynamic> formData; // 새로운 필드 추가
 
   @override
   Widget build(BuildContext context) {
@@ -377,6 +390,14 @@ class _formSubmit extends StatelessWidget {
     return TextButton(
       onPressed: () {
         _formKey.currentState!.validate();
+        postRegister(formData).then((value) {
+          if (value.status == 'success') {
+            Navigator.pushNamed(context, '/login');
+          } else {
+            print(value.message);
+            CustomDialog.showServerValidatorErrorMsg(value);
+          }
+        });
       },
       style: baseStyle,
       child: Container(
