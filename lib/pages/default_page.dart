@@ -6,6 +6,8 @@ import 'package:Deal_Connect/pages/profile/profile_index.dart';
 import 'package:Deal_Connect/pages/transaction/transaction_index.dart';
 import 'package:flutter/material.dart';
 
+import 'group/group_index.dart';
+
 class DefaultPage extends StatefulWidget {
   const DefaultPage({Key? key}) : super(key: key);
 
@@ -130,7 +132,8 @@ class _DefaultPageState extends State<DefaultPage> {
   FloatingActionButton _renderFloatingActionButton() {
     return FloatingActionButton(
       onPressed: (){
-        Navigator.push(context, MaterialPageRoute(builder: (context) => ProfileIndex()));
+        Navigator.push(context, MaterialPageRoute(builder: (context)
+        => GroupIndex()));
       },
       backgroundColor: PRIMARY_COLOR,
       child: Icon(
