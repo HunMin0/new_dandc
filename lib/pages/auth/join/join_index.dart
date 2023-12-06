@@ -39,8 +39,6 @@ class _JoinIndexState extends State<JoinIndex> {
     'userPhone': '',
   };
 
-
-
   @override
   void initState() {
     super.initState();
@@ -351,6 +349,7 @@ class _JoinIndexState extends State<JoinIndex> {
       },
       onChanged: (String value) {
         joinFormData['userEmail'] = value;
+
       },
     );
   }
