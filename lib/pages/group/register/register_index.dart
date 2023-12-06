@@ -1,9 +1,17 @@
+import 'dart:io';
+
+import 'package:Deal_Connect/api/group.dart';
 import 'package:Deal_Connect/components/const/setting_colors.dart';
 import 'package:Deal_Connect/components/custom/common_text_form_filed.dart';
 import 'package:Deal_Connect/components/custom/custom_text_form_field.dart';
+import 'package:Deal_Connect/components/custom/input_file_grid.dart';
 import 'package:Deal_Connect/components/layout/default_logo_layout.dart';
+import 'package:Deal_Connect/items/image_picker_item.dart';
+import 'package:Deal_Connect/pages/auth/join/join_index.dart';
+import 'package:Deal_Connect/utils/custom_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
+import 'package:image_picker/image_picker.dart';
 
 class GroupRegisterIndex extends StatefulWidget {
   const GroupRegisterIndex({super.key});
@@ -14,13 +22,23 @@ class GroupRegisterIndex extends StatefulWidget {
 
 class _GroupRegisterIndexState extends State<GroupRegisterIndex> {
   final _formKey = GlobalKey<FormState>();
-
-
+  XFile? _image; //이미지를 담을 변수 선언
   String name = '';
   String description = '';
   List<String> searchKeywords = [];
   String keyword = '';
 
+  final ImagePicker picker = ImagePicker(); //ImagePicker 초기화
+
+  Future getImage(ImageSource imageSource) async {
+    //pickedFile에 ImagePicker로 가져온 이미지가 담긴다.
+    final XFile? pickedFile = await picker.pickImage(source: imageSource);
+    if (pickedFile != null) {
+      setState(() {
+        _image = XFile(pickedFile.path); //가져온 이미지를 _image에 저장
+      });
+    }
+  }
   @override
   void initState() {
     super.initState();
@@ -36,8 +54,6 @@ class _GroupRegisterIndexState extends State<GroupRegisterIndex> {
       ),
       side: BorderSide(color: PRIMARY_COLOR),
     );
-
-    TextEditingController searchController = TextEditingController();
 
 
     final textStyle = TextStyle(
@@ -61,6 +77,20 @@ class _GroupRegisterIndexState extends State<GroupRegisterIndex> {
               //autovalidateMode: AutovalidateMode.onUserInteraction, // 실시간 유효성 검사 모드 설정
               child: Column(
                 children: [
+                  Container(
+                    padding: EdgeInsets.symmetric(vertical: 0, horizontal: 0),
+                    child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          ElevatedButton(
+                            onPressed: () {
+                              getImage(ImageSource.gallery); //getImage 함수를 호출해서 카메라로 찍은 사진 가져오기
+                            },
+                            child: Text("이미지"),
+                          ),
+                        ]
+                    ),
+                  ),
                   Row(
                     children: [
                       Expanded(
@@ -102,7 +132,7 @@ class _GroupRegisterIndexState extends State<GroupRegisterIndex> {
                           },
                           onChanged: (String value) {
                             setState(() {
-                              name = value;
+                              description = value;
                             });
                           },
                         ),
@@ -136,7 +166,6 @@ class _GroupRegisterIndexState extends State<GroupRegisterIndex> {
                               FocusScope.of(context).unfocus(); // 키보드 닫기
                             });
                           }
-
                         },
                         child: Container(
                           width: 48.0,
@@ -162,27 +191,67 @@ class _GroupRegisterIndexState extends State<GroupRegisterIndex> {
                   ),
                   SizedBox(height: 16.0),
                   Container(
-                    height: 200, // Set a fixed height or use MediaQuery to get the screen height.
-                    child: Column(
-                      children: [
-                        Expanded(
-                          child: searchKeywords != null && searchKeywords.isNotEmpty
-                              ? ListView.builder(
-                                  itemCount: searchKeywords.length,
-                                  itemBuilder: (context, index) {
-                                    return ListTile(
-                                      title: Text(searchKeywords[index]),
-                                    );
-                                  },
-                                )
-                              : Center(
-                            child: Text('키워드를 추가해주세요.'),
+                    height: 200,
+                    child: Wrap(
+                      spacing: 3.0, // Chip 간의 간격 조정
+                      runSpacing: 3.0, // Chip이 여러 줄로 나열될 경우 줄 간의 간격 조정
+                      children: searchKeywords != null && searchKeywords.isNotEmpty
+                          ? searchKeywords.map((keyword) {
+                        return Chip(
+                          label: Text(
+                            keyword,
+                            style: TextStyle(fontSize: 12.0), // 폰트 크기 조정
                           ),
-                        )
+                          onDeleted: () {
+                            setState(() {
+                              searchKeywords.remove(keyword);
+                            });
+                          },
+                        );
+                      }).toList()
+                          : [
+                        Text('키워드를 추가해주세요.')
                       ],
                     ),
                   ),
+                  TextButton(
+                    onPressed: () {
+                      Map groupMapData = {
+                        'name': name,
+                        'description': description,
+                        'keywords': searchKeywords,
+                      };
+                      postRegisterGroup(groupMapData).then((value) {
+                        if (value.status == 'success') {
+                            Navigator.pushNamed(context, '/login');
+                        } else {
+                          print(value.message);
+                          CustomDialog.showServerValidatorErrorMsg(value);
+                        }
+                      });
 
+                    },
+                    style: TextButton.styleFrom(
+                      backgroundColor: PRIMARY_COLOR, // 버튼 상태에 따라 색상 조정
+                      padding: EdgeInsets.all(16.0),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                    ),
+                    child: Container(
+                      width: double.infinity,
+                      child: const Center(
+                        child: Text(
+                          '그룹 만들기',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 14.0,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),

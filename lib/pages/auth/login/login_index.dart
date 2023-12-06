@@ -83,7 +83,7 @@ class LoginIndexState extends State<LoginIndex> {
                             ),
                           ),
                         ),
-                        _EmailLogin(context),
+                        _UserIdLogin(context),
                         SizedBox(
                           height: 15.0,
                         ),
@@ -263,12 +263,12 @@ class LoginIndexState extends State<LoginIndex> {
     );
   }
 
-  Container _EmailLogin(BuildContext context) {
+  Container _UserIdLogin(BuildContext context) {
     return Container(
       margin: EdgeInsets.only(top: 20),
       child: TextButton(
         onPressed: () {
-          Navigator.pushNamed(context, '/login/email');
+          Navigator.pushNamed(context, '/login/userId');
         },
         child: Container(
           padding: EdgeInsets.symmetric(
@@ -290,7 +290,7 @@ class LoginIndexState extends State<LoginIndex> {
               ),
               Expanded(
                 child: Text(
-                  '이메일로 로그인',
+                  '아이디 로그인',
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 16,

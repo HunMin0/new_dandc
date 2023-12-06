@@ -209,6 +209,7 @@ class _JoinIndexState extends State<JoinIndex> {
       onChanged: (String value) {
         setState(() {
           userID = value;
+          _isIDValid = false;
         });
       },
     );

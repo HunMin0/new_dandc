@@ -1,7 +1,7 @@
 import 'package:Deal_Connect/components/const/setting_themes.dart';
 import 'package:Deal_Connect/pages/auth/join/join_index.dart';
-import 'package:Deal_Connect/pages/auth/login/email_login.dart';
 import 'package:Deal_Connect/pages/auth/login/login_index.dart';
+import 'package:Deal_Connect/pages/auth/login/user_id_login.dart';
 import 'package:Deal_Connect/pages/auth/terms/terms_index.dart';
 import 'package:Deal_Connect/pages/default_page.dart';
 import 'package:Deal_Connect/pages/intro/intro_index.dart';
@@ -9,6 +9,8 @@ import 'package:Deal_Connect/pages/root_page.dart';
 import 'package:flutter/material.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+
   runApp(const MyApp());
 }
 
@@ -27,7 +29,7 @@ class MyApp extends StatelessWidget {
         '/home': (context) => DefaultPage(),
         '/intro': (context) => IntroIndex(),
         '/login': (context) => LoginIndex(),
-        '/login/email': (context) => EmailLogin(),
+        '/login/userId': (context) => UserIdLogin(),
         '/join': (context) => JoinIndex(),
         '/terms': (context) => TermsIndex(),
       }
