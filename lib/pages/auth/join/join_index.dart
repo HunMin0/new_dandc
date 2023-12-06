@@ -39,11 +39,7 @@ class _JoinIndexState extends State<JoinIndex> {
     'userPhone': '',
   };
 
-  String userName = '';
-  String userID = '';
-  String userpassword = '';
-  String userEmail = '';
-  String userPhone = '';
+
 
   @override
   void initState() {
@@ -57,13 +53,13 @@ class _JoinIndexState extends State<JoinIndex> {
       backgroundColor:
       MaterialStateProperty.all<Color>(
         // 4자 이상인 경우 파란색, 아닌 경우 흰색
-        userID.length >= 4
+        joinFormData['userID'].length >= 4
             ? Colors.blue
             : Colors.white,
       ),
       foregroundColor:
       MaterialStateProperty.all<Color>(
-        userID.length >= 4
+        joinFormData['userID'].length >= 4
             ? Colors.white
             : Colors.black,
       ),
@@ -111,11 +107,11 @@ class _JoinIndexState extends State<JoinIndex> {
                           maxHeight: double.infinity,
                         ),
                         child: FutureBuilder<bool>(
-                          future: checkDuplicate(userID), // 비동기 중복 체크 함수 호출
+                          future: checkDuplicate(joinFormData['userID']), // 비동기 중복 체크 함수 호출
                           builder: (context, snapshot) {
                             return TextButton(
                               onPressed: () async {
-                                bool isDuplicate = await checkDuplicate(userID);
+                                bool isDuplicate = await checkDuplicate(joinFormData['userID']);
                                 // 여기에서 중복 체크 결과를 사용하여 필요한 작업 수행
                                 if (isDuplicate) {
                                   // 중복된 경우의 처리
