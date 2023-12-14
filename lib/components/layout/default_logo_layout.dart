@@ -26,6 +26,7 @@ class DefaultLogoLayout extends StatelessWidget {
         ),
         centerTitle: true,
         elevation: 0,
+        backgroundColor: Colors.white,
       ),
       body: SafeArea(
         child: Padding(

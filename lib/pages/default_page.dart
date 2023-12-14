@@ -48,6 +48,7 @@ class _DefaultPageState extends State<DefaultPage> {
   // AppBar 영역
   AppBar renderAppBar(){
     return AppBar(
+      backgroundColor: Colors.white,
       automaticallyImplyLeading: false, // 뒤로가기 버튼 제거처리
       title: GestureDetector(
         onTap: (){
@@ -129,18 +130,22 @@ class _DefaultPageState extends State<DefaultPage> {
   }
 
   // Floating 액션 버튼
-  FloatingActionButton _renderFloatingActionButton() {
-    return FloatingActionButton(
-      onPressed: (){
-        Navigator.push(context, MaterialPageRoute(builder: (context)
-        => GroupIndex()));
-      },
-      backgroundColor: PRIMARY_COLOR,
-      child: Icon(
-        Icons.add,
-        color: Colors.white,
-      ),
-    );
+   _renderFloatingActionButton() {
+    if(_currentIndex == 0){
+      return FloatingActionButton(
+        onPressed: (){
+          Navigator.push(context, MaterialPageRoute(builder: (context)
+          => GroupIndex()));
+        },
+        backgroundColor: PRIMARY_COLOR,
+        child: Icon(
+          Icons.add,
+          color: Colors.white,
+        ),
+      );
+    } else {
+      return null;
+    }
   }
 }
 

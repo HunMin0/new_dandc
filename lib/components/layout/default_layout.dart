@@ -13,7 +13,7 @@ class DefaultLayout extends StatelessWidget {
       backgroundColor: backgroundColor ?? SettingColors.primaryMeterialColor,
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(20.0),
+          padding: const EdgeInsets.symmetric(horizontal: 12.0,),
           child: child,
         ),
       ),
