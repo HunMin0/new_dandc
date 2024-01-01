@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:Deal_Connect/model/user.dart';
 import 'package:Deal_Connect/Utils/shared_pref_utils.dart';
 import 'package:Deal_Connect/pages/home/components/group_card.dart';
-import 'package:Deal_Connect/pages/home/components/list_card.dart';
+import 'package:Deal_Connect/components/list_card.dart';
 
 // 메인홈
 class HomeIndex extends StatefulWidget {

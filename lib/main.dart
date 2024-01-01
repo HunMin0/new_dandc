@@ -20,19 +20,19 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Deal&Connect', // 디바이스의 작업줄에 표시역할
-      theme: SettingThemes.lightTheme,
-      debugShowCheckedModeBanner: false,
-      initialRoute: '/',
-      routes: {
-        '/': (context) => RootPage(),
-        '/home': (context) => DefaultPage(),
-        '/intro': (context) => IntroIndex(),
-        '/login': (context) => LoginIndex(),
-        '/login/userId': (context) => UserIdLogin(),
-        '/join': (context) => JoinIndex(),
-        '/terms': (context) => TermsIndex(),
-      }
+        title: 'Deal&Connect', // 디바이스의 작업줄에 표시역할
+        theme: SettingThemes.lightTheme,
+        debugShowCheckedModeBanner: false,
+        initialRoute: '/',
+        routes: {
+          '/': (context) => RootPage(),
+          '/home': (context) => DefaultPage(),
+          '/intro': (context) => IntroIndex(),
+          '/login': (context) => LoginIndex(),
+          '/login/userId': (context) => UserIdLogin(),
+          '/join': (context) => JoinIndex(),
+          '/terms': (context) => TermsIndex(),
+        }
     );
   }
 }

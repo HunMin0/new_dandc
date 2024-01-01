@@ -50,6 +50,7 @@ class _DefaultPageState extends State<DefaultPage> {
     return AppBar(
       backgroundColor: Colors.white,
       automaticallyImplyLeading: false, // 뒤로가기 버튼 제거처리
+      scrolledUnderElevation: 0, // 스크롤시 배경색이 강제되는거 해제
       title: GestureDetector(
         onTap: (){
           setState(() {
