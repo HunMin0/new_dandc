@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+// 프로필 사업장등록 카테고리 리스트
+
 final List<Map<String, String>> sectorTypeList = [
   {
     'imagePath' : 'main_sample05',

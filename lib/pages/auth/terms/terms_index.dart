@@ -326,7 +326,7 @@ class _checkType extends StatelessWidget {
         color: termAgreed ? PRIMARY_COLOR : Colors.transparent, // 클릭 시 배경색 변경
       ),
       child: CircleAvatar(
-        backgroundColor: Colors.transparent, // 이 부분 수정
+        backgroundColor: Colors.transparent,
         child: Icon(
           Icons.check,
           size: 16.0,

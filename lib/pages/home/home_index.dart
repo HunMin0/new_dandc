@@ -1,3 +1,5 @@
+import 'package:Deal_Connect/db/group_data.dart';
+import 'package:Deal_Connect/db/vertical_data.dart';
 import 'package:Deal_Connect/pages/business/business_index.dart';
 import 'package:flutter/material.dart';
 import 'package:Deal_Connect/model/user.dart';
@@ -110,37 +112,6 @@ class _HomeIndexState extends State<HomeIndex> {
 class _HorizontalList extends StatelessWidget {
   _HorizontalList ({Key? key}) : super(key: key);
 
-  final List<Map<String, dynamic>> groupDataList = [
-    {
-      'imagePath': 'main_sample01',
-      'title': '서초구 고기집 사장모임',
-      'category': '미식/친목',
-      'memberCount': 37,
-      'link':'#',
-    },
-    {
-      'imagePath': 'main_sample02',
-      'title': '골프여신이 함께해요',
-      'category': '스포츠/레져',
-      'memberCount': 143,
-      'link':'#',
-    },
-    {
-      'imagePath': 'main_sample03',
-      'title': '수학의정석 시즌1',
-      'category': '교육/레슨',
-      'memberCount': 60,
-      'link':'#',
-    },
-    {
-      'imagePath': 'main_sample04',
-      'title': '골프는 자세가 중요해',
-      'category': '공부/학습',
-      'memberCount': 54,
-      'link':'#',
-    },
-  ];
-
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -239,54 +210,6 @@ class _partnerBannerStyle extends StatelessWidget {
 // 회원 세로 리스트
 class _VerticalList extends StatelessWidget {
   _VerticalList({Key? key}) : super(key: key);
-
-  final List<Map<String, dynamic>> verticalDataList = [
-    {
-      'avaterImagePath':'main_sample_avater',
-      'bgImagePath': 'main_sample05',
-      'companyName': '청년 한다발 서초점',
-      'userName': '김훈민',
-      'tagList': ['#서초구', '#당일배달', '#꽃다발'],
-      'newMark': true,
-      'link':'#',
-    },
-    {
-      'avaterImagePath':'main_sample_avater2',
-      'bgImagePath': 'main_sample06',
-      'companyName': '골프여신 내동점',
-      'userName': '임성택',
-      'tagList': ['#사전예약', '#당일레슨', '#하우스'],
-      'newMark': false,
-      'link':'#',
-    },
-    {
-      'avaterImagePath':'main_sample_avater3',
-      'bgImagePath': 'main_sample07',
-      'companyName': '헬스청년 괴정점',
-      'userName': '이규봉',
-      'tagList': ['#1:1', '#개인PT', '#신규환영'],
-      'newMark': false,
-      'link':'#',
-    },
-    {
-      'avaterImagePath':'main_sample_avater2',
-      'bgImagePath': 'main_sample08',
-      'companyName': '청년 한다발 서초점',
-      'userName': '홍길동',
-      'tagList': ['#서초구', '#당일배달', '#꽃다발'],
-      'newMark': false,
-      'link':'#',
-    },
-    {
-      'avaterImagePath':'main_sample_avater',
-      'bgImagePath': 'main_sample09',
-      'companyName': '청년 한다발 서초점',
-      'userName': '홍길순',
-      'tagList': ['#서초구', '#당일배달', '#꽃다발'],
-      'newMark': false,
-      'link':'#',
-    },
-  ];
 
   @override
   Widget build(BuildContext context) {
