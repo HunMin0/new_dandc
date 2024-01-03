@@ -1,3 +1,5 @@
+import 'package:Deal_Connect/pages/profile/company_add/company_add_index.dart';
+import 'package:Deal_Connect/pages/profile/components/tab_list/tabBarButton.dart';
 import 'package:flutter/material.dart';
 
 class NotUserRegistered extends StatelessWidget {
@@ -75,8 +77,10 @@ class NotUserRegistered extends StatelessWidget {
                           Row(
                             children: [
                               Expanded(
-                                child: _TabBarButton(
-                                    btnTitle: '업체 등록하기', onPressed: () {}),
+                                child: TabBarButton(
+                                    btnTitle: '내 업체 등록하기', onPressed: () {
+                                      Navigator.push(context, MaterialPageRoute(builder: (context) => CompanyAddIndex()));
+                                }),
                               ),
                             ],
                           ),
@@ -108,36 +112,6 @@ class NotUserRegistered extends StatelessWidget {
                       )),
           ),
         ),
-      ),
-    );
-  }
-}
-
-class _TabBarButton extends StatelessWidget {
-  final String btnTitle;
-  final VoidCallback onPressed;
-
-  const _TabBarButton({
-    required this.btnTitle,
-    required this.onPressed,
-    super.key,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return ElevatedButton(
-      onPressed: onPressed,
-      child: Text(
-        btnTitle,
-        style: TextStyle(
-            color: Colors.white, fontSize: 14.0, fontWeight: FontWeight.w500),
-      ),
-      style: ElevatedButton.styleFrom(
-        minimumSize: Size(double.infinity, 48),
-        backgroundColor: Color(0xFF75A8E4),
-        foregroundColor: Color(0xFF75A8E4),
-        elevation: 0,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
       ),
     );
   }

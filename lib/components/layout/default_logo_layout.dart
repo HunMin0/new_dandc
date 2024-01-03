@@ -19,7 +19,7 @@ class DefaultLogoLayout extends StatelessWidget {
       backgroundColor: backgroundColor ?? SettingColors.primaryMeterialColor,
       appBar: AppBar(
         title: titleName != null
-            ? Text(titleName!)
+            ? Text(titleName!, style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.w400),)
             : Image.asset(
           'assets/images/logo.png',
           width: 180.0, //MediaQuery.of(context).size.width / 2,

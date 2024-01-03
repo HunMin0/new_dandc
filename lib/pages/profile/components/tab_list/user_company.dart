@@ -1,4 +1,6 @@
 import 'package:Deal_Connect/components/list_card.dart';
+import 'package:Deal_Connect/pages/profile/company_add/company_add_index.dart';
+import 'package:Deal_Connect/pages/profile/components/tab_list/tabBarButton.dart';
 import 'package:flutter/material.dart';
 
 class UserCompany extends StatelessWidget {
@@ -22,26 +24,44 @@ class UserCompany extends StatelessWidget {
           right: 14.0,
         ),
         child: ListView.builder(
-          itemCount: companyDataList.length,
+          itemCount: companyDataList.length +1,
           itemBuilder: (context, index) {
-            Map<String, dynamic> verticalData = companyDataList[index];
+            
+            if (index < companyDataList.length) {
+              Map<String, dynamic> verticalData = companyDataList[index];
 
-            return GestureDetector(
-              onTap: () {
-                print('클릭했다~');
-              },
-              child: ListCard(
-                avaterImagePath: verticalData['avaterImagePath'],
-                bgImagePath: verticalData['bgImagePath'],
-                companyName: verticalData['companyName'],
-                userName: verticalData['userName'],
-                tagList: verticalData['tagList'],
-                newMark: verticalData['newMark'],
-              ),
-            );
+              return GestureDetector(
+                onTap: () {
+                  print('클릭했다~');
+                },
+                child: ListCard(
+                  avaterImagePath: verticalData['avaterImagePath'],
+                  bgImagePath: verticalData['bgImagePath'],
+                  companyName: verticalData['companyName'],
+                  userName: verticalData['userName'],
+                  tagList: verticalData['tagList'],
+                  newMark: verticalData['newMark'],
+                ),
+              );
+            } else {
+              return Padding(
+                padding: const EdgeInsets.only(top: 10.0, bottom: 40.0),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: TabBarButton(
+                          btnTitle: '내 업체 추가하기', onPressed: () {
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => CompanyAddIndex()));
+                      }),
+                    ),
+                  ],
+                ),
+              );
+            }
           },
         ),
       ),
+
     );
   }
 }
