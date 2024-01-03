@@ -11,6 +11,7 @@ class JoinTextFormField extends StatefulWidget {
   final bool autofocus;
   final bool isNumber; // true 숫자 , false 문자포함
   final int? maxLength;
+  final bool? enabled;
   final ValueChanged<String>? onChanged;
   final String? Function(String?)? validator;
 
@@ -21,6 +22,7 @@ class JoinTextFormField extends StatefulWidget {
     this.autofocus = false, // 기본값 false로 설정
     this.obscureText = false, // 기본값 false로 설정
     this.isNumber = false,
+    this.enabled,
     this.hintText,
     this.helperText,
     this.errorText,
@@ -53,6 +55,7 @@ class _JoinTextFormFieldState extends State<JoinTextFormField> {
             ),),
         ),
         TextFormField(
+          enabled: widget.enabled,
           autovalidateMode: AutovalidateMode.onUserInteraction,
           validator: widget.validator,
           cursorColor: PRIMARY_COLOR, // 커서 색상

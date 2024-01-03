@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:Deal_Connect/components/const/setting_colors.dart';
 import 'package:Deal_Connect/components/layout/default_next_layout.dart';
+import 'package:Deal_Connect/pages/profile/company_add/company_add_step_one.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -35,8 +36,26 @@ class _CompanyAddAlbumState extends State<CompanyAddAlbum> {
         Navigator.of(context).popUntil((route) => route.isFirst);
       },
       nextOnPressed: () {
-        Navigator.push(context,
-            MaterialPageRoute(builder: (context) => CompanyAddAlbum()));
+        Navigator.push(
+          context,
+          PageRouteBuilder(
+            pageBuilder: (context, animation, secondaryAnimation) =>
+                CompanyAddStepOne(),
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
+              const begin = Offset(1.0, 0.0);
+              const end = Offset.zero;
+              const curve = Curves.easeInOut;
+
+              var tween =
+              Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+
+              var offsetAnimation = animation.drive(tween);
+
+              return SlideTransition(position: offsetAnimation, child: child);
+            },
+          ),
+        );
       },
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
