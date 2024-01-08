@@ -157,7 +157,14 @@ class _CompanyAddIndexState extends State<CompanyAddIndex> {
                       margin: EdgeInsets.only(bottom: 6.0),
                       width: 70.0,
                       height: 70.0,
-                      child: thumbnailImage,
+                      child:ClipRRect(
+                        borderRadius: BorderRadius.circular(15),
+                        child: SizedBox(
+                          width: 50,
+                          height: 50,
+                          child: thumbnailImage,
+                        ),
+                      ),
                     ),
                     Text(
                       item.name,
