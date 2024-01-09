@@ -31,6 +31,7 @@ class DefaultNextLayout extends StatelessWidget {
     return Scaffold(
       backgroundColor: backgroundColor ?? SettingColors.primaryMeterialColor,
       appBar: AppBar(
+        scrolledUnderElevation: 0,
         title: titleName != null
             ? Text(
                 titleName!,
@@ -129,5 +130,4 @@ class BottomButtons extends StatelessWidget {
     );
   }
 
-  test() {}
 }

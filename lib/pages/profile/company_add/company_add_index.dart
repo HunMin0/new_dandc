@@ -16,7 +16,7 @@ class CompanyAddIndex extends StatefulWidget {
 
 class _CompanyAddIndexState extends State<CompanyAddIndex> {
   int selectedIdx = -1;
-  bool isProcessable = false;
+  bool isProcessable = true; // 작업종료후 false
   String selectedSectorName = "";
   List<Category>? categories;
 

@@ -75,7 +75,9 @@ class _DefaultPageState extends State<DefaultPage> {
         ),
         _AppBarAction(
           imagePath: 'more',
-          onTap: () {},
+          onTap: () {
+            Navigator.of(context).pushReplacementNamed('/');
+          },
         ),
       ],
     );
