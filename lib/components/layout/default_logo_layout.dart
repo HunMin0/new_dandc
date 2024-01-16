@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:Deal_Connect/components/const/setting_colors.dart';
 
@@ -5,11 +7,13 @@ class DefaultLogoLayout extends StatelessWidget {
   final Widget child;
   final Color? backgroundColor;
   final String? titleName;
+  final String? isNotInnerPadding;
 
   const DefaultLogoLayout({
     this.titleName,
     required this.child,
     this.backgroundColor,
+    this.isNotInnerPadding,
 
     Key? key}) : super(key: key);
 
@@ -30,7 +34,7 @@ class DefaultLogoLayout extends StatelessWidget {
       ),
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(20.0),
+          padding: isNotInnerPadding == 'true' ? const EdgeInsets.all(0.0) : const EdgeInsets.all(20.0),
           child: child,
         ),
       ),
