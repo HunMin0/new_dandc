@@ -4,12 +4,16 @@ import 'package:Deal_Connect/components/const/setting_colors.dart';
 // light 테마
 class SettingThemes {
   static ThemeData get lightTheme => ThemeData(
-      fontFamily: 'NotoSans',
-      primarySwatch: SettingColors.primaryMeterialColor, // AppBar와 플롯액션버튼 프라이머리 컬러 지정
-      scaffoldBackgroundColor: Colors.white,
-      // splashColor: Colors.pink, // 픗롯액션버튼 클릭시 색상
-      textTheme: _textTheme,
-      brightness: Brightness.light, // 디폴트는 light , dark 테마
+    useMaterial3: true,
+    fontFamily: 'NotoSans',
+    primarySwatch: SettingColors.primaryMeterialColor, // AppBar와 플롯액션버튼 프라이머리 컬러 지정
+    scaffoldBackgroundColor: Colors.white,
+    // splashColor: Colors.pink, // 픗롯액션버튼 클릭시 색상
+    textTheme: _textTheme,
+    brightness: Brightness.light, // 디폴트는 light , dark 테마
+    colorScheme: ColorScheme.fromSeed(
+      seedColor: Colors.green
+    ),
   );
 
   // dark 테마
