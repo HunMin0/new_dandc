@@ -1,5 +1,6 @@
 import 'package:Deal_Connect/components/custom/join_text_form_field.dart';
 import 'package:Deal_Connect/components/layout/default_next_layout.dart';
+import 'package:Deal_Connect/pages/profile/company_add/company_add_step_three.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -12,9 +13,21 @@ class CompanyAddStepTwo extends StatefulWidget {
 
 class _CompanyAddStepTwoState extends State<CompanyAddStepTwo> {
   bool isProcessable = false;
-  bool hasHoliday = true;
-  // 휴무일
+
+  // 휴무일이 있는지 없는지
+  bool hasHoliday = false;
+
+  // 공휴일 시간이 같은지 다른지
+  bool hasTimeDay = true;
+
+  // 운영시간 데이터
   String closedData = '';
+
+  // 휴무일 추가 입력 데이터
+  String operatingData = '';
+
+  // 공휴일 추가 입력 데이터
+  String weekendData = '';
 
   @override
   Widget build(BuildContext context) {
@@ -37,6 +50,34 @@ class _CompanyAddStepTwoState extends State<CompanyAddStepTwo> {
       backgroundColor: hasHoliday == false ? Color(0xFF75A8E4) : Colors.white,
       side: BorderSide(
         color: hasHoliday == false ? Color(0xFF75A8E4) : Color(0xFFD9D9D9),
+        width: 1.0,
+      ),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10.0),
+      ),
+      fixedSize: Size.fromHeight(50.0),
+      elevation: 0,
+    );
+
+    final hasTimeDayButtonStyle = ElevatedButton.styleFrom(
+      foregroundColor: hasTimeDay == true ? Colors.white : Color(0xFFABABAB),
+      backgroundColor: hasTimeDay == true ? Color(0xFF75A8E4) : Colors.white,
+      side: BorderSide(
+        color: hasTimeDay == true ? Color(0xFF75A8E4) : Color(0xFFD9D9D9),
+        width: 1.0,
+      ),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10.0),
+      ),
+      fixedSize: Size.fromHeight(50.0),
+      elevation: 0,
+    );
+
+    final noHasTimeDayButtonStyle = ElevatedButton.styleFrom(
+      foregroundColor: hasTimeDay == false ? Colors.white : Color(0xFFABABAB),
+      backgroundColor: hasTimeDay == false ? Color(0xFF75A8E4) : Colors.white,
+      side: BorderSide(
+        color: hasTimeDay == false ? Color(0xFF75A8E4) : Color(0xFFD9D9D9),
         width: 1.0,
       ),
       shape: RoundedRectangleBorder(
@@ -92,7 +133,7 @@ class _CompanyAddStepTwoState extends State<CompanyAddStepTwo> {
             context,
             PageRouteBuilder(
               pageBuilder: (context, animation, secondaryAnimation) =>
-                  CompanyAddStepTwo(),
+                  CompanyAddStepThree(),
               transitionsBuilder:
                   (context, animation, secondaryAnimation, child) {
                 const begin = Offset(1.0, 0.0);
@@ -114,15 +155,7 @@ class _CompanyAddStepTwoState extends State<CompanyAddStepTwo> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                // if (hasHoliday == true) {
-                //   '영업시간을 선택해주세요'
-                //   }else {
-                //   '휴무일이 있나요?'
-                //   }
-
-                (hasHoliday == true && closedData != null)
-                    ? '영업시간을 선택해주세요'
-                    : (!hasHoliday ? '영업시간을 선택해주세요' : '휴무일이 있나요?'),
+                closedData.isNotEmpty ? '다음을 눌러 업체등록을 완성해주세요' : '업체운영 사항을 입력해주세요.',
                 style: TextStyle(
                   fontSize: 17.0,
                   fontWeight: FontWeight.w600,
@@ -173,12 +206,11 @@ class _CompanyAddStepTwoState extends State<CompanyAddStepTwo> {
                         label: '휴무일을 입력해주세요',
                         hintText: '예) 공휴일 휴무, 월요일 마다 휴무',
                         onChanged: (String value) {
-                          closedData = value;
+                          operatingData = value;
                         }),
                   SizedBox(
                     height: 10.0,
                   ),
-
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -191,8 +223,8 @@ class _CompanyAddStepTwoState extends State<CompanyAddStepTwo> {
                           Expanded(
                               child: ElevatedButton(
                                   style: closedData.isNotEmpty
-                                  ? clearBottomSheetButtonStyle
-                                  : bottomSheetButtonStyle,
+                                      ? clearBottomSheetButtonStyle
+                                      : bottomSheetButtonStyle,
                                   onPressed: () {
                                     showModalBottomSheet(
                                         backgroundColor: Colors.white,
@@ -200,12 +232,20 @@ class _CompanyAddStepTwoState extends State<CompanyAddStepTwo> {
                                         context: context,
                                         builder: (_) {
                                           return _BuildDateTime(
-                                            onTimeSelected: (DateTime startTime, DateTime endTime){
+                                            onConfirmation: (bool value){
                                               setState(() {
-                                                String formattedStartTime = "${startTime.hour}:${startTime.minute.toString().padLeft(2, '0')}";
-                                                String formattedEndTime = "${endTime.hour}:${endTime.minute.toString().padLeft(2, '0')}";
+                                                isProcessable = value;
+                                              });
+                                            },
+                                            onTimeSelected: (DateTime startTime,
+                                                DateTime endTime) {
+                                              setState(() {
+                                                String formattedStartTime =
+                                                    "${startTime.hour}:${startTime.minute.toString().padLeft(2, '0')}";
+                                                String formattedEndTime =
+                                                    "${endTime.hour}:${endTime.minute.toString().padLeft(2, '0')}";
                                                 closedData =
-                                                '영업시간: $formattedStartTime ~ $formattedEndTime';
+                                                    '영업시간: $formattedStartTime ~ $formattedEndTime';
                                               });
                                             },
                                           );
@@ -216,7 +256,9 @@ class _CompanyAddStepTwoState extends State<CompanyAddStepTwo> {
                                     children: [
                                       Icon(
                                         Icons.access_time,
-                                        color: closedData.isNotEmpty ? Colors.white : Color(0xFF75A8E4),
+                                        color: closedData.isNotEmpty
+                                            ? Colors.white
+                                            : Color(0xFF75A8E4),
                                         size: 20.0,
                                       ),
                                       SizedBox(
@@ -224,65 +266,75 @@ class _CompanyAddStepTwoState extends State<CompanyAddStepTwo> {
                                       ),
                                       Text(
                                         closedData.isNotEmpty
-                                        ? closedData
-                                        : '여기를 눌러서 시간선택',
+                                            ? closedData
+                                            : '여기를 눌러서 시간선택',
                                         style: TextStyle(
                                             fontSize: 13.0,
                                             fontWeight: FontWeight.w700,
-                                            color: closedData.isNotEmpty ? Colors.white : Color(0xFF75A8E4)),
+                                            color: closedData.isNotEmpty
+                                                ? Colors.white
+                                                : Color(0xFF75A8E4)),
                                       ),
                                     ],
                                   ))),
                         ],
                       ),
-                      
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            '주말/공휴일 시간도 동일 한가요?',
-                            style: TextStyle(fontSize: 13.0),
-                          ),
-                          Row(
-                            children: [
-                              Expanded(
-                                  child: ElevatedButton(
-                                      style: hasHolidayButtonStyle,
-                                      onPressed: () {
-                                        setState(() {
-                                          hasHoliday = true;
-                                        });
-                                      },
-                                      child: Text(
-                                        '항상 같아요',
-                                        style: TextStyle(fontSize: 13.0),
-                                      ))),
-                              SizedBox(
-                                width: 10.0,
-                              ),
-                              Expanded(
-                                  child: ElevatedButton(
-                                      style: noHolidayButtonStyle,
-                                      onPressed: () {
-                                        setState(() {
-                                          hasHoliday = false;
-                                        });
-                                      },
-                                      child: Text(
-                                        '다를때가 있어요',
-                                        style: TextStyle(fontSize: 13.0),
-                                      ))),
-                            ],
-                          ),
-                          JoinTextFormField(
-                              label: '휴무일을 입력해주세요',
-                              hintText: '예) 공휴일 휴무, 월요일 마다 휴무',
-                              onChanged: (String value) {
-                                closedData = value;
-                              }),
-                        ],
-                      )
-
+                      if (closedData.isNotEmpty)
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            SizedBox(
+                              height: 15.0,
+                            ),
+                            Text(
+                              '주말/공휴일 시간도 동일 한가요?',
+                            ),
+                            SizedBox(
+                              height: 10.0,
+                            ),
+                            Row(
+                              children: [
+                                Expanded(
+                                    child: ElevatedButton(
+                                        style: hasTimeDayButtonStyle,
+                                        onPressed: () {
+                                          setState(() {
+                                            hasTimeDay = true;
+                                          });
+                                        },
+                                        child: Text(
+                                          '항상 같아요',
+                                          style: TextStyle(fontSize: 13.0),
+                                        ))),
+                                SizedBox(
+                                  width: 10.0,
+                                ),
+                                Expanded(
+                                    child: ElevatedButton(
+                                        style: noHasTimeDayButtonStyle,
+                                        onPressed: () {
+                                          setState(() {
+                                            hasTimeDay = false;
+                                          });
+                                        },
+                                        child: Text(
+                                          '다를때가 있어요',
+                                          style: TextStyle(fontSize: 13.0),
+                                        ))),
+                              ],
+                            ),
+                            SizedBox(
+                              height: 10.0,
+                            ),
+                            if (!hasTimeDay)
+                              JoinTextFormField(
+                                  label: '주말/공휴일 시간을 입력해주세요',
+                                  hintText: '예) 주말 13:00~18:00',
+                                  onChanged: (String value) {
+                                    weekendData = value;
+                                  }),
+                          ],
+                        )
                     ],
                   ),
                 ],
@@ -295,15 +347,13 @@ class _CompanyAddStepTwoState extends State<CompanyAddStepTwo> {
   }
 }
 
-
-
-
-
 class _BuildDateTime extends StatefulWidget {
   final Function(DateTime, DateTime) onTimeSelected;
+  final Function(bool) onConfirmation;
 
   const _BuildDateTime({
     required this.onTimeSelected,
+    required this.onConfirmation,
     Key? key,
   }) : super(key: key);
 
@@ -312,8 +362,10 @@ class _BuildDateTime extends StatefulWidget {
 }
 
 class _BuildDateState extends State<_BuildDateTime> {
-  DateTime initialDateTime1 = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day, 9, 0);
-  DateTime initialDateTime2 = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day, 18, 0);
+  DateTime initialDateTime1 = DateTime(
+      DateTime.now().year, DateTime.now().month, DateTime.now().day, 9, 0);
+  DateTime initialDateTime2 = DateTime(
+      DateTime.now().year, DateTime.now().month, DateTime.now().day, 18, 0);
 
   @override
   Widget build(BuildContext context) {
@@ -324,6 +376,7 @@ class _BuildDateState extends State<_BuildDateTime> {
       minutes: initialDateTime2.minute % 30,
     ));
 
+
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.only(
@@ -333,8 +386,19 @@ class _BuildDateState extends State<_BuildDateTime> {
         ),
         child: Column(
           children: [
-            Text('영업시간 선택', style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.w700,),),
-            Divider(height: 30.0, color: Color(0xFFdddddd),),
+            Text(
+              '영업시간 선택',
+              style: TextStyle(
+                fontSize: 18.0,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            Divider(
+              height: 30.0,
+              color: Color(0xFFdddddd),
+            ),
+
+
             Row(
               children: [
                 Expanded(
@@ -345,7 +409,10 @@ class _BuildDateState extends State<_BuildDateTime> {
                     widget.onTimeSelected(initialDateTime1, initialDateTime2);
                   }),
                 ),
-                Text('~', style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.w700),),
+                Text(
+                  '~',
+                  style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.w700),
+                ),
                 Expanded(
                   child: _buildDatePicker(initialDateTime2, (DateTime newTime) {
                     setState(() {
@@ -358,10 +425,24 @@ class _BuildDateState extends State<_BuildDateTime> {
             ),
             Row(
               children: [
-                Expanded(child: ElevatedButton(onPressed: (){
-                  widget.onTimeSelected(initialDateTime1, initialDateTime2);
-                  Navigator.pop(context);
-                }, child: Text('확인'))),
+                Expanded(
+                    child: ElevatedButton(
+                        onPressed: () {
+                          widget.onTimeSelected(
+                              initialDateTime1, initialDateTime2);
+                          widget.onConfirmation(true);
+                          Navigator.pop(context);
+
+                        },
+                        style: ElevatedButton.styleFrom(
+                          elevation: 0,
+                          padding: EdgeInsets.symmetric(vertical: 12.0),
+                          backgroundColor: Color(0xFF75A8E4),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
+                        ),
+                        child: Text('확인', style: TextStyle(color: Colors.white, fontSize: 14.0),))),
               ],
             ),
           ],
@@ -370,16 +451,18 @@ class _BuildDateState extends State<_BuildDateTime> {
     );
   }
 
-  Widget _buildDatePicker(DateTime initialDateTime, Function(DateTime) onChanged) {
+  Widget _buildDatePicker(
+      DateTime initialDateTime, Function(DateTime) onChanged) {
     return Container(
       height: 200.0,
       child: CupertinoDatePicker(
         mode: CupertinoDatePickerMode.time,
         initialDateTime: initialDateTime,
-        minuteInterval: 30, // 30분 간격
-        use24hFormat: true, // 24시간 형식 사용
+        minuteInterval: 30,
+        // 30분 간격
+        use24hFormat: true,
+        // 24시간 형식 사용
         onDateTimeChanged: onChanged,
-
       ),
     );
   }
