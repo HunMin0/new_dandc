@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 // 프로필 사업장 탭 리스트
 
 final List<Map<String, dynamic>> companyDataList = [
-/*
+
     {
       'avaterImagePath': 'main_sample_avater',
       'bgImagePath': 'main_sample05',
@@ -49,6 +49,6 @@ final List<Map<String, dynamic>> companyDataList = [
       'newMark': false,
       'link': '#',
     },
-    */
+
 
 ];

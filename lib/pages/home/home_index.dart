@@ -1,6 +1,7 @@
 import 'package:Deal_Connect/db/group_data.dart';
 import 'package:Deal_Connect/db/vertical_data.dart';
 import 'package:Deal_Connect/pages/business/business_index.dart';
+import 'package:Deal_Connect/pages/history/history_detail/history_detail_index.dart';
 import 'package:flutter/material.dart';
 import 'package:Deal_Connect/model/user.dart';
 import 'package:Deal_Connect/Utils/shared_pref_utils.dart';
@@ -84,7 +85,7 @@ class _HomeIndexState extends State<HomeIndex> {
         Navigator.push(
           context,
           MaterialPageRoute(
-              builder: (context) => BusinessIndex()), // 배너 클릭 이동화면
+              builder: (context) => HistoryDetailIndex(historyType: "mine")), // 배너 클릭 이동화면
         );
       },
       child: _partnerBannerStyle(waitingCount: 8),

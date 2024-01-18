@@ -75,15 +75,7 @@ class _HistoryTabBarState extends State<HistoryTabBar>
         Expanded(
           child: Container(
             color: Color(0xFFF5F6FA),
-            child: TabBarView(
-              controller: tabController,
-              physics: NeverScrollableScrollPhysics(),
-              children: [
-                HistoryTabList(),
-                HistoryTabList(),
-                HistoryTabList()
-              ],
-            ),
+            child: HistoryTabList(),
           ),
         ),
       ],

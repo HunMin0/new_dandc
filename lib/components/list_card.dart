@@ -62,7 +62,7 @@ class ListCard extends StatelessWidget {
                   Row(
                     children: [
                       Text(
-                        companyName,
+                        userName,
                         style: TextStyle(
                             fontWeight: FontWeight.w500, fontSize: 16.0),
                       ),
@@ -77,14 +77,13 @@ class ListCard extends StatelessWidget {
                         ),
                     ],
                   ),
-                  _cardTag('거래내역'),
                 ],
               ),
               SizedBox(
                 height: 4.0,
               ),
               Text(
-                userName,
+                companyName,
                 style: TextStyle(
                     fontWeight: FontWeight.w500,
                     fontSize: 14.0,

@@ -3,6 +3,8 @@ import 'package:Deal_Connect/pages/business/business_index.dart';
 import 'package:Deal_Connect/pages/history/history_index.dart';
 import 'package:Deal_Connect/pages/home/home_index.dart';
 import 'package:Deal_Connect/pages/profile/profile_index.dart';
+import 'package:Deal_Connect/pages/search/search_index.dart';
+import 'package:Deal_Connect/pages/search/search_partner_list.dart';
 import 'package:Deal_Connect/pages/transaction/transaction_index.dart';
 import 'package:flutter/material.dart';
 
@@ -67,7 +69,9 @@ class _DefaultPageState extends State<DefaultPage> {
       actions: [
         _AppBarAction(
           imagePath: 'search',
-          onTap: () {},
+          onTap: () {
+            Navigator.push(context, MaterialPageRoute(builder: (context) => SearchIndex()));
+          },
         ),
         _AppBarAction(
           imagePath: 'alarm',
