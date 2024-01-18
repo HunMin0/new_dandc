@@ -80,7 +80,11 @@ class IntroIndex extends StatelessWidget {
               width: MediaQuery.of(context).size.width,
               height: 50,
               child: ElevatedButton(
-                style: ElevatedButton.styleFrom(primary: HexColor('#75a8e4')),
+                style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF75a8e4),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(40.0),
+                    )),
                 onPressed: () {
                   CustomDialog.showProgressDialog(context);
                   SharedPrefUtils.clearAccessToken().then((value) {
@@ -144,5 +148,4 @@ class IntroIndex extends StatelessWidget {
       ),
     );
   }
-
 }

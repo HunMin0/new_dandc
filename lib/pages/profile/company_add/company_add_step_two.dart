@@ -155,7 +155,9 @@ class _CompanyAddStepTwoState extends State<CompanyAddStepTwo> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                closedData.isNotEmpty ? '다음을 눌러 업체등록을 완성해주세요' : '업체운영 사항을 입력해주세요.',
+                closedData.isNotEmpty
+                    ? '다음을 눌러 업체등록을 완성해주세요'
+                    : '업체운영 사항을 입력해주세요.',
                 style: TextStyle(
                   fontSize: 17.0,
                   fontWeight: FontWeight.w600,
@@ -211,138 +213,150 @@ class _CompanyAddStepTwoState extends State<CompanyAddStepTwo> {
                   SizedBox(
                     height: 10.0,
                   ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 10.0),
-                        child: Text('영업시간을 선택해주세요'),
-                      ),
-                      Row(
-                        children: [
-                          Expanded(
-                              child: ElevatedButton(
-                                  style: closedData.isNotEmpty
-                                      ? clearBottomSheetButtonStyle
-                                      : bottomSheetButtonStyle,
-                                  onPressed: () {
-                                    showModalBottomSheet(
-                                        backgroundColor: Colors.white,
-                                        showDragHandle: true,
-                                        context: context,
-                                        builder: (_) {
-                                          return _BuildDateTime(
-                                            onConfirmation: (bool value){
-                                              setState(() {
-                                                isProcessable = value;
-                                              });
-                                            },
-                                            onTimeSelected: (DateTime startTime,
-                                                DateTime endTime) {
-                                              setState(() {
-                                                String formattedStartTime =
-                                                    "${startTime.hour}:${startTime.minute.toString().padLeft(2, '0')}";
-                                                String formattedEndTime =
-                                                    "${endTime.hour}:${endTime.minute.toString().padLeft(2, '0')}";
-                                                closedData =
-                                                    '영업시간: $formattedStartTime ~ $formattedEndTime';
-                                              });
-                                            },
-                                          );
-                                        });
-                                  },
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Icon(
-                                        Icons.access_time,
-                                        color: closedData.isNotEmpty
-                                            ? Colors.white
-                                            : Color(0xFF75A8E4),
-                                        size: 20.0,
-                                      ),
-                                      SizedBox(
-                                        width: 8.0,
-                                      ),
-                                      Text(
-                                        closedData.isNotEmpty
-                                            ? closedData
-                                            : '여기를 눌러서 시간선택',
-                                        style: TextStyle(
-                                            fontSize: 13.0,
-                                            fontWeight: FontWeight.w700,
-                                            color: closedData.isNotEmpty
-                                                ? Colors.white
-                                                : Color(0xFF75A8E4)),
-                                      ),
-                                    ],
-                                  ))),
-                        ],
-                      ),
-                      if (closedData.isNotEmpty)
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            SizedBox(
-                              height: 15.0,
-                            ),
-                            Text(
-                              '주말/공휴일 시간도 동일 한가요?',
-                            ),
-                            SizedBox(
-                              height: 10.0,
-                            ),
-                            Row(
-                              children: [
-                                Expanded(
-                                    child: ElevatedButton(
-                                        style: hasTimeDayButtonStyle,
-                                        onPressed: () {
-                                          setState(() {
-                                            hasTimeDay = true;
-                                          });
-                                        },
-                                        child: Text(
-                                          '항상 같아요',
-                                          style: TextStyle(fontSize: 13.0),
-                                        ))),
-                                SizedBox(
-                                  width: 10.0,
-                                ),
-                                Expanded(
-                                    child: ElevatedButton(
-                                        style: noHasTimeDayButtonStyle,
-                                        onPressed: () {
-                                          setState(() {
-                                            hasTimeDay = false;
-                                          });
-                                        },
-                                        child: Text(
-                                          '다를때가 있어요',
-                                          style: TextStyle(fontSize: 13.0),
-                                        ))),
-                              ],
-                            ),
-                            SizedBox(
-                              height: 10.0,
-                            ),
-                            if (!hasTimeDay)
-                              JoinTextFormField(
-                                  label: '주말/공휴일 시간을 입력해주세요',
-                                  hintText: '예) 주말 13:00~18:00',
-                                  onChanged: (String value) {
-                                    weekendData = value;
-                                  }),
-                          ],
-                        )
-                    ],
-                  ),
+                  _buildCompanyTime(
+                      clearBottomSheetButtonStyle,
+                      bottomSheetButtonStyle,
+                      context,
+                      hasTimeDayButtonStyle,
+                      noHasTimeDayButtonStyle),
                 ],
               ),
             ],
           ),
         ),
       ),
+    );
+  }
+
+  Column _buildCompanyTime(
+      ButtonStyle clearBottomSheetButtonStyle,
+      ButtonStyle bottomSheetButtonStyle,
+      BuildContext context,
+      ButtonStyle hasTimeDayButtonStyle,
+      ButtonStyle noHasTimeDayButtonStyle) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 10.0),
+          child: Text('영업시간을 선택해주세요'),
+        ),
+        Row(
+          children: [
+            Expanded(
+                child: ElevatedButton(
+                    style: closedData.isNotEmpty
+                        ? clearBottomSheetButtonStyle
+                        : bottomSheetButtonStyle,
+                    onPressed: () {
+                      showModalBottomSheet(
+                          backgroundColor: Colors.white,
+                          showDragHandle: true,
+                          context: context,
+                          builder: (_) {
+                            return _BuildDateTime(
+                              onConfirmation: (bool value) {
+                                setState(() {
+                                  isProcessable = value;
+                                });
+                              },
+                              onTimeSelected:
+                                  (DateTime startTime, DateTime endTime) {
+                                setState(() {
+                                  String formattedStartTime =
+                                      "${startTime.hour}:${startTime.minute.toString().padLeft(2, '0')}";
+                                  String formattedEndTime =
+                                      "${endTime.hour}:${endTime.minute.toString().padLeft(2, '0')}";
+                                  closedData =
+                                      '영업시간: $formattedStartTime ~ $formattedEndTime';
+                                });
+                              },
+                            );
+                          });
+                    },
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.access_time,
+                          color: closedData.isNotEmpty
+                              ? Colors.white
+                              : Color(0xFF75A8E4),
+                          size: 20.0,
+                        ),
+                        SizedBox(
+                          width: 8.0,
+                        ),
+                        Text(
+                          closedData.isNotEmpty ? closedData : '여기를 눌러서 시간선택',
+                          style: TextStyle(
+                              fontSize: 13.0,
+                              fontWeight: FontWeight.w700,
+                              color: closedData.isNotEmpty
+                                  ? Colors.white
+                                  : Color(0xFF75A8E4)),
+                        ),
+                      ],
+                    ))),
+          ],
+        ),
+        if (closedData.isNotEmpty)
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(
+                height: 15.0,
+              ),
+              Text(
+                '주말/공휴일 시간도 동일 한가요?',
+              ),
+              SizedBox(
+                height: 10.0,
+              ),
+              Row(
+                children: [
+                  Expanded(
+                      child: ElevatedButton(
+                          style: hasTimeDayButtonStyle,
+                          onPressed: () {
+                            setState(() {
+                              hasTimeDay = true;
+                            });
+                          },
+                          child: Text(
+                            '항상 같아요',
+                            style: TextStyle(fontSize: 13.0),
+                          ))),
+                  SizedBox(
+                    width: 10.0,
+                  ),
+                  Expanded(
+                      child: ElevatedButton(
+                          style: noHasTimeDayButtonStyle,
+                          onPressed: () {
+                            setState(() {
+                              hasTimeDay = false;
+                            });
+                          },
+                          child: Text(
+                            '다를때가 있어요',
+                            style: TextStyle(fontSize: 13.0),
+                          ))),
+                ],
+              ),
+              SizedBox(
+                height: 10.0,
+              ),
+              if (!hasTimeDay)
+                JoinTextFormField(
+                    label: '주말/공휴일 시간을 입력해주세요',
+                    hintText: '예) 주말 13:00~18:00',
+                    onChanged: (String value) {
+                      weekendData = value;
+                    }),
+            ],
+          )
+      ],
     );
   }
 }
@@ -376,7 +390,6 @@ class _BuildDateState extends State<_BuildDateTime> {
       minutes: initialDateTime2.minute % 30,
     ));
 
-
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.only(
@@ -397,8 +410,6 @@ class _BuildDateState extends State<_BuildDateTime> {
               height: 30.0,
               color: Color(0xFFdddddd),
             ),
-
-
             Row(
               children: [
                 Expanded(
@@ -432,7 +443,6 @@ class _BuildDateState extends State<_BuildDateTime> {
                               initialDateTime1, initialDateTime2);
                           widget.onConfirmation(true);
                           Navigator.pop(context);
-
                         },
                         style: ElevatedButton.styleFrom(
                           elevation: 0,
@@ -442,7 +452,10 @@ class _BuildDateState extends State<_BuildDateTime> {
                             borderRadius: BorderRadius.circular(8.0),
                           ),
                         ),
-                        child: Text('확인', style: TextStyle(color: Colors.white, fontSize: 14.0),))),
+                        child: Text(
+                          '확인',
+                          style: TextStyle(color: Colors.white, fontSize: 14.0),
+                        ))),
               ],
             ),
           ],

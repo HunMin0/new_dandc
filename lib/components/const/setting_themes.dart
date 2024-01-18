@@ -11,6 +11,7 @@ class SettingThemes {
     // splashColor: Colors.pink, // 픗롯액션버튼 클릭시 색상
     textTheme: _textTheme,
     brightness: Brightness.light, // 디폴트는 light , dark 테마
+
   );
 
   // dark 테마
