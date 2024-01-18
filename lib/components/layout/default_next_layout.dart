@@ -6,6 +6,7 @@ class DefaultNextLayout extends StatelessWidget {
   final Color? backgroundColor;
   final String? titleName;
 
+  final bool isCancel;
   final bool bottomBar;
   final bool isProcessable;
   final String? nextTitle;
@@ -23,6 +24,7 @@ class DefaultNextLayout extends StatelessWidget {
       this.nextTitle,
       this.prevOnPressed,
       this.nextOnPressed,
+      this.isCancel = true, // 기본값 true로 설정
       Key? key})
       : super(key: key);
 
@@ -53,6 +55,7 @@ class DefaultNextLayout extends StatelessWidget {
       ),
       bottomNavigationBar: bottomBar
           ? BottomButtons(
+              isCancel: isCancel,
               isProcessable: isProcessable!,
               nextOnPressed: nextOnPressed!,
               prevOnPressed: prevOnPressed!,
@@ -70,6 +73,7 @@ class BottomButtons extends StatelessWidget {
   final String prevTitle;
   final VoidCallback? nextOnPressed;
   final VoidCallback prevOnPressed;
+  final bool isCancel;
 
   const BottomButtons(
       {required this.nextOnPressed,
@@ -77,6 +81,7 @@ class BottomButtons extends StatelessWidget {
       required this.nextTitle,
       required this.prevTitle,
       required this.isProcessable,
+        required this.isCancel,
       super.key});
 
   @override
@@ -104,6 +109,7 @@ class BottomButtons extends StatelessWidget {
           padding: EdgeInsets.all(16.0),
           child: Row(
             children: [
+              if(isCancel)
               ElevatedButton(
                 style: boxStyle,
                 onPressed: prevOnPressed,
@@ -112,15 +118,22 @@ class BottomButtons extends StatelessWidget {
                   style: textStyle,
                 ),
               ),
+              if(isCancel)
               SizedBox(
                 width: 10.0,
               ),
               Expanded(
                 child: ElevatedButton(
-                  style: isProcessable ? boxStyle.copyWith(backgroundColor: MaterialStateProperty.all(Color(0xFF75A8E4)))
-                  : boxDisble,
+                  style: isProcessable
+                      ? boxStyle.copyWith(
+                          backgroundColor:
+                              MaterialStateProperty.all(Color(0xFF75A8E4)))
+                      : boxDisble,
                   onPressed: isProcessable ? nextOnPressed : null,
-                  child: Text(nextTitle, style: textStyle.copyWith(color: Colors.white),),
+                  child: Text(
+                    nextTitle,
+                    style: textStyle.copyWith(color: Colors.white),
+                  ),
                 ),
               ),
             ],
@@ -129,5 +142,4 @@ class BottomButtons extends StatelessWidget {
       ],
     );
   }
-
 }

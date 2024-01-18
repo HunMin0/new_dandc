@@ -11,6 +11,7 @@ class CompanyAddStepThree extends StatefulWidget {
 }
 
 class _CompanyAddStepThreeState extends State<CompanyAddStepThree> {
+  bool isProcessable = true;
   final GlobalKey<FormState> _companyFormKey = GlobalKey<FormState>();
   List<String> keywords = List.filled(3, '');
   bool isHomepage = false;
@@ -24,8 +25,20 @@ class _CompanyAddStepThreeState extends State<CompanyAddStepThree> {
       },
       child: DefaultNextLayout(
         titleName: '업체등록',
-        isProcessable: false,
-        bottomBar: false,
+        isProcessable: isProcessable,
+        bottomBar: true,
+        isCancel: false,
+        prevTitle: '취소',
+        nextTitle: '등록 완료하기',
+        prevOnPressed: () {},
+        nextOnPressed: () {
+          if (_companyFormKey.currentState!.validate()) {
+            // 유효한 경우 실행할 코드 추가
+
+            _showCompleteDialog(context);
+          }
+        },
+
         child: Column(
           children: [
             Expanded(
@@ -53,38 +66,7 @@ class _CompanyAddStepThreeState extends State<CompanyAddStepThree> {
                 ),
               ),
             ),
-            Row(
-              children: [
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: () {
-                      if (_companyFormKey.currentState!.validate()) {
-                        // 유효한 경우 실행할 코드 추가
 
-                        _showCompleteDialog(context);
-                      }
-                      //Navigator.of(context).popUntil((route) => route.isFirst);
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Color(0xFF75A8E4),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8.0)),
-                      elevation: 0,
-                      padding: EdgeInsets.symmetric(
-                          vertical: 16.0, horizontal: 40.0),
-                    ),
-                    child: Text(
-                      '등록 완료하기',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 14.0,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
           ],
         ),
       ),
@@ -280,80 +262,92 @@ void _showKeyWordsDialog(BuildContext context) {
             ),
           ],
         ),
-        content: Column(
-          children: [
-            Text(
-              '업체 검색시에 사용되며 내 업체를 쉽게\n표현 할 수 있는 형식이예요!\n아래와 같이 표시가 되며 키워드 등록은\n필수 입니다!',
-              textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 14.0),
-            ),
-            SizedBox(
-              height: 10.0,
-            ),
-            Text(
-              '예) 서초구, 당일배달, 꽃배달',
-              style: TextStyle(color: Color(0xFFABABAB)),
-            ),
-            SizedBox(
-              height: 12.0,
-            ),
-            Container(
-              decoration: BoxDecoration(
-                border: Border.all(
-                  width: 1.0,
-                  color: Colors.black,
-                ),
-                borderRadius: BorderRadius.circular(8.0),
+        content: Container(
+          height: 415.0,
+          child: Column(
+            children: [
+              Text(
+                '업체 검색시에 사용되며 내 업체를 쉽게\n표현 할 수 있는 형식이예요!\n아래와 같이 표시가 되며 키워드 등록은\n필수 입니다!',
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 13.0),
               ),
-              child: Column(
-                children: [
-                  Stack(
-                    //overflow: Overflow.visible,
-                    clipBehavior: Clip.none,
-                    children: [
-                      Container(
-                        width: 170,
-                        height: 170,
-                        decoration: BoxDecoration(
-                          image: DecorationImage(
-                            image: AssetImage(
-                                'assets/images/sample/main_sample05.jpg'),
-                            fit: BoxFit.cover,
-                          ),
-                          borderRadius: BorderRadius.circular(10.0),
-                        ),
-                      ),
-                      Positioned(
-                        right: -8.0,
-                        bottom: -25.0,
-                        child: Container(
+              SizedBox(
+                height: 10.0,
+              ),
+              Text(
+                '예) 서초구, 당일배달, 꽃배달',
+                style: TextStyle(color: Color(0xFFABABAB), fontSize: 13.0, fontWeight: FontWeight.w700,),
+              ),
+              SizedBox(
+                height: 12.0,
+              ),
+              Container(
+                width: 220.0,
+                padding: EdgeInsets.symmetric(vertical: 20.0),
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    width: 1.0,
+                    color: Color(0xffD9D9D9),
+                  ),
+                  borderRadius: BorderRadius.circular(14.0),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Stack(
+                      //overflow: Overflow.visible,
+                      clipBehavior: Clip.none,
+                      children: [
+                        Container(
+                          width: 170,
+                          height: 170,
                           decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: Colors.white,
-                              width: 3.0,
+                            image: DecorationImage(
+                              image: AssetImage(
+                                  'assets/images/sample/main_sample05.jpg'),
+                              fit: BoxFit.cover,
+                            ),
+                            borderRadius: BorderRadius.circular(10.0),
+                          ),
+                        ),
+                        Positioned(
+                          right: -8.0,
+                          bottom: -20.0,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: Colors.white,
+                                width: 3.0,
+                              ),
+                            ),
+                            child: CircleAvatar(
+                              radius: 34.0,
+                              backgroundImage: AssetImage(
+                                  'assets/images/sample/main_sample_avater.jpg'),
                             ),
                           ),
-                          child: CircleAvatar(
-                            radius: 34.0,
-                            backgroundImage: AssetImage(
-                                'assets/images/sample/main_sample_avater.jpg'),
-                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      _buildKeyText(text: '#서초구'),
-                      _buildKeyText(text: '#당일배달'),
-                      _buildKeyText(text: '#꽃배달'),
-                    ],
-                  ),
-                ],
+                      ],
+                    ),
+                    SizedBox(height: 25.0,),
+                    Text('청년 한다발 서초점'),
+                    SizedBox(height: 10.0,),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        _buildKeyText(text: '#서초구'),
+                        SizedBox(width: 5.0,),
+                        _buildKeyText(text: '#당일배달'),
+                        SizedBox(width: 5.0,),
+                        _buildKeyText(text: '#꽃배달'),
+                      ],
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
         actions: [
           Row(
