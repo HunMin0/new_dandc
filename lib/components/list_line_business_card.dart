@@ -48,16 +48,26 @@ class ListLineBusinessCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text(
-            companyName,
-            style: TextStyle(
+          Text(companyName,
+              style: TextStyle(
                 fontWeight: FontWeight.w500,
                 fontSize: 16.0,
-            )
+              )),
+          SizedBox(
+            height: 5,
           ),
-          SizedBox(height: 5,),
-          Text("주소 자리입니다.", style: TextStyle(fontSize: 13, color: HexColor("#AAAAAA")), overflow: TextOverflow.ellipsis,),
-          SizedBox(height: 10,),
+          Text(
+            "주소 자리입니다.",
+            style: TextStyle(
+              fontWeight: FontWeight.w500,
+              fontSize: 14.0,
+              color: Color(0xFF8c8c8c),
+            ),
+            overflow: TextOverflow.ellipsis,
+          ),
+          SizedBox(
+            height: 10,
+          ),
           Row(
             children: [
               _buildTags(tagList),

@@ -35,7 +35,7 @@ class ListBusinessCard extends StatelessWidget {
             ),
             SizedBox(height: 5,),
             Text(companyName, style: TextStyle(fontWeight: FontWeight.bold), overflow: TextOverflow.ellipsis,),
-            SizedBox(height: 5,),
+            SizedBox(height: 10,),
             SingleChildScrollView(
               scrollDirection: Axis.horizontal, // 가로 스크롤
               child: _buildTags(tagList),

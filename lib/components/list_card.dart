@@ -53,51 +53,40 @@ class ListCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          Row(
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [
-                      Text(
-                        userName,
-                        style: TextStyle(
-                            fontWeight: FontWeight.w500, fontSize: 16.0),
-                      ),
-                      SizedBox(
-                        width: 2.0,
-                      ),
-                      if (newMark)
-                        Icon(
-                          Icons.check_circle,
-                          color: Color(0xFF75a8e4),
-                          size: 15.0,
-                        ),
-                    ],
-                  ),
-                ],
+              Text(
+                userName,
+                style: TextStyle(
+                    fontWeight: FontWeight.w500, fontSize: 16.0),
               ),
               SizedBox(
-                height: 4.0,
+                width: 2.0,
               ),
-              Text(
-                companyName,
-                style: TextStyle(
-                    fontWeight: FontWeight.w500,
-                    fontSize: 14.0,
-                    color: Color(0xFF8c8c8c)),
-              ),
+              if (newMark)
+                Icon(
+                  Icons.check_circle,
+                  color: Color(0xFF75a8e4),
+                  size: 15.0,
+                ),
             ],
           ),
           SizedBox(
             height: 5.0,
           ),
-          Row(
-            children: [
-              _buildTags(tagList),
-            ],
+          Text(
+            companyName,
+            style: TextStyle(
+                fontWeight: FontWeight.w500,
+                fontSize: 14.0,
+                color: Color(0xFF8c8c8c)),
+          ),
+          SizedBox(
+            height: 10.0,
+          ),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal, // 가로 스크롤
+            child: _buildTags(tagList),
           ),
         ],
       ),
