@@ -1,20 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:hexcolor/hexcolor.dart';
 
-class ListCard extends StatelessWidget {
+class ListLineBusinessCard extends StatelessWidget {
   final String bgImagePath;
-  final String avaterImagePath;
   final String companyName;
-  final String userName;
   final List<String> tagList;
-  final bool newMark;
 
-  const ListCard(
+  const ListLineBusinessCard(
       {required this.bgImagePath,
-      required this.avaterImagePath,
       required this.companyName,
-      required this.userName,
       required this.tagList,
-      required this.newMark,
       Key? key})
       : super(key: key);
 
@@ -53,47 +48,16 @@ class ListCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [
-                      Text(
-                        userName,
-                        style: TextStyle(
-                            fontWeight: FontWeight.w500, fontSize: 16.0),
-                      ),
-                      SizedBox(
-                        width: 2.0,
-                      ),
-                      if (newMark)
-                        Icon(
-                          Icons.check_circle,
-                          color: Color(0xFF75a8e4),
-                          size: 15.0,
-                        ),
-                    ],
-                  ),
-                ],
-              ),
-              SizedBox(
-                height: 4.0,
-              ),
-              Text(
-                companyName,
-                style: TextStyle(
-                    fontWeight: FontWeight.w500,
-                    fontSize: 14.0,
-                    color: Color(0xFF8c8c8c)),
-              ),
-            ],
+          Text(
+            companyName,
+            style: TextStyle(
+                fontWeight: FontWeight.w500,
+                fontSize: 16.0,
+            )
           ),
-          SizedBox(
-            height: 5.0,
-          ),
+          SizedBox(height: 5,),
+          Text("주소 자리입니다.", style: TextStyle(fontSize: 13, color: HexColor("#AAAAAA")), overflow: TextOverflow.ellipsis,),
+          SizedBox(height: 10,),
           Row(
             children: [
               _buildTags(tagList),
@@ -118,24 +82,6 @@ class ListCard extends StatelessWidget {
               fit: BoxFit.cover,
             ),
             borderRadius: BorderRadius.circular(10.0),
-          ),
-        ),
-        Positioned(
-          right: -8.0,
-          bottom: -8.0,
-          child: Container(
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(
-                color: Colors.white,
-                width: 2.0,
-              ),
-            ),
-            child: CircleAvatar(
-              radius: 18.0,
-              backgroundImage:
-                  AssetImage('assets/images/sample/${avaterImagePath}.jpg'),
-            ),
           ),
         ),
       ],

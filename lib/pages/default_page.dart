@@ -35,13 +35,15 @@ class _DefaultPageState extends State<DefaultPage> {
         top: false, // safearea까지 먹힌 색을 top은 미적용 처리
         child: Scaffold(
           appBar: renderAppBar(),
-          floatingActionButton: _renderFloatingActionButton(),
-          floatingActionButtonLocation: FloatingActionButtonLocation.endFloat, // floatingAction위치
+          //floatingActionButton: _renderFloatingActionButton(),
+          //floatingActionButtonLocation: FloatingActionButtonLocation.endFloat, // floatingAction위치
           body: Padding(
             padding: const EdgeInsets.symmetric(vertical: 10.0),
             child: _pages[_currentIndex],
           ),
-          bottomNavigationBar: renderBottomNavigationBar(),
+          bottomNavigationBar: Padding(
+              padding: EdgeInsets.only(bottom: 10),
+              child: renderBottomNavigationBar()),
         ),
       ),
     );
@@ -91,7 +93,7 @@ class _DefaultPageState extends State<DefaultPage> {
   BottomNavigationBar renderBottomNavigationBar(){
     final textStyle = TextStyle(
       fontWeight: FontWeight.bold,
-      fontSize: 12.0,
+      fontSize: 13.0,
     );
 
     return BottomNavigationBar(
@@ -123,14 +125,18 @@ class _DefaultPageState extends State<DefaultPage> {
   // bottom 네비게이션 상태변화
   BottomNavigationBarItem _buildBottomItem(String imagePath, String label, int index) {
     return BottomNavigationBarItem(
-      icon: _currentIndex == index
-          ? ImageIcon(
-        AssetImage('assets/images/icons/$imagePath'+'_over.png'),
-        size: 20.0,
-      )
-          : ImageIcon(
-        AssetImage('assets/images/icons/$imagePath.png'),
-        size: 20.0,
+      icon: Container(
+        height: 30,
+        padding: EdgeInsets.only(bottom: 5),
+        child: _currentIndex == index
+            ? ImageIcon(
+          AssetImage('assets/images/icons/$imagePath'+'_over.png'),
+          size: 22.0,
+        )
+            : ImageIcon(
+          AssetImage('assets/images/icons/$imagePath.png'),
+          size: 22.0,
+        ),
       ),
       label: label,
     );

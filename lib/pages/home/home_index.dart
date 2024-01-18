@@ -132,7 +132,7 @@ class _HorizontalList extends StatelessWidget {
               child: GroupCard(
                 imagePath: groupData['imagePath'],
                 title: groupData['title'],
-                category: groupData['category'],
+                //category: groupData['category'],
                 memberCount: groupData['memberCount'],
               ),
             );

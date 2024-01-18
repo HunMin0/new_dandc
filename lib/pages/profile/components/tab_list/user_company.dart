@@ -1,4 +1,5 @@
 import 'package:Deal_Connect/components/list_card.dart';
+import 'package:Deal_Connect/components/list_line_business_card.dart';
 import 'package:Deal_Connect/pages/profile/company_add/company_add_index.dart';
 import 'package:Deal_Connect/pages/profile/components/tab_list/tabBarButton.dart';
 import 'package:flutter/material.dart';
@@ -34,13 +35,10 @@ class UserCompany extends StatelessWidget {
                 onTap: () {
                   print('클릭했다~');
                 },
-                child: ListCard(
-                  avaterImagePath: verticalData['avaterImagePath'],
+                child: ListLineBusinessCard(
                   bgImagePath: verticalData['bgImagePath'],
                   companyName: verticalData['companyName'],
-                  userName: verticalData['userName'],
                   tagList: verticalData['tagList'],
-                  newMark: verticalData['newMark'],
                 ),
               );
             } else {

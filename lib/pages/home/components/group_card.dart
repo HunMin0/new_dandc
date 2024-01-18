@@ -4,11 +4,9 @@ class GroupCard extends StatefulWidget {
   final String imagePath;
   final String title;
   final int memberCount;
-  final String category;
 
   const GroupCard({
     required this.imagePath,
-    required this.category,
     required this.title,
     required this.memberCount,
     Key? key})
@@ -104,51 +102,51 @@ class _GroupCardState extends State<GroupCard> {
                 fontSize: 12.0,
               ),
             ),
-            Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 3.0),
-              child: Text(
-                '·',
-                style: textStyle.copyWith(
-                  fontSize: 12.0,
-                ),
-              ),
-            ),
-            Text(
-              widget.category,
-              style: textStyle.copyWith(
-                fontSize: 12.0,
-                color: Color(0xFF6793c8),
-              ),
-            ),
+            // Padding(
+            //   padding:
+            //       const EdgeInsets.symmetric(horizontal: 3.0),
+            //   child: Text(
+            //     '·',
+            //     style: textStyle.copyWith(
+            //       fontSize: 12.0,
+            //     ),
+            //   ),
+            // ),
+            // Text(
+            //   widget.category,
+            //   style: textStyle.copyWith(
+            //     fontSize: 12.0,
+            //     color: Color(0xFF6793c8),
+            //   ),
+            // ),
           ],
         ),
-        Row(
-          children: [
-            Container(
-              width: 20.0,
-              height: 20.0,
-              child: IconButton(
-                iconSize: 18.0,
-                padding: EdgeInsets.all(0.0),
-                icon: isFavorite
-                    ? Icon(
-                        Icons.favorite,
-                        color: Color(0xFF6793c8),
-                      )
-                    : Icon(
-                        Icons.favorite_border,
-                        color: Colors.white,
-                      ),
-                onPressed: () {
-                  setState(() {
-                    toggleFavorite();
-                  });
-                },
-              ),
-            ),
-          ],
-        ),
+        // Row(
+        //   children: [
+        //     Container(
+        //       width: 20.0,
+        //       height: 20.0,
+        //       child: IconButton(
+        //         iconSize: 18.0,
+        //         padding: EdgeInsets.all(0.0),
+        //         icon: isFavorite
+        //             ? Icon(
+        //                 Icons.favorite,
+        //                 color: Color(0xFF6793c8),
+        //               )
+        //             : Icon(
+        //                 Icons.favorite_border,
+        //                 color: Colors.white,
+        //               ),
+        //         onPressed: () {
+        //           setState(() {
+        //             toggleFavorite();
+        //           });
+        //         },
+        //       ),
+        //     ),
+        //   ],
+        // ),
       ],
     );
   }
