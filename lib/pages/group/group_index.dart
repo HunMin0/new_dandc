@@ -1,5 +1,6 @@
 import 'package:Deal_Connect/components/layout/default_logo_layout.dart';
 import 'package:Deal_Connect/components/const/setting_colors.dart';
+import 'package:Deal_Connect/pages/group/group_search/group_search_index.dart';
 import 'package:Deal_Connect/pages/group/register/register_index.dart';
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
@@ -31,14 +32,15 @@ class GroupIndex extends StatelessWidget {
             height: 30.0,
           ),
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               InkWell(
                 onTap: () {
                   Navigator.push(
                     context,
                     PageRouteBuilder(
-                      pageBuilder: (context, animation, secondaryAnimation) => const GroupRegisterIndex(),
+                      pageBuilder: (context, animation, secondaryAnimation) => const GroupSearchIndex(),
                       transitionsBuilder: (context, animation, secondaryAnimation, child) {
                         const begin = Offset(1.0, 0.0);
                         const end = Offset.zero;
@@ -60,17 +62,13 @@ class GroupIndex extends StatelessWidget {
                   height: screenWidth, // 버튼의 세로 크기
                   width: screenWidth,
                   decoration: BoxDecoration(
-                    color: HexColor('F5F6FA'),
+                    color: HexColor('#F5F6FA'),
                     borderRadius: BorderRadius.circular(10.0), // 여기서 10.0은 원하는 반지름 값입니다.
                   ),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Image.asset(
-                        'assets/images/search.png', // 이미지의 경로
-                        height: 24.0, // 이미지의 높이
-                        width: 24.0, // 이미지의 너비
-                      ),
+                      Icon(Icons.search_rounded, size: 30.0,),
                       const SizedBox(height: 8.0), // 이미지와 버튼 사이의 간격 조절
                       const Text(
                         '그룹 찾기',
@@ -85,6 +83,7 @@ class GroupIndex extends StatelessWidget {
 
                 ),
               ),
+              SizedBox(width: 10,),
               InkWell(
                 onTap: () {
                   Navigator.push(
@@ -112,17 +111,13 @@ class GroupIndex extends StatelessWidget {
                   height: screenWidth, // 버튼의 세로 크기
                   width: screenWidth,
                   decoration: BoxDecoration(
-                    color: HexColor('F5F6FA'),
+                    color: HexColor('#F5F6FA'),
                     borderRadius: BorderRadius.circular(10.0), // 여기서 10.0은 원하는 반지름 값입니다.
                   ),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Image.asset(
-                        'assets/images/search.png', // 이미지의 경로
-                        height: 24.0, // 이미지의 높이
-                        width: 24.0, // 이미지의 너비
-                      ),
+                      Icon(Icons.add, size: 30.0,),
                       const SizedBox(height: 8.0), // 이미지와 버튼 사이의 간격 조절
                       const Text(
                         '그룹 만들기',

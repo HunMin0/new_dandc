@@ -24,42 +24,45 @@ class DefaultSearchLayout extends StatelessWidget {
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.white,
-        title: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Expanded(
-              child: TextField(
-                onSubmitted: (value) {
-                  // 여기에 키패드 서브밋이 발생했을 때 수행할 작업을 추가합니다.
-                  onSubmit(value);
-                },
-                decoration: InputDecoration(
-                  filled: true,
-                  fillColor: HexColor("#F5F6FA"),
-                  contentPadding: EdgeInsets.symmetric(
-                    vertical: 10,
-                    horizontal: 20,
+        title: Container(
+          padding: EdgeInsets.only(top:5),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Expanded(
+                child: TextField(
+                  onSubmitted: (value) {
+                    // 여기에 키패드 서브밋이 발생했을 때 수행할 작업을 추가합니다.
+                    onSubmit(value);
+                  },
+                  decoration: InputDecoration(
+                    filled: true,
+                    fillColor: HexColor("#F5F6FA"),
+                    contentPadding: EdgeInsets.symmetric(
+                      vertical: 10,
+                      horizontal: 20,
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10.0), // 테두리를 둥글게 설정
+                      borderSide: BorderSide.none, // 바텀 border 없애기
+                    ),
+                    hintText: '검색 키워드를 입력해주세요',
                   ),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(100.0), // 테두리를 둥글게 설정
-                    borderSide: BorderSide.none, // 바텀 border 없애기
-                  ),
-                  hintText: '검색 키워드를 입력해주세요',
                 ),
               ),
-            ),
-            TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: Text(
-                  '취소',
-                  style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: HexColor("#666666")),
-                ))
-          ],
+              TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text(
+                    '취소',
+                    style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: HexColor("#666666")),
+                  ))
+            ],
+          ),
         ),
       ),
       body: SafeArea(

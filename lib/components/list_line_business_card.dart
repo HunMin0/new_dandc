@@ -56,14 +56,19 @@ class ListLineBusinessCard extends StatelessWidget {
           SizedBox(
             height: 5,
           ),
-          Text(
-            "주소 자리입니다.",
-            style: TextStyle(
-              fontWeight: FontWeight.w500,
-              fontSize: 14.0,
-              color: Color(0xFF8c8c8c),
-            ),
-            overflow: TextOverflow.ellipsis,
+          Row(
+            children: [
+              Text("홍길동 |"),
+              Text(
+                " 주소 자리입니다.",
+                style: TextStyle(
+                  fontWeight: FontWeight.w500,
+                  fontSize: 14.0,
+                  color: Color(0xFF8c8c8c),
+                ),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
           ),
           SizedBox(
             height: 10,

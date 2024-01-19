@@ -1,12 +1,16 @@
 import 'package:Deal_Connect/db/group_data.dart';
 import 'package:Deal_Connect/db/vertical_data.dart';
+import 'package:Deal_Connect/pages/business/business_detail/business_detail_info.dart';
 import 'package:Deal_Connect/pages/business/business_index.dart';
+import 'package:Deal_Connect/pages/group/group_index.dart';
 import 'package:Deal_Connect/pages/history/history_detail/history_detail_index.dart';
+import 'package:Deal_Connect/pages/search/search_index.dart';
 import 'package:flutter/material.dart';
 import 'package:Deal_Connect/model/user.dart';
 import 'package:Deal_Connect/Utils/shared_pref_utils.dart';
 import 'package:Deal_Connect/pages/home/components/group_card.dart';
 import 'package:Deal_Connect/components/list_card.dart';
+import 'package:hexcolor/hexcolor.dart';
 
 // 메인홈
 class HomeIndex extends StatefulWidget {
@@ -38,12 +42,12 @@ class _HomeIndexState extends State<HomeIndex> {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _buildTitle('그룹'),
+                      _buildTitle('그룹', '그룹 찾기', GroupIndex()),
                       _HorizontalList(),
                       SizedBox(
                         height: 20.0,
                       ),
-                      _buildTitle('파트너'),
+                      _buildTitle('파트너', '파트너 찾기', SearchIndex()),
                       _partnerBanner(context, 8), // 파트너 배너상태
                       SizedBox(
                         height: 16.0,
@@ -61,14 +65,25 @@ class _HomeIndexState extends State<HomeIndex> {
   }
 
   // 공통 타이틀
-  Padding _buildTitle(String text) {
+  Padding _buildTitle(String text, String buttonText, Widget goto) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 12.0),
       child: Column(
         children: [
-          Text(
-            text,
-            style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.w500),
+          Row(
+            children: [
+              Text(
+                text,
+                style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.w500),
+              ),
+              Spacer(),
+              TextButton(
+                onPressed: () {
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => goto));
+                },
+                child: Text(buttonText, style: TextStyle( color: HexColor("#75A8E4") ),),
+              )
+            ],
           ),
           SizedBox(
             height: 14.0,
@@ -85,7 +100,8 @@ class _HomeIndexState extends State<HomeIndex> {
         Navigator.push(
           context,
           MaterialPageRoute(
-              builder: (context) => HistoryDetailIndex(historyType: "mine")), // 배너 클릭 이동화면
+              builder: (context) =>
+                  HistoryDetailIndex(historyType: "mine")), // 배너 클릭 이동화면
         );
       },
       child: _partnerBannerStyle(waitingCount: 8),
@@ -111,7 +127,7 @@ class _HomeIndexState extends State<HomeIndex> {
 
 // 회원 가로 리스트
 class _HorizontalList extends StatelessWidget {
-  _HorizontalList ({Key? key}) : super(key: key);
+  _HorizontalList({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -122,11 +138,11 @@ class _HorizontalList extends StatelessWidget {
         child: ListView.builder(
           scrollDirection: Axis.horizontal,
           itemCount: groupDataList.length,
-          itemBuilder: (context, index){
+          itemBuilder: (context, index) {
             Map<String, dynamic> groupData = groupDataList[index];
 
             return GestureDetector(
-              onTap: (){
+              onTap: () {
                 print('클릭됨');
               },
               child: GroupCard(
@@ -147,9 +163,8 @@ class _HorizontalList extends StatelessWidget {
 class _partnerBannerStyle extends StatelessWidget {
   final int waitingCount;
 
-  const _partnerBannerStyle({
-    required this.waitingCount,
-    Key? key}) : super(key: key);
+  const _partnerBannerStyle({required this.waitingCount, Key? key})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -226,11 +241,11 @@ class _VerticalList extends StatelessWidget {
         ),
         child: ListView.builder(
           itemCount: verticalDataList.length,
-          itemBuilder: (context, index){
+          itemBuilder: (context, index) {
             Map<String, dynamic> verticalData = verticalDataList[index];
 
             return GestureDetector(
-              onTap: (){
+              onTap: () {
                 print('클릭했다~');
               },
               child: ListCard(
