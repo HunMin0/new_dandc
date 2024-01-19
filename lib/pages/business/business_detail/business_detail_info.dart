@@ -1,4 +1,6 @@
 import 'package:Deal_Connect/components/layout/default_logo_layout.dart';
+import 'package:Deal_Connect/components/list_service_card.dart';
+import 'package:Deal_Connect/db/service_data.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
@@ -98,7 +100,7 @@ class _BusinessDetailInfoState extends State<BusinessDetailInfo> {
                         Row(
                           children: [
                             Container(
-                              width: 30,
+                              width: 25,
                               child: Image(
                                 image: AssetImage(
                                     'assets/images/icons/partner_icon.png'),
@@ -181,6 +183,21 @@ class _BusinessDetailInfoState extends State<BusinessDetailInfo> {
               Divider(
                 thickness: 10,
                 color: HexColor("#f5f6fa"),
+              ),
+              Expanded(
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: serviceDataList.length,
+                  itemBuilder: (context, index){
+                    Map<String, dynamic> serviceData = serviceDataList[index];
+                    return GestureDetector(
+                      onTap: (){
+                        print('클릭됨');
+                      },
+                      child: ListServiceCard(),
+                    );
+                  },
+                ),
               ),
             ],
           ),
