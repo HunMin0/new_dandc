@@ -26,7 +26,7 @@ class _BusinessTabListState extends State<BusinessTabList> {
           crossAxisCount: 2, // 한 줄에 2개의 아이템
           crossAxisSpacing: 10.0, // 아이템 간의 가로 간격
           mainAxisSpacing: 10.0, // 아이템 간의 세로 간격
-          childAspectRatio: 1 / 1.25,
+          childAspectRatio: 1 / 1.4,
         ),
         itemCount: companyDataList.length, // 아이템 개수
         itemBuilder: (context, index) {

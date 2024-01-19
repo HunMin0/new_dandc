@@ -50,7 +50,7 @@ class ListCard extends StatelessWidget {
                     children: [
                       Row(
                         children: [
-                          Text('하남돼지집', style: historyTitleFontStyle, ),
+                          Text('하남돼지집2', style: historyTitleFontStyle, ),
                           Spacer(),
                           Text(created_at, style: historyNormalFontStyle),
                         ],
@@ -83,12 +83,11 @@ class ListCard extends StatelessWidget {
               ],
             ),
           ),
-          SizedBox(
+          Divider(
+            thickness: 10,
             height: 10,
-            child: Container(
-              decoration: BoxDecoration(color: HexColor('#F5F6FA')),
-            ),
-          ),
+            color: HexColor('#F5F6FA'),
+          )
         ],
       ),
     );

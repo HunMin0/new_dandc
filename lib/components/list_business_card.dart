@@ -26,8 +26,8 @@ class ListBusinessCard extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.all(10.0),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 0.0, vertical: 5.0),
@@ -35,7 +35,8 @@ class ListBusinessCard extends StatelessWidget {
             ),
             SizedBox(height: 5,),
             Text(companyName, style: TextStyle(fontWeight: FontWeight.bold), overflow: TextOverflow.ellipsis,),
-            SizedBox(height: 10,),
+            Text("홍길동", style: TextStyle(color: HexColor("#75A8E4"), fontSize: 12),),
+            SizedBox(height: 5,),
             SingleChildScrollView(
               scrollDirection: Axis.horizontal, // 가로 스크롤
               child: _buildTags(tagList),

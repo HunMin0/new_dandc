@@ -213,17 +213,17 @@ class HistoryIndex extends StatelessWidget {
                                 children: [
                                   Text(
                                     '나의 파트너들 중 누가 제일 큰손일까요!?',
-                                    style: TextStyle(
-                                      color: HexColor('#FFFFFF'),
-                                      fontSize: 13,
-                                    ),
-                                  ),
-                                  Text(
-                                    '랭킹 보러가기',
-                                    style: TextStyle(
+                                      style: TextStyle(
                                         color: HexColor('#FFFFFF'),
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.bold),
+                                        fontSize: 13,
+                                      ),
+                                    ),
+                                    Text(
+                                      '랭킹 보러가기',
+                                      style: TextStyle(
+                                          color: HexColor('#FFFFFF'),
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.bold),
                                   )
                                 ],
                               ),
