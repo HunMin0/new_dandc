@@ -26,7 +26,7 @@ class ProfileUserCondition extends StatelessWidget {
           _buildTabLine(),
           _buildUserTab(
             company.toString(),
-            '업체',
+            '소속그룹',
           ),
           _buildTabLine(),
           _buildUserTab(

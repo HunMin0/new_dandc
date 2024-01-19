@@ -111,6 +111,7 @@ class LoginIndexState extends State<LoginIndex> {
     final textStyle = TextStyle(
       color: BODY_TEXT_COLOR,
       fontWeight: FontWeight.w400,
+      fontSize: 13.0,
     );
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -137,7 +138,6 @@ class LoginIndexState extends State<LoginIndex> {
           },
           child: Text(
             '회원가입',
-            textAlign: TextAlign.center,
             style: textStyle,
           ),
         ),

@@ -388,6 +388,7 @@ class _formSubmit extends StatelessWidget {
         postRegister(formData).then((value) {
           if (value.status == 'success') {
             Navigator.pushNamed(context, '/login');
+
           } else {
             print(value.message);
             CustomDialog.showServerValidatorErrorMsg(value);
