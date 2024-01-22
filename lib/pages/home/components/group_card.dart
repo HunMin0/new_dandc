@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 
 class GroupCard extends StatefulWidget {
+  final int id;
   final String imagePath;
   final String title;
   final int memberCount;
 
   const GroupCard({
+    required this.id,
     required this.imagePath,
     required this.title,
     required this.memberCount,

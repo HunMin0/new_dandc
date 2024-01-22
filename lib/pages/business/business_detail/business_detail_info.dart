@@ -201,7 +201,8 @@ class _BusinessDetailInfoState extends State<BusinessDetailInfo> {
               ),
             ],
           ),
-        ));
+        )
+    );
   }
 
 // 반복태그

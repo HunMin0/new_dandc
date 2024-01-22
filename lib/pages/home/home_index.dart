@@ -3,6 +3,7 @@ import 'package:Deal_Connect/db/vertical_data.dart';
 import 'package:Deal_Connect/pages/business/business_detail/business_detail_info.dart';
 import 'package:Deal_Connect/pages/business/business_index.dart';
 import 'package:Deal_Connect/pages/group/group_index.dart';
+import 'package:Deal_Connect/pages/group/group_view.dart';
 import 'package:Deal_Connect/pages/history/history_detail/history_detail_index.dart';
 import 'package:Deal_Connect/pages/search/search_index.dart';
 import 'package:flutter/material.dart';
@@ -156,9 +157,27 @@ class _HorizontalList extends StatelessWidget {
 
             return GestureDetector(
               onTap: () {
-                print('클릭됨');
+                //  print('클릭됨');
+                //  GroupView();
+                /*
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => GroupView(),
+                    builder: (context) => GroupView(id: groupData['id']),
+                  ),
+                );
+                */
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => GroupView(
+                        id: groupData['id'],
+                      )
+                    ),
+                );
               },
               child: GroupCard(
+                id: groupData['id'],
                 imagePath: groupData['imagePath'],
                 title: groupData['title'],
                 //category: groupData['category'],
