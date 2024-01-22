@@ -24,6 +24,7 @@ class ListCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final historyNormalFontStyle = TextStyle(
       fontSize: 13.0,
+      fontWeight: FontWeight.w500
     );
 
     final historyTitleFontStyle = TextStyle(
@@ -63,6 +64,7 @@ class ListCard extends StatelessWidget {
                           Text(companyCeo, style: historyNormalFontStyle),
                         ],
                       ),
+                      SizedBox(height: 5,),
                       Row(
                         children: [
                           Text('거래 항목', style: historyNormalFontStyle),
@@ -70,6 +72,7 @@ class ListCard extends StatelessWidget {
                           Text(trade_name, style: historyNormalFontStyle),
                         ],
                       ),
+                      SizedBox(height: 5,),
                       Row(
                         children: [
                           Text('거래 금액', style: historyNormalFontStyle),

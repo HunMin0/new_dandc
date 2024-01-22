@@ -135,6 +135,7 @@ class IntroIndex extends StatelessWidget {
             ),
           ),
           Container(
+            padding: EdgeInsets.only(bottom: 50),
             child: Text(
               '계속 진행시, 서비스 이용약관 및 개인정보 취급방침에 동의하게 됩니다',
               style: textStyle.copyWith(
