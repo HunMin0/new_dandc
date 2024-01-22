@@ -1,9 +1,4 @@
-import 'package:Deal_Connect/db/company_data.dart';
-import 'package:Deal_Connect/db/post_data.dart';
 import 'package:Deal_Connect/pages/history/components/history_tab_list.dart';
-import 'package:Deal_Connect/pages/profile/components/tab_list/not_user_registered.dart';
-import 'package:Deal_Connect/pages/profile/components/tab_list/user_company.dart';
-import 'package:Deal_Connect/pages/profile/components/tab_list/user_post.dart';
 import 'package:flutter/material.dart';
 
 class HistoryTabBar extends StatefulWidget {

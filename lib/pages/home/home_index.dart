@@ -77,12 +77,25 @@ class _HomeIndexState extends State<HomeIndex> {
                 style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.w500),
               ),
               Spacer(),
-              TextButton(
+              ElevatedButton(
                 onPressed: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => goto));
+                  Navigator.push(
+                      context, MaterialPageRoute(builder: (context) => goto));
                 },
-                child: Text(buttonText, style: TextStyle( color: HexColor("#75A8E4") ),),
-              )
+                child: Text(
+                  buttonText,
+                  style: TextStyle(
+                    color: Color(0xff333333),
+                  ),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Color(0xFFf5f6fa),
+                  foregroundColor: Color(0xFFf5f6fa),
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8.0)),
+                ),
+              ),
             ],
           ),
           SizedBox(
