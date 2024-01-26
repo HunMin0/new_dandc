@@ -21,7 +21,7 @@ class _ProfileUserTabBarState extends State<ProfileUserTabBar>
     super.initState();
     // tab컨트롤러 초기화
     tabController = TabController(
-      length: 2,
+      length: 3,
       vsync: this,
     );
   }

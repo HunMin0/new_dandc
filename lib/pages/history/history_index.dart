@@ -1,21 +1,40 @@
 import 'package:Deal_Connect/components/layout/default_basic_layout.dart';
-import 'package:Deal_Connect/pages/history/components/history_tab_bar.dart';
+import 'package:Deal_Connect/db/trade_data.dart';
+import 'package:Deal_Connect/pages/history/components/list_card.dart';
 import 'package:Deal_Connect/pages/history/history_detail/history_detail_index.dart';
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
 
-class HistoryIndex extends StatelessWidget {
+class HistoryIndex extends StatefulWidget {
   const HistoryIndex({Key? key}) : super(key: key);
+
+  @override
+  State<HistoryIndex> createState() => _HistoryIndexState();
+}
+
+class _HistoryIndexState extends State<HistoryIndex>
+    with TickerProviderStateMixin {
+  late final TabController tabController;
+
+  @override
+  void initState() {
+    super.initState();
+    // tab컨트롤러 초기화
+    tabController = TabController(
+      length: 3,
+      vsync: this,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return DefaultBasicLayout(
-      child: NestedScrollView(
-        headerSliverBuilder: (context, innerBoxIsScrolled) {
-          return [
-            SliverList(
-                delegate: SliverChildListDelegate([
-              const Padding(
+      child: CustomScrollView(
+        slivers: [
+          SliverAppBar(
+            expandedHeight: 510.0,
+            flexibleSpace: FlexibleSpaceBar(
+              background: Padding(
                 padding: EdgeInsets.all(12.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -43,12 +62,105 @@ class HistoryIndex extends StatelessWidget {
                   ],
                 ),
               ),
-            ]))
-          ];
-        },
-        body: HistoryTabBar(),
+            ),
+          ),
+          SliverToBoxAdapter(
+            child: Divider(
+              color: Color(0xFFF5F6FA),
+              thickness: 16.0,
+            ),
+          ),
+          SliverPersistentHeader(
+            delegate: MySliverPersistentHeaderDelegate(tabController),
+            pinned: true,
+          ),
+          SliverToBoxAdapter(
+            child: Divider(
+              color: Color(0xFFF5F6FA),
+              thickness: 16.0,
+            ),
+          ),
+          SliverList(
+            delegate: SliverChildBuilderDelegate(
+              (BuildContext context, int index) {
+                return Container(
+                  child: tradeDataList.isNotEmpty
+                      ? ListCard(
+                          created_at: tradeDataList[index]['created_at'],
+                          companyCeo: tradeDataList[index]['companyCeo'],
+                          companyName: tradeDataList[index]['companyName'],
+                          trade_name: tradeDataList[index]['trade_name'],
+                          trade_price: tradeDataList[index]['trade_price'],
+                          buyer: tradeDataList[index]['buyer'],
+                        )
+                      : const Text('등록된 데이터가 없습니다'),
+                );
+              },
+              childCount: tradeDataList.length,
+            ),
+          ),
+        ],
       ),
     );
+  }
+}
+
+class MySliverPersistentHeaderDelegate extends SliverPersistentHeaderDelegate {
+  final TabController tabController;
+
+  MySliverPersistentHeaderDelegate(this.tabController);
+
+  @override
+  Widget build(
+      BuildContext context, double shrinkOffset, bool overlapsContent) {
+    return Container(
+      height: 50.0,
+      color: Colors.white,
+      child: TabBar(
+        controller: tabController,
+        indicatorColor: Colors.black,
+        indicatorWeight: 2.0,
+        labelColor: Colors.black,
+        dividerColor: Colors.white,
+        unselectedLabelColor: Colors.grey[500],
+        labelStyle: TextStyle(
+          fontSize: 15.0,
+          fontWeight: FontWeight.w600,
+        ),
+        unselectedLabelStyle: TextStyle(
+          fontWeight: FontWeight.w500,
+        ),
+        indicatorSize: TabBarIndicatorSize.tab,
+        tabs: [
+          Tab(
+            child: Text(
+              '전체',
+            ),
+          ),
+          Tab(
+            child: Text(
+              '구매',
+            ),
+          ),
+          Tab(
+            child: Text(
+              '판매',
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  double get maxExtent => 50.0;
+
+  @override
+  double get minExtent => 50.0;
+
+  @override
+  bool shouldRebuild(covariant SliverPersistentHeaderDelegate oldDelegate) {
+    return false;
   }
 }
 

@@ -1,6 +1,5 @@
 import 'package:Deal_Connect/components/layout/default_logo_layout.dart';
 import 'package:Deal_Connect/pages/history/components/history_detail_list.dart';
-import 'package:Deal_Connect/pages/history/components/history_tab_list.dart';
 import 'package:Deal_Connect/pages/history/components/search_term_select.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:hexcolor/hexcolor.dart';

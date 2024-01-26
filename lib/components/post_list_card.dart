@@ -64,6 +64,7 @@ class PostListCard extends StatelessWidget {
                         postTitle.length > 16
                             ? '${postTitle.substring(0, 16)}...'
                             : postTitle,
+                        overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                             fontWeight: FontWeight.w500, fontSize: 16.0),
                       ),
