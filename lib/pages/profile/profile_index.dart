@@ -38,11 +38,11 @@ class _ProfileIndexState extends State<ProfileIndex>
   @override
   Widget build(BuildContext context) {
     return DefaultBasicLayout(
-      child: DefaultTabController(
-        length: 2,
-        child: CustomScrollView(
-          slivers: [
+      child: NestedScrollView(
+        headerSliverBuilder: (context, innerBoxIsScrolled) {
+          return [
             SliverAppBar(
+              pinned: false,
               expandedHeight: 260.0,
               flexibleSpace: FlexibleSpaceBar(
                 background: Padding(
@@ -74,6 +74,7 @@ class _ProfileIndexState extends State<ProfileIndex>
                 ),
               ),
             ),
+
             SliverToBoxAdapter(
               child: Divider(
                 color: Color(0xFFF5F6FA),
@@ -92,22 +93,27 @@ class _ProfileIndexState extends State<ProfileIndex>
             ),
 
 
-
-            SliverFillRemaining(
-              child: TabBarView(
-                controller: tabController,
-                children: [
-                  UserCompany(),
-                  UserPost(),
-                ],
-              ),
+          ];
+        },
+        body: TabBarView(
+          controller: tabController,
+          children: [
+            CustomScrollView(
+              slivers: [
+                SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                            (context, index) => Container(
+                          height: 40,
+                          child: Text('index: $index'),
+                        ),
+                        childCount: 40))
+              ],
             ),
-
-
-
-
+            UserPost(),
           ],
         ),
+
+
       ),
     );
   }
@@ -171,55 +177,52 @@ class UserCompany extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: SingleChildScrollView(
-        physics: NeverScrollableScrollPhysics(),
-        child: Column(
-          children: [
-            Text('data'),
-            Text('data'),
-            Text('data'),
-            Text('data'),
-            Text('data'),
-            Text('data'),
-            Text('data'),
-            Text('data'),
-            Text('data'),
-            Text('data'),
-            Text('data'),
-            Text('data'),
-            Text('data'),
-            Text('data'),
-            Text('data'),
-            Text('data'),
-            Text('data'),
-            Text('data'),
-            Text('data'),
-            Text('data'),
-            Text('data'),
-            Text('data'),
-            Text('data'),
-            Text('data'),
-            Text('data'),
-            Text('data'),
-            Text('data'),
-            Text('data'),
-            Text('data'),
-            Text('data'),
-            Text('data'),
-            Text('data'),
-            Text('data'),
-            Text('data'),
-            Text('data'),
-            Text('data'),
-            Text('data'),
-            Text('data'),
-            Text('data'),
-            Text('data'),
-            Text('data'),
-            Text('data'),
-            Text('data10'),
-          ],
-        ),
+      child: ListView(
+        children: [
+          Text('data'),
+          Text('data'),
+          Text('data'),
+          Text('data'),
+          Text('data'),
+          Text('data'),
+          Text('data'),
+          Text('data'),
+          Text('data'),
+          Text('data'),
+          Text('data'),
+          Text('data'),
+          Text('data'),
+          Text('data'),
+          Text('data'),
+          Text('data'),
+          Text('data'),
+          Text('data'),
+          Text('data'),
+          Text('data'),
+          Text('data'),
+          Text('data'),
+          Text('data'),
+          Text('data'),
+          Text('data'),
+          Text('data'),
+          Text('data'),
+          Text('data'),
+          Text('data'),
+          Text('data'),
+          Text('data'),
+          Text('data'),
+          Text('data'),
+          Text('data'),
+          Text('data'),
+          Text('data'),
+          Text('data'),
+          Text('data'),
+          Text('data'),
+          Text('data'),
+          Text('data'),
+          Text('data'),
+          Text('data10')
+        ],
       ),
     );
   }
