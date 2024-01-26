@@ -13,6 +13,7 @@ class DefaultNextLayout extends StatelessWidget {
   final String? prevTitle;
   final VoidCallback? nextOnPressed;
   final VoidCallback? prevOnPressed;
+  final String? isNotInnerPadding;
 
   const DefaultNextLayout(
       {this.titleName,
@@ -25,6 +26,7 @@ class DefaultNextLayout extends StatelessWidget {
       this.prevOnPressed,
       this.nextOnPressed,
       this.isCancel = true, // 기본값 true로 설정
+        this.isNotInnerPadding,
       Key? key})
       : super(key: key);
 
@@ -49,7 +51,8 @@ class DefaultNextLayout extends StatelessWidget {
       ),
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(20.0),
+          //  padding: const EdgeInsets.all(20.0),
+          padding: isNotInnerPadding == 'true' ? const EdgeInsets.all(0.0) : const EdgeInsets.all(20.0),
           child: child,
         ),
       ),
