@@ -24,22 +24,22 @@ class _CompanyAddStepThreeState extends State<CompanyAddStepThree> {
         FocusScope.of(context).requestFocus(FocusNode());
       },
       child: DefaultNextLayout(
-        titleName: '업체등록',
-        isProcessable: isProcessable,
-        bottomBar: true,
-        isCancel: false,
-        prevTitle: '취소',
-        nextTitle: '등록 완료하기',
-        prevOnPressed: () {},
-        nextOnPressed: () {
-          if (_companyFormKey.currentState!.validate()) {
-            // 유효한 경우 실행할 코드 추가
+    titleName: '업체등록',
+    isProcessable: isProcessable,
+    bottomBar: true,
+    isCancel: false,
+    prevTitle: '취소',
+    nextTitle: '등록 완료하기',
+    prevOnPressed: () {},
+    nextOnPressed: () {
+    if (_companyFormKey.currentState!.validate()) {
+    // 유효한 경우 실행할 코드 추가
 
-            _showCompleteDialog(context);
-          }
-        },
+    _showCompleteDialog(context);
+    }
+    },
 
-        child: Column(
+    child: Column(
           children: [
             Expanded(
               child: SingleChildScrollView(

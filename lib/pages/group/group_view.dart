@@ -26,7 +26,7 @@ class _GroupViewState extends State<GroupView> {
         bottomBar: true,
         isCancel: false,
         prevTitle: '취소',
-        nextTitle: '그룹 참여하기',
+        nextTitle: '그룹 가입 신청하기',
         isNotInnerPadding: 'true',
         prevOnPressed: () {},
         nextOnPressed: () {
