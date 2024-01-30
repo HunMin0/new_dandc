@@ -1,5 +1,6 @@
 import 'package:Deal_Connect/components/layout/default_basic_layout.dart';
 import 'package:Deal_Connect/components/list_line_business_card.dart';
+import 'package:Deal_Connect/components/post_list_card.dart';
 import 'package:Deal_Connect/db/company_data.dart';
 import 'package:Deal_Connect/db/post_data.dart';
 import 'package:Deal_Connect/pages/profile/company_add/company_add_index.dart';
@@ -74,7 +75,6 @@ class _ProfileIndexState extends State<ProfileIndex>
                 ),
               ),
             ),
-
             SliverToBoxAdapter(
               child: Divider(
                 color: Color(0xFFF5F6FA),
@@ -91,29 +91,95 @@ class _ProfileIndexState extends State<ProfileIndex>
                 thickness: 16.0,
               ),
             ),
-
-
           ];
         },
-        body: TabBarView(
-          controller: tabController,
-          children: [
-            CustomScrollView(
-              slivers: [
-                SliverList(
-                    delegate: SliverChildBuilderDelegate(
-                            (context, index) => Container(
-                          height: 40,
-                          child: Text('index: $index'),
-                        ),
-                        childCount: 40))
-              ],
-            ),
-            UserPost(),
-          ],
+        body: Container(
+          color: Color(0xFFf5f6f8),
+          padding: EdgeInsets.symmetric(horizontal: 14.0),
+          child: TabBarView(
+            controller: tabController,
+            children: [
+              SizedBox(
+                child: companyDataList.isNotEmpty
+                    ? CustomScrollView(
+                        slivers: [
+                          SliverList(
+                            delegate: SliverChildBuilderDelegate(
+                                (BuildContext context, int index) {
+                              Map<String, dynamic> verticalData =
+                                  companyDataList[index];
+
+                              return GestureDetector(
+                                onTap: () {
+                                  print('클릭했다~');
+                                },
+                                child: ListLineBusinessCard(
+                                  bgImagePath: verticalData['bgImagePath'],
+                                  companyName: verticalData['companyName'],
+                                  tagList: verticalData['tagList'],
+                                ),
+                              );
+                            }, childCount: companyDataList.length),
+                          ),
+                          SliverToBoxAdapter(
+                            child: Padding(
+                              padding: const EdgeInsets.only(
+                                  top: 10.0, bottom: 40.0),
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: TabBarButton(
+                                        btnTitle: '내 업체 추가하기',
+                                        onPressed: () {
+                                          Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      CompanyAddIndex()));
+                                        }),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      )
+                    : NotUserRegistered(isTabType: true),
+              ),
+              SizedBox(
+                child: postDataList.isNotEmpty
+                    ? CustomScrollView(
+                  slivers: [
+                    SliverList(
+                      delegate: SliverChildBuilderDelegate(
+                              (BuildContext context, int index) {
+                                Map<String, dynamic> postData = postDataList[index];
+
+                            return GestureDetector(
+                              onTap: () {
+                                print('클릭했다~');
+                              },
+                              child: PostListCard(
+                                bgImagePath: postData['bgImagePath'],
+                                postTitle: postData['postTitle'],
+                                postSubject: postData['postSubject'],
+                                comment: postData['comment'],
+                                date: postData['date'],
+                                newMark: postData['newMark'],
+                              ),
+                            );
+                          }, childCount: companyDataList.length),
+                    ),
+                    SliverToBoxAdapter(
+                      child: SizedBox(height: 50.0,),
+                    ),
+                  ],
+                )
+                    : NotUserRegistered(isTabType: false),
+              ),
+            ],
+          ),
         ),
-
-
       ),
     );
   }
@@ -170,69 +236,5 @@ class ProfileUserTabHeaderDelegate extends SliverPersistentHeaderDelegate {
   @override
   bool shouldRebuild(covariant SliverPersistentHeaderDelegate oldDelegate) {
     return false;
-  }
-}
-
-class UserCompany extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: ListView(
-        children: [
-          Text('data'),
-          Text('data'),
-          Text('data'),
-          Text('data'),
-          Text('data'),
-          Text('data'),
-          Text('data'),
-          Text('data'),
-          Text('data'),
-          Text('data'),
-          Text('data'),
-          Text('data'),
-          Text('data'),
-          Text('data'),
-          Text('data'),
-          Text('data'),
-          Text('data'),
-          Text('data'),
-          Text('data'),
-          Text('data'),
-          Text('data'),
-          Text('data'),
-          Text('data'),
-          Text('data'),
-          Text('data'),
-          Text('data'),
-          Text('data'),
-          Text('data'),
-          Text('data'),
-          Text('data'),
-          Text('data'),
-          Text('data'),
-          Text('data'),
-          Text('data'),
-          Text('data'),
-          Text('data'),
-          Text('data'),
-          Text('data'),
-          Text('data'),
-          Text('data'),
-          Text('data'),
-          Text('data'),
-          Text('data10')
-        ],
-      ),
-    );
-  }
-}
-
-class UserPost extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Text('User Post Page'),
-    );
   }
 }
