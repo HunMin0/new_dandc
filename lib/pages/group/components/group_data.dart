@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 final List<Map<String, dynamic>> groupDataList = [
   {
+    'id':1,
     'memThumbImagePath':'main_sample_avater',
     'memNickName':'우스헤라',
     'writeRegDate':'2023년 10월 25일 오후05:38',
@@ -13,6 +14,7 @@ final List<Map<String, dynamic>> groupDataList = [
     'writeViewCnt':20,
   },
   {
+    'id':2,
     'memThumbImagePath':'main_sample_avater',
     'memNickName':'우스헤라',
     'writeRegDate':'2023년 10월 25일 오후05:38',

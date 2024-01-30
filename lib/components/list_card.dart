@@ -9,13 +9,16 @@ class ListCard extends StatelessWidget {
   final bool newMark;
 
   const ListCard(
-      {required this.bgImagePath,
-      required this.avaterImagePath,
-      required this.companyName,
-      required this.userName,
-      required this.tagList,
-      required this.newMark,
-      Key? key})
+      {
+        required this.bgImagePath,
+        required this.avaterImagePath,
+        required this.companyName,
+        required this.userName,
+        required this.tagList,
+        required this.newMark,
+        Key? key
+      }
+      )
       : super(key: key);
 
   @override

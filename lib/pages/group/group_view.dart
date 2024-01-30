@@ -4,6 +4,7 @@ import 'package:Deal_Connect/components/list_card.dart';
 import 'package:Deal_Connect/pages/group/components/group_button.dart';
 import 'package:Deal_Connect/pages/group/components/group_condition.dart';
 import 'package:Deal_Connect/pages/group/components/group_list_card.dart';
+import 'package:Deal_Connect/pages/group/group_view_index.dart';
 import 'package:flutter/material.dart';
 
 import 'components/group_data.dart';
@@ -26,7 +27,7 @@ class _GroupViewState extends State<GroupView> {
         bottomBar: true,
         isCancel: false,
         prevTitle: '취소',
-        nextTitle: '그룹 참여하기',
+        nextTitle: '그룹 가입 신청하기',
         isNotInnerPadding: 'true',
         prevOnPressed: () {},
         nextOnPressed: () {
@@ -43,7 +44,6 @@ class _GroupViewState extends State<GroupView> {
                       image: DecorationImage(
                         image: AssetImage(
                             'assets/images/sample/main_sample01.jpg'),
-                        //  image: widget.imagePath,  =>  무슨 오류인지 모르겠음
                         fit: BoxFit.cover,
                       ),
                     ),
@@ -100,6 +100,13 @@ class _GroupViewState extends State<GroupView> {
                           return GestureDetector(
                             onTap: () {
                               print('클릭했다 게시글을');
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => GroupViewIndex(
+                                      id: groupData['id'],
+                                    )
+                                  ),
+                              );
                             },
                             child: GroupListCard(
                               memThumbImagePath: groupData['memThumbImagePath'],

@@ -8,12 +8,14 @@ class DefaultLogoLayout extends StatelessWidget {
   final Color? backgroundColor;
   final String? titleName;
   final String? isNotInnerPadding;
+  final bool? rightMoreBtn ;
 
   const DefaultLogoLayout({
     this.titleName,
     required this.child,
     this.backgroundColor,
     this.isNotInnerPadding,
+    this.rightMoreBtn = false,
 
     Key? key}) : super(key: key);
 
@@ -31,6 +33,17 @@ class DefaultLogoLayout extends StatelessWidget {
         centerTitle: true,
         elevation: 0,
         backgroundColor: Colors.white,
+        actions: rightMoreBtn != null && rightMoreBtn! ? [
+          IconButton(onPressed: (){}, icon: Icon(Icons.more_horiz)),
+        ] : null,
+        /*
+        actions: [
+          IconButton(
+              onPressed: (){},
+              icon: Icon(Icons.more_horiz),
+          ),
+        ],
+        */
       ),
       body: SafeArea(
         child: Padding(
