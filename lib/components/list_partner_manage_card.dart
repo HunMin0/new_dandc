@@ -1,22 +1,21 @@
 import 'package:flutter/material.dart';
 
-class ListCard extends StatelessWidget {
+class ListPartnerManageCard extends StatelessWidget {
   final String bgImagePath;
   final String avaterImagePath;
   final String companyName;
   final String userName;
+  final bool isNew;
   final List<String> tagList;
 
-  const ListCard(
-      {
-        required this.bgImagePath,
-        required this.avaterImagePath,
-        required this.companyName,
-        required this.userName,
-        required this.tagList,
-        Key? key
-      }
-      )
+  const ListPartnerManageCard(
+      {required this.bgImagePath,
+      required this.avaterImagePath,
+      required this.companyName,
+      required this.userName,
+      required this.tagList,
+      this.isNew = false,
+      Key? key})
       : super(key: key);
 
   @override
@@ -42,6 +41,70 @@ class ListCard extends StatelessWidget {
             width: 18.0,
           ),
           _ListRightText(),
+          isNew
+              ? Container(
+                  child: Column(
+                    children: [
+                      ElevatedButton(
+                        onPressed: () {
+                        },
+                        child: Text(
+                          '승인',
+                          style: TextStyle(
+                            color: Color(0xff333333),
+                          ),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Color(0xFFf5f6fa),
+                          foregroundColor: Color(0xFFf5f6fa),
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8.0)),
+                        ),
+                      ),
+                      ElevatedButton(
+                        onPressed: () {
+                        },
+                        child: Text(
+                          '반려',
+                          style: TextStyle(
+                            color: Color(0xffffffff),
+                          ),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Color(0xFF333333),
+                          foregroundColor: Color(0xFF333333),
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8.0)),
+                        ),
+                      ),
+                    ],
+                  ),
+                )
+              : Container(
+                  child: Column(
+                    children: [
+                      ElevatedButton(
+                        onPressed: () {
+                        },
+                        child: Text(
+                          '방출',
+                          style: TextStyle(
+                            color: Color(0xffffffff),
+                          ),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Color(0xFF333333),
+                          foregroundColor: Color(0xFF333333),
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8.0)),
+                        ),
+                      ),
+                    ],
+                  ),
+                )
         ],
       ),
     );
@@ -55,8 +118,7 @@ class ListCard extends StatelessWidget {
         children: [
           Text(
             userName,
-            style: TextStyle(
-                fontWeight: FontWeight.w500, fontSize: 16.0),
+            style: TextStyle(fontWeight: FontWeight.w500, fontSize: 16.0),
           ),
           SizedBox(
             height: 5.0,

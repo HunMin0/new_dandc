@@ -34,7 +34,7 @@ class DefaultLogoLayout extends StatelessWidget {
         elevation: 0,
         backgroundColor: Colors.white,
         actions: rightMoreBtn != null && rightMoreBtn! ? [
-          IconButton(onPressed: (){}, icon: Icon(Icons.more_horiz)),
+          IconButton(onPressed: (){}, icon: Icon(Icons.settings)),
         ] : null,
         /*
         actions: [

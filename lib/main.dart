@@ -6,7 +6,9 @@ import 'package:Deal_Connect/pages/auth/terms/terms_index.dart';
 import 'package:Deal_Connect/pages/default_page.dart';
 import 'package:Deal_Connect/pages/intro/intro_index.dart';
 import 'package:Deal_Connect/pages/root_page.dart';
+import 'package:Deal_Connect/utils/shared_pref_utils.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -19,6 +21,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
     return MaterialApp(
         title: 'Deal&Connect', // 디바이스의 작업줄에 표시역할
         theme: SettingThemes.lightTheme,
@@ -35,4 +38,5 @@ class MyApp extends StatelessWidget {
         }
     );
   }
+
 }

@@ -40,7 +40,7 @@ class TransactionIndex extends StatelessWidget {
                       context,
                       PageRouteBuilder(
                         pageBuilder: (context, animation, secondaryAnimation) =>
-                            const GroupSearchIndex(),
+                            GroupSearchIndex(),
                         transitionsBuilder:
                             (context, animation, secondaryAnimation, child) {
                           const begin = Offset(1.0, 0.0);
@@ -107,7 +107,7 @@ class TransactionIndex extends StatelessWidget {
                       context,
                       PageRouteBuilder(
                         pageBuilder: (context, animation, secondaryAnimation) =>
-                        const GroupSearchIndex(),
+                        GroupSearchIndex(),
                         transitionsBuilder:
                             (context, animation, secondaryAnimation, child) {
                           const begin = Offset(1.0, 0.0);

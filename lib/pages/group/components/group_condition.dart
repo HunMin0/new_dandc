@@ -1,3 +1,5 @@
+import 'package:Deal_Connect/pages/group/group_partner/group_partner_index.dart';
+import 'package:Deal_Connect/pages/group/group_trade/group_trade_index.dart';
 import 'package:flutter/material.dart';
 
 class GroupCondition extends StatelessWidget {
@@ -17,14 +19,24 @@ class GroupCondition extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          _buildUserTab(
-            partner.toString(),
-            '파트너',
+          GestureDetector(
+            onTap: (){
+              Navigator.push(context, MaterialPageRoute(builder: (context) => GroupPartnerIndex()));
+            },
+            child: _buildUserTab(
+              partner.toString(),
+              '파트너',
+            ),
           ),
           _buildTabLine(),
-          _buildUserTab(
-            history,
-            '거래내역',
+          GestureDetector(
+            onTap: (){
+              Navigator.push(context, MaterialPageRoute(builder: (context) => GroupTradeIndex()));
+            },
+            child: _buildUserTab(
+              history,
+              '거래내역',
+            ),
           ),
         ],
       ),

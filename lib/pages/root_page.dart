@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:Deal_Connect/utils/shared_pref_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -34,16 +35,14 @@ class RootPageState extends State<RootPage> {
   }
 
   Future<void> _checkLoginStatus() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    bool isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
-
-    if (isLoggedIn) {
-      // 이미 로그인된 경우 홈 화면으로 이동
-      Navigator.pushReplacementNamed(context, '/home');
-    } else {
-      // 로그인되어 있지 않은 경우 로그인 화면으로 이동
-      Navigator.pushReplacementNamed(context, '/intro');
-    }
+    SharedPrefUtils.getUser().then((user) {
+      print(user);
+      if (user != null) {
+        Navigator.pushReplacementNamed(context, '/home');
+      } else {
+        Navigator.pushReplacementNamed(context, '/intro');
+      }
+    });
   }
 
   @override

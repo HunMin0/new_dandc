@@ -4,6 +4,7 @@ import 'package:Deal_Connect/components/list_card.dart';
 import 'package:Deal_Connect/pages/group/components/group_button.dart';
 import 'package:Deal_Connect/pages/group/components/group_condition.dart';
 import 'package:Deal_Connect/pages/group/components/group_list_card.dart';
+import 'package:Deal_Connect/pages/group/group_manage/group_manage_index.dart';
 import 'package:Deal_Connect/pages/group/group_view_index.dart';
 import 'package:flutter/material.dart';
 
@@ -26,11 +27,14 @@ class _GroupViewState extends State<GroupView> {
         isProcessable: true,
         bottomBar: true,
         isCancel: false,
+        rightMoreBtn: true,
         prevTitle: '취소',
         nextTitle: '그룹 가입 신청하기',
         isNotInnerPadding: 'true',
         prevOnPressed: () {},
-        nextOnPressed: () {
+        nextOnPressed: () {},
+        rightMoreBtnAction: () {
+          Navigator.push(context, MaterialPageRoute(builder: (context) => GroupManageIndex()));
         },
         child: NestedScrollView(
           headerSliverBuilder: (context, innerBoxIsScrolled) {
@@ -59,17 +63,6 @@ class _GroupViewState extends State<GroupView> {
                         '서초구 고기집 사장모임',
                         style:
                         TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                      ),
-                      Row(
-                        children: [
-                          Icon(Icons.group),
-                          SizedBox(width: 5),
-                          Text(
-                            '37',
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                          Text('명 · 비공개그룹')
-                        ],
                       ),
                       SizedBox(height: 24.0),
                       GroupCondition(partner: 192, history: '10k'),

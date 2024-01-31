@@ -69,7 +69,6 @@ class _SearchIndexState extends State<SearchIndex> {
                             companyName: verticalData['companyName'],
                             userName: verticalData['userName'],
                             tagList: verticalData['tagList'],
-                            newMark: verticalData['newMark'],
                           ),
                         );
                       },

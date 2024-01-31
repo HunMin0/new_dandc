@@ -8,15 +8,12 @@ class ListCard extends StatelessWidget {
   final List<String> tagList;
 
   const ListCard(
-      {
-        required this.bgImagePath,
-        required this.avaterImagePath,
-        required this.companyName,
-        required this.userName,
-        required this.tagList,
-        Key? key
-      }
-      )
+      {required this.bgImagePath,
+      required this.avaterImagePath,
+      required this.companyName,
+      required this.userName,
+      required this.tagList,
+      Key? key})
       : super(key: key);
 
   @override
@@ -51,7 +48,7 @@ class ListCard extends StatelessWidget {
     return Expanded(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
             userName,
@@ -59,7 +56,11 @@ class ListCard extends StatelessWidget {
                 fontWeight: FontWeight.w500, fontSize: 16.0),
           ),
           SizedBox(
-            height: 5.0,
+            width: 2.0,
+          ),
+          _cardTag('거래내역'),
+          SizedBox(
+            height: 4.0,
           ),
           Text(
             companyName,
@@ -68,12 +69,10 @@ class ListCard extends StatelessWidget {
                 fontSize: 14.0,
                 color: Color(0xFF8c8c8c)),
           ),
-          SizedBox(
-            height: 5.0,
-          ),
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal, // 가로 스크롤
-            child: _buildTags(tagList),
+          Row(
+            children: [
+              _buildTags(tagList),
+            ],
           ),
         ],
       ),

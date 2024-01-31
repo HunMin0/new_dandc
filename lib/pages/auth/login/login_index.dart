@@ -286,7 +286,9 @@ class LoginIndexState extends State<LoginIndex> {
               SizedBox(
                 width: 25,
                 height: 25,
-                child: Image.asset('assets/images/icons/login_email_icon.png'),
+                child: Icon(
+                  Icons.person_outline
+                ),
               ),
               Expanded(
                 child: Text(

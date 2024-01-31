@@ -25,7 +25,7 @@ class DefaultSearchLayout extends StatelessWidget {
         elevation: 0,
         backgroundColor: Colors.white,
         title: Container(
-          padding: EdgeInsets.only(top:5),
+          padding: EdgeInsets.symmetric(vertical: 10),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [

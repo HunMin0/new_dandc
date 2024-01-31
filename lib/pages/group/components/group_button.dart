@@ -11,7 +11,6 @@ class GroupButton extends StatelessWidget {
         SizedBox(
           width: 10.0,
         ),
-        _reanderButton(btnName: '그룹 설정', onPressed: (){},),
         SizedBox(width: 10.0,),
         _iconButton(btnIcons: Icons.person_add, onPressed: (){},),
       ],

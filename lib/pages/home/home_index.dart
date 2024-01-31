@@ -286,7 +286,6 @@ class _VerticalList extends StatelessWidget {
                 companyName: verticalData['companyName'],
                 userName: verticalData['userName'],
                 tagList: verticalData['tagList'],
-                newMark: verticalData['newMark'],
               ),
             );
           },

@@ -14,21 +14,8 @@ class DefaultNextLayout extends StatelessWidget {
   final VoidCallback? nextOnPressed;
   final VoidCallback? prevOnPressed;
   final String? isNotInnerPadding;
-
-  const DefaultNextLayout(
-      {this.titleName,
-      required this.child,
-      required this.isProcessable,
-      this.backgroundColor,
-      required this.bottomBar,
-      this.prevTitle,
-      this.nextTitle,
-      this.prevOnPressed,
-      this.nextOnPressed,
-      this.isCancel = true, // 기본값 true로 설정
-        this.isNotInnerPadding,
-      Key? key})
-      : super(key: key);
+  final bool? rightMoreBtn;
+  final VoidCallback? rightMoreBtnAction;
 
   @override
   Widget build(BuildContext context) {
@@ -48,11 +35,21 @@ class DefaultNextLayout extends StatelessWidget {
         centerTitle: true,
         elevation: 0,
         backgroundColor: Colors.white,
+        actions: rightMoreBtn != null && rightMoreBtn!
+            ? [
+                IconButton(
+                  onPressed: rightMoreBtnAction,
+                  icon: Icon(Icons.settings),
+                ),
+              ]
+            : null,
       ),
       body: SafeArea(
         child: Padding(
           //  padding: const EdgeInsets.all(20.0),
-          padding: isNotInnerPadding == 'true' ? const EdgeInsets.all(0.0) : const EdgeInsets.all(20.0),
+          padding: isNotInnerPadding == 'true'
+              ? const EdgeInsets.all(0.0)
+              : const EdgeInsets.all(20.0),
           child: child,
         ),
       ),
@@ -68,6 +65,23 @@ class DefaultNextLayout extends StatelessWidget {
           : null,
     );
   }
+
+  const DefaultNextLayout(
+      {this.titleName,
+      required this.child,
+      required this.isProcessable,
+      this.backgroundColor,
+      required this.bottomBar,
+      this.prevTitle,
+      this.nextTitle,
+      this.prevOnPressed,
+      this.nextOnPressed,
+      this.isCancel = true, // 기본값 true로 설정
+      this.isNotInnerPadding,
+      this.rightMoreBtn = false,
+      this.rightMoreBtnAction,
+      Key? key})
+      : super(key: key);
 }
 
 class BottomButtons extends StatelessWidget {
@@ -84,7 +98,7 @@ class BottomButtons extends StatelessWidget {
       required this.nextTitle,
       required this.prevTitle,
       required this.isProcessable,
-        required this.isCancel,
+      required this.isCancel,
       super.key});
 
   @override
@@ -112,19 +126,19 @@ class BottomButtons extends StatelessWidget {
           padding: EdgeInsets.all(16.0),
           child: Row(
             children: [
-              if(isCancel)
-              ElevatedButton(
-                style: boxStyle,
-                onPressed: prevOnPressed,
-                child: Text(
-                  prevTitle,
-                  style: textStyle,
+              if (isCancel)
+                ElevatedButton(
+                  style: boxStyle,
+                  onPressed: prevOnPressed,
+                  child: Text(
+                    prevTitle,
+                    style: textStyle,
+                  ),
                 ),
-              ),
-              if(isCancel)
-              SizedBox(
-                width: 10.0,
-              ),
+              if (isCancel)
+                SizedBox(
+                  width: 10.0,
+                ),
               Expanded(
                 child: ElevatedButton(
                   style: isProcessable

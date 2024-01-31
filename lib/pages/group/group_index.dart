@@ -40,7 +40,7 @@ class GroupIndex extends StatelessWidget {
                   Navigator.push(
                     context,
                     PageRouteBuilder(
-                      pageBuilder: (context, animation, secondaryAnimation) => const GroupSearchIndex(),
+                      pageBuilder: (context, animation, secondaryAnimation) => GroupSearchIndex(),
                       transitionsBuilder: (context, animation, secondaryAnimation, child) {
                         const begin = Offset(1.0, 0.0);
                         const end = Offset.zero;
