@@ -1,12 +1,32 @@
 import 'package:Deal_Connect/components/layout/default_basic_layout.dart';
 import 'package:Deal_Connect/components/layout/default_layout.dart';
+import 'package:Deal_Connect/components/list_business_card.dart';
+import 'package:Deal_Connect/db/company_data.dart';
+import 'package:Deal_Connect/pages/business/business_detail/business_detail_info.dart';
 import 'package:Deal_Connect/pages/business/components/business_tab_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
 
 // 사업장찾기
-class BusinessIndex extends StatelessWidget {
+class BusinessIndex extends StatefulWidget {
   const BusinessIndex({Key? key}) : super(key: key);
+
+  @override
+  State<BusinessIndex> createState() => _BusinessIndexState();
+}
+
+class _BusinessIndexState extends State<BusinessIndex> with TickerProviderStateMixin {
+  late final TabController tabController;
+
+  @override
+  void initState() {
+    super.initState();
+    // tab컨트롤러 초기화
+    tabController = TabController(
+      length: 4,
+      vsync: this,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -52,15 +72,125 @@ class BusinessIndex extends StatelessWidget {
                 ),
               ),
             ),
+            SliverToBoxAdapter(
+              child: Divider(
+                color: Color(0xFFF5F6FA),
+                thickness: 8.0,
+              ),
+            ),
+            SliverPersistentHeader(
+              delegate: BusinessUserTabHeaderDelegate(tabController),
+              pinned: true,
+            ),
+            SliverToBoxAdapter(
+              child: Divider(
+                color: Color(0xFFF5F6FA),
+                thickness: 16.0,
+              ),
+            ),
           ];
         },
-          body: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(child: BusinessTabBar()),
-            ],
+          body: Container(
+            color: Color(0xFFf5f6f8),
+            padding: EdgeInsets.symmetric(horizontal: 14.0),
+            child: companyDataList.isNotEmpty
+                ? GridView.builder(
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2, // 한 줄에 2개의 아이템
+                crossAxisSpacing: 10.0, // 아이템 간의 가로 간격
+                mainAxisSpacing: 10.0, // 아이템 간의 세로 간격
+                childAspectRatio: 1 / 1.4,
+              ),
+              itemCount: companyDataList.length, // 아이템 개수
+              itemBuilder: (context, index) {
+                Map<String, dynamic> companyData = companyDataList[index];
+                return GestureDetector(
+                  onTap: () {
+                    print('클릭했다~ ');
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => BusinessDetailInfo()));
+                  },
+                  child: Container(
+                    child: ListBusinessCard(
+                      bgImagePath: companyData['bgImagePath'],
+                      avaterImagePath: companyData['avaterImagePath'],
+                      companyName: companyData['companyName'],
+                      tagList : companyData['tagList'],
+                    ),
+                  ),
+                );
+              },
+            ) : const Text('등록된 데이터가 없습니다'),
           ),
         )
     );
+  }
+}
+
+
+class BusinessUserTabHeaderDelegate extends SliverPersistentHeaderDelegate {
+  final TabController tabController;
+
+  BusinessUserTabHeaderDelegate(this.tabController);
+
+  @override
+  Widget build(
+      BuildContext context, double shrinkOffset, bool overlapsContent) {
+    return Container(
+      height: 50.0,
+      color: Colors.white,
+      child: TabBar(
+        controller: tabController,
+        indicatorColor: Colors.black,
+        indicatorWeight: 2.0,
+        labelColor: Colors.black,
+        dividerColor: Colors.white,
+        unselectedLabelColor: Colors.grey[500],
+        isScrollable: true,
+        onTap: (value) {
+          print(value);
+        },
+        labelStyle: TextStyle(
+          fontSize: 15.0,
+          fontWeight: FontWeight.w600,
+        ),
+        unselectedLabelStyle: TextStyle(
+          fontWeight: FontWeight.w500,
+        ),
+        indicatorSize: TabBarIndicatorSize.tab,
+        tabs: [
+          Tab(
+            child: Text(
+              '식당/주점/카페',
+            ),
+          ),
+          Tab(
+            child: Text(
+              '법무/세무/보험',
+            ),
+          ),
+          Tab(
+            child: Text(
+              '화장품/건강식품',
+            ),
+          ),
+          Tab(
+            child: Text(
+              '화장품/건강식품',
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  double get maxExtent => 50.0;
+
+  @override
+  double get minExtent => 50.0;
+
+  @override
+  bool shouldRebuild(covariant SliverPersistentHeaderDelegate oldDelegate) {
+    return false;
   }
 }

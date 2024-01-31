@@ -28,11 +28,6 @@ class _BusinessTabBarState extends State<BusinessTabBar> with TickerProviderStat
       color: Color(0xFFF5F6FA),
       child: Column(
         children: [
-          Divider(
-            color: Color(0xFFF5F6FA),
-            height: 8,
-            thickness: 8.0,
-          ),
           Container(
             color: Colors.white,
             child: TabBar(
