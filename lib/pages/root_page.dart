@@ -16,16 +16,9 @@ class RootPageState extends State<RootPage> {
   void initState() {
     // refreshFcmToken().then((value) {});
 
-    _startIntroTimer();
+    _checkLoginStatus();
 
     super.initState();
-  }
-
-  void _startIntroTimer() {
-    _cancelIntroTimer();
-    _introTimer = Timer(const Duration(seconds: 3), () {
-      _checkLoginStatus();
-    });
   }
 
   void _cancelIntroTimer() {
@@ -36,7 +29,6 @@ class RootPageState extends State<RootPage> {
 
   Future<void> _checkLoginStatus() async {
     SharedPrefUtils.getUser().then((user) {
-      print(user);
       if (user != null) {
         Navigator.pushReplacementNamed(context, '/home');
       } else {
@@ -51,17 +43,7 @@ class RootPageState extends State<RootPage> {
       backgroundColor: HexColor('#75a8e4'),
       body: SafeArea(
         child: SizedBox(
-          /*
-          width: MediaQuery.of(context).size.width,
-          height: MediaQuery.of(context).size.height,
-          child: GifView.asset(
-            'assets/images/intro.gif',
-            height: MediaQuery.of(context).size.width,
-            width: MediaQuery.of(context).size.height,
-            frameRate: 15,
-            loop: false,
-          ),
-          */
+
         ),
       ),
     );

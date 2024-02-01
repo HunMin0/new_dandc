@@ -1,8 +1,14 @@
 import 'package:Deal_Connect/components/layout/default_basic_layout.dart';
 import 'package:Deal_Connect/components/layout/default_logo_layout.dart';
+import 'package:Deal_Connect/components/list_ranking_card.dart';
+import 'package:Deal_Connect/db/group_ranking_data.dart';
 import 'package:Deal_Connect/db/trade_data.dart';
+import 'package:Deal_Connect/pages/group/group_trade/group_trade_detail.dart';
+import 'package:Deal_Connect/pages/group/group_trade/group_trade_history_list.dart';
 import 'package:Deal_Connect/pages/history/components/list_card.dart';
 import 'package:Deal_Connect/pages/history/history_detail/history_detail_index.dart';
+import 'package:Deal_Connect/pages/history/history_detail/history_detail_info.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
 
@@ -36,7 +42,7 @@ class _GroupTradeIndexState extends State<GroupTradeIndex>
         slivers: [
           SliverAppBar(
             automaticallyImplyLeading: false,
-            expandedHeight: 330.0,
+            expandedHeight: 310.0,
             flexibleSpace: FlexibleSpaceBar(
               background: Padding(
                 padding: EdgeInsets.all(12.0),
@@ -46,7 +52,7 @@ class _GroupTradeIndexState extends State<GroupTradeIndex>
                     Text(
                       '서초구 고기집 사장모임의\nDeal & Connect',
                       style:
-                      TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                     ),
                     SizedBox(
                       height: 14.0,
@@ -78,17 +84,19 @@ class _GroupTradeIndexState extends State<GroupTradeIndex>
           ),
           SliverList(
             delegate: SliverChildBuilderDelegate(
-                  (BuildContext context, int index) {
+              (BuildContext context, int index) {
                 return Container(
-                  child: tradeDataList.isNotEmpty
-                      ? ListCard(
-                    created_at: tradeDataList[index]['created_at'],
-                    companyCeo: tradeDataList[index]['companyCeo'],
-                    companyName: tradeDataList[index]['companyName'],
-                    trade_name: tradeDataList[index]['trade_name'],
-                    trade_price: tradeDataList[index]['trade_price'],
-                    buyer: tradeDataList[index]['buyer'],
-                  )
+                  child: groupRankingData.isNotEmpty
+                      ? ListRankingCard(
+                          avaterImagePath: groupRankingData[index]
+                              ['avaterImagePath'],
+                          bgImagePath: groupRankingData[index]['bgImagePath'],
+                          companyName: groupRankingData[index]['companyName'],
+                          userName: groupRankingData[index]['userName'],
+                          tagList: groupRankingData[index]['tagList'],
+                          ranking: groupRankingData[index]['ranking'],
+                          money: groupRankingData[index]['money'],
+                        )
                       : const Text('등록된 데이터가 없습니다'),
                 );
               },
@@ -110,19 +118,27 @@ class MySliverPersistentHeaderDelegate extends SliverPersistentHeaderDelegate {
   Widget build(
       BuildContext context, double shrinkOffset, bool overlapsContent) {
     return Container(
-      height: 50.0,
-      color: Colors.white,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text('Deal&Connect 랭킹', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),),
-          ],
-        ),
-      )
-    );
+        height: 50.0,
+        color: Colors.white,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Row(
+                children: [
+                  Text(
+                    'Deal&Connect 랭킹',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                  ),
+                  Spacer(),
+                  Text('최근 30일')
+                ],
+              ),
+            ],
+          ),
+        ));
   }
 
   @override
@@ -260,7 +276,9 @@ class _buildHistoryBox extends StatelessWidget {
               )
             ],
           ),
-          SizedBox(height: 20,),
+          SizedBox(
+            height: 20,
+          ),
           _buildMyRanking(),
         ],
       ),
@@ -275,33 +293,38 @@ class _buildMyRanking extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 14.0),
-      decoration: BoxDecoration(
-        color: HexColor('#75A8E4'),
-        borderRadius: const BorderRadius.all(Radius.circular(10)),
-      ),
-      child: Row(
-        children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                '상세 거래내역 보기',
-                style: TextStyle(
-                    color: HexColor('#FFFFFF'),
-                    fontSize: 15,
-                    fontWeight: FontWeight.bold),
-              )
-            ],
-          ),
-          const Spacer(),
-          const Icon(
-            Icons.chevron_right,
-            color: Colors.white,
-            size: 24.0,
-          ),
-        ],
+    return GestureDetector(
+      onTap: (){
+        Navigator.push(context, CupertinoPageRoute(builder: (context) => GroupTradeDetail()));
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 14.0),
+        decoration: BoxDecoration(
+          color: HexColor('#75A8E4'),
+          borderRadius: const BorderRadius.all(Radius.circular(10)),
+        ),
+        child: Row(
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '상세 거래내역 보기',
+                  style: TextStyle(
+                      color: HexColor('#FFFFFF'),
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold),
+                )
+              ],
+            ),
+            const Spacer(),
+            const Icon(
+              Icons.chevron_right,
+              color: Colors.white,
+              size: 24.0,
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -1,3 +1,6 @@
+import 'package:Deal_Connect/pages/profile/other_profile.dart';
+import 'package:Deal_Connect/pages/profile/profile_partner/profile_partner_index.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class ProfileUserCondition extends StatelessWidget {
@@ -19,9 +22,18 @@ class ProfileUserCondition extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          _buildUserTab(
-            partner.toString(),
-            '파트너',
+          GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                CupertinoPageRoute(builder: (context) => ProfilePartnerIndex()
+                ),
+              );
+            },
+            child: _buildUserTab(
+              partner.toString(),
+              '파트너',
+            ),
           ),
           _buildTabLine(),
           _buildUserTab(

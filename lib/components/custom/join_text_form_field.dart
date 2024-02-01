@@ -11,6 +11,7 @@ class JoinTextFormField extends StatefulWidget {
   final bool autofocus;
   final bool isNumber; // true 숫자 , false 문자포함
   final int? maxLength;
+  final int? maxLines;
   final bool? enabled;
   final ValueChanged<String>? onChanged;
   final String? Function(String?)? validator;
@@ -19,6 +20,7 @@ class JoinTextFormField extends StatefulWidget {
     required this.label,
     required this.onChanged,
     this.maxLength,
+    this.maxLines = 1,
     this.autofocus = false, // 기본값 false로 설정
     this.obscureText = false, // 기본값 false로 설정
     this.isNumber = false,
@@ -64,6 +66,7 @@ class _JoinTextFormFieldState extends State<JoinTextFormField> {
           // 화면에 들어올경우 포커스를 걸어놓을지 설정 true
           autofocus: widget.autofocus,
           // 값이 바뀔경우 콜백
+          maxLines: widget.maxLines,
           maxLength: widget.maxLength,
           keyboardType: widget.isNumber ? TextInputType.number : TextInputType.text,
           inputFormatters: widget.isNumber ? [

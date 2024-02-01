@@ -46,7 +46,6 @@ class DefaultNextLayout extends StatelessWidget {
       ),
       body: SafeArea(
         child: Padding(
-          //  padding: const EdgeInsets.all(20.0),
           padding: isNotInnerPadding == 'true'
               ? const EdgeInsets.all(0.0)
               : const EdgeInsets.all(20.0),
@@ -123,7 +122,7 @@ class BottomButtons extends StatelessWidget {
     return Stack(
       children: [
         Container(
-          padding: EdgeInsets.all(16.0),
+          padding: EdgeInsets.only(left:16.0, right:16.0, bottom:16.0),
           child: Row(
             children: [
               if (isCancel)

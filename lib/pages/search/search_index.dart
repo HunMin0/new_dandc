@@ -1,6 +1,7 @@
 import 'package:Deal_Connect/components/layout/default_search_layout.dart';
 import 'package:Deal_Connect/components/list_card.dart';
 import 'package:Deal_Connect/db/group_data.dart';
+import 'package:Deal_Connect/db/search_sample_date.dart';
 import 'package:Deal_Connect/db/vertical_data.dart';
 import 'package:Deal_Connect/pages/home/components/group_card.dart';
 import 'package:Deal_Connect/pages/search/components/partner_card.dart';
@@ -161,18 +162,18 @@ class _HorizontalList extends StatelessWidget {
       height: 140.0,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
-        itemCount: groupDataList.length,
+        itemCount: searchSampleDataList.length,
         itemBuilder: (context, index) {
-          Map<String, dynamic> groupData = groupDataList[index];
+          Map<String, dynamic> sampleData = searchSampleDataList[index];
 
           return GestureDetector(
             onTap: () {
               print('클릭됨');
             },
             child: PartnerCard(
-              imagePath: groupData['imagePath'],
-              name: groupData['title'],
-              markets: groupData['category'],
+              imagePath: sampleData['imagePath'],
+              name: sampleData['name'],
+              markets: sampleData['markets'],
             ),
           );
         },
