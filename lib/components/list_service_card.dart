@@ -6,19 +6,22 @@ class ListServiceCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: HexColor("#F6FDFA"),
-      child: Container(
-        margin: EdgeInsets.all(10.0),
-        width: 180.0,
-        decoration: BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage('assets/images/sample/service_sample01.png'),
-            fit: BoxFit.cover,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          height: 120,
+          decoration: BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage('assets/images/sample/main_sample01.jpg'),
+              fit: BoxFit.fill
+            ),
+            borderRadius: BorderRadius.circular(10.0),
           ),
-          borderRadius: BorderRadius.circular(10.0),
         ),
-      ),
+        SizedBox(height: 5,),
+        Text('꽃 바구니', style: TextStyle( fontWeight: FontWeight.bold ),),
+      ],
     );
   }
 }

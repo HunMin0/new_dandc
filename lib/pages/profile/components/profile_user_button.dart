@@ -1,3 +1,5 @@
+import 'package:Deal_Connect/pages/profile/partner_attend/partner_attend_index.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class ProfileUserButton extends StatelessWidget {
@@ -11,7 +13,9 @@ class ProfileUserButton extends StatelessWidget {
         SizedBox(
           width: 10.0,
         ),
-        _reanderButton(btnName: '파트너 신청 확인하기', onPressed: (){},),
+        _reanderButton(btnName: '파트너 신청 확인하기', onPressed: (){
+          Navigator.push(context, CupertinoPageRoute(builder: (context) => PartnerAttendIndex()));
+        },),
       ],
     );
   }

@@ -2,6 +2,8 @@ import 'package:Deal_Connect/components/layout/default_basic_layout.dart';
 import 'package:Deal_Connect/db/trade_data.dart';
 import 'package:Deal_Connect/pages/history/components/list_card.dart';
 import 'package:Deal_Connect/pages/history/history_detail/history_detail_index.dart';
+import 'package:Deal_Connect/pages/history/history_ranking/history_ranking_index.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
 
@@ -353,40 +355,45 @@ class _buildMyRanking extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 14.0),
-      decoration: BoxDecoration(
-        color: HexColor('#75A8E4'),
-        borderRadius: const BorderRadius.all(Radius.circular(10)),
-      ),
-      child: Row(
-        children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                '나의 파트너들 중 누가 제일 큰손일까요!?',
-                style: TextStyle(
-                  color: HexColor('#FFFFFF'),
-                  fontSize: 13,
-                ),
-              ),
-              Text(
-                '랭킹 보러가기',
-                style: TextStyle(
+    return GestureDetector(
+      onTap: (){
+        Navigator.push(context, CupertinoPageRoute(builder: (context) => HistoryRankingIndex()));
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 14.0),
+        decoration: BoxDecoration(
+          color: HexColor('#75A8E4'),
+          borderRadius: const BorderRadius.all(Radius.circular(10)),
+        ),
+        child: Row(
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '나의 파트너들 중 누가 제일 큰손일까요!?',
+                  style: TextStyle(
                     color: HexColor('#FFFFFF'),
-                    fontSize: 15,
-                    fontWeight: FontWeight.bold),
-              )
-            ],
-          ),
-          const Spacer(),
-          const Icon(
-            Icons.chevron_right,
-            color: Colors.white,
-            size: 24.0,
-          ),
-        ],
+                    fontSize: 13,
+                  ),
+                ),
+                Text(
+                  '랭킹 보러가기',
+                  style: TextStyle(
+                      color: HexColor('#FFFFFF'),
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold),
+                )
+              ],
+            ),
+            const Spacer(),
+            const Icon(
+              Icons.chevron_right,
+              color: Colors.white,
+              size: 24.0,
+            ),
+          ],
+        ),
       ),
     );
   }

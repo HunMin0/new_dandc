@@ -1,24 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:hexcolor/hexcolor.dart';
+import 'package:intl/intl.dart';
 
-class ListCard extends StatelessWidget {
+class ListRankingCard extends StatelessWidget {
   final String bgImagePath;
   final String avaterImagePath;
   final String companyName;
   final String userName;
-  final bool hasApprove;
+  final String ranking;
+  final String money;
   final List<String> tagList;
 
-  const ListCard(
-      {
-        required this.bgImagePath,
-        required this.avaterImagePath,
-        required this.companyName,
-        required this.userName,
-        required this.tagList,
-        this.hasApprove = false,
-        Key? key
-      }
-      )
+  const ListRankingCard(
+      {required this.bgImagePath,
+      required this.avaterImagePath,
+      required this.companyName,
+      required this.userName,
+      required this.ranking,
+      required this.tagList,
+      required this.money,
+      Key? key})
       : super(key: key);
 
   @override
@@ -35,33 +36,37 @@ class ListCard extends StatelessWidget {
   }
 
   Padding _ListCardData() {
+    String formattedMoney = NumberFormat('#,##0').format(int.parse(money));
+
     return Padding(
       padding: const EdgeInsets.all(14.0),
       child: Row(
         children: [
-          _ListLeftBg(),
+          Container(
+            width: 65,
+            padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 2.0),
+            decoration: BoxDecoration(
+              color: HexColor("#f1f1f1"),
+              borderRadius: BorderRadius.all(Radius.circular(10.0)),
+            ),
+            child: Column(
+              children: [
+                Text(
+                  ranking + '등',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                Text(formattedMoney + '원', style: TextStyle(fontSize: 10.0))
+              ],
+            ),
+          ),
+          SizedBox(
+            width: 15,
+          ),
+          _ListRightText(),
           SizedBox(
             width: 18.0,
           ),
-          _ListRightText(),
-          if (hasApprove)
-            ElevatedButton(
-              onPressed: () {
-              },
-              child: Text(
-                '승인',
-                style: TextStyle(
-                  color: Color(0xffffffff),
-                ),
-              ),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Color(0xFF333333),
-                foregroundColor: Color(0xFF333333),
-                elevation: 0,
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8.0)),
-              ),
-            ),
+          _ListLeftBg(),
         ],
       ),
     );
@@ -75,8 +80,7 @@ class ListCard extends StatelessWidget {
         children: [
           Text(
             userName,
-            style: TextStyle(
-                fontWeight: FontWeight.w500, fontSize: 16.0),
+            style: TextStyle(fontWeight: FontWeight.w500, fontSize: 16.0),
           ),
           SizedBox(
             height: 5.0,

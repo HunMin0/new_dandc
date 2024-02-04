@@ -51,10 +51,7 @@ class _HistoryDetailInfoState extends State<HistoryDetailInfo> {
                       Spacer(),
                       Column(
                         children: [
-                          Image(
-                            image: AssetImage('assets/images/right_arrow.png'),
-                            width: 20,
-                          ),
+                          Icon(Icons.compare_arrows_rounded, size: 50, color: HexColor("#aaaaaa"),),
                           SizedBox(
                             height: 10,
                           ),
@@ -93,12 +90,20 @@ class _HistoryDetailInfoState extends State<HistoryDetailInfo> {
                 ],
               ),
             ),
-            Divider(
-              thickness: 10,
-              color: HexColor('#F5F6FA'),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 15.0),
+              child: Row(
+                children: [
+                  _reanderButton(btnName: '승인', onPressed: (){},),
+                  SizedBox(
+                    width: 10.0,
+                  ),
+                  _reanderButton(btnName: '반려', onPressed: (){},),
+                ],
+              ),
             ),
             Padding(
-              padding: const EdgeInsets.all(20.0),
+              padding: const EdgeInsets.symmetric(horizontal: 20.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -107,7 +112,7 @@ class _HistoryDetailInfoState extends State<HistoryDetailInfo> {
                       Text(
                         "거래 정보",
                         style:
-                            TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                            TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
                       ),
                       Spacer(),
                       TextButton(
@@ -153,7 +158,7 @@ class _HistoryDetailInfoState extends State<HistoryDetailInfo> {
                   ),
                   Text(
                     "[김철수]님 한마디",
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
                   ),
                   SizedBox(
                     height: 10,
@@ -171,7 +176,7 @@ class _HistoryDetailInfoState extends State<HistoryDetailInfo> {
                   ),
                   Text(
                     "[하남돼지집]님 한마디",
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
                   ),
                   SizedBox(
                     height: 10,
@@ -184,6 +189,7 @@ class _HistoryDetailInfoState extends State<HistoryDetailInfo> {
                         borderRadius: BorderRadius.circular(10.0),
                       ),
                       child: Text("와주셔서 감사합니다!")),
+                  SizedBox(height: 40,),
                 ],
               ),
             )
@@ -231,3 +237,40 @@ class _HistoryDetailInfoState extends State<HistoryDetailInfo> {
     );
   }
 }
+
+
+class _reanderButton extends StatelessWidget {
+  final String btnName;
+  final VoidCallback onPressed;
+
+  const _reanderButton({
+    required this.btnName,
+    required this.onPressed,
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: ElevatedButton(
+        onPressed: onPressed,
+        child: Text(
+          btnName,
+          style: TextStyle(
+              color: Colors.black,
+              fontSize: 14.0,
+              fontWeight: FontWeight.w500),
+        ),
+        style: ElevatedButton.styleFrom(
+          minimumSize: Size(double.infinity, 50),
+          backgroundColor: Color(0xFFF5F6FA),
+          foregroundColor: Color(0xFFF5F6FA),
+          elevation: 0,
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8.0)),
+        ),
+      ),
+    );
+  }
+}
+

@@ -3,15 +3,15 @@ import 'package:Deal_Connect/components/list_line_business_card.dart';
 import 'package:Deal_Connect/components/post_list_card.dart';
 import 'package:Deal_Connect/db/company_data.dart';
 import 'package:Deal_Connect/db/post_data.dart';
+import 'package:Deal_Connect/pages/business/business_detail/business_detail_info.dart';
+import 'package:Deal_Connect/pages/group/group_board/group_board_info.dart';
 import 'package:Deal_Connect/pages/profile/company_add/company_add_index.dart';
 import 'package:Deal_Connect/pages/profile/components/profile_user_button.dart';
 import 'package:Deal_Connect/pages/profile/components/profile_user_condition.dart';
 import 'package:Deal_Connect/pages/profile/components/profile_user_info.dart';
-import 'package:Deal_Connect/pages/profile/components/profile_user_tab_bar.dart';
 import 'package:Deal_Connect/pages/profile/components/tab_list/not_user_registered.dart';
 import 'package:Deal_Connect/pages/profile/components/tab_list/tabBarButton.dart';
-import 'package:Deal_Connect/pages/profile/components/tab_list/user_company.dart';
-import 'package:Deal_Connect/pages/profile/components/tab_list/user_post.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 // 프로필
@@ -111,7 +111,11 @@ class _ProfileIndexState extends State<ProfileIndex>
 
                               return GestureDetector(
                                 onTap: () {
-                                  print('클릭했다~');
+                                  Navigator.push(
+                                    context,
+                                    CupertinoPageRoute(builder: (context) => BusinessDetailInfo()
+                                    ),
+                                  );
                                 },
                                 child: ListLineBusinessCard(
                                   bgImagePath: verticalData['bgImagePath'],
@@ -157,7 +161,11 @@ class _ProfileIndexState extends State<ProfileIndex>
 
                             return GestureDetector(
                               onTap: () {
-                                print('클릭했다~');
+                                Navigator.push(
+                                  context,
+                                  CupertinoPageRoute(builder: (context) => GroupBoardInfo(id: 1)
+                                  ),
+                                );
                               },
                               child: PostListCard(
                                 bgImagePath: postData['bgImagePath'],

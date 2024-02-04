@@ -4,6 +4,7 @@ import 'package:Deal_Connect/components/list_card.dart';
 import 'package:Deal_Connect/db/company_data.dart';
 import 'package:Deal_Connect/db/vertical_data.dart';
 import 'package:Deal_Connect/pages/business/business_detail/business_detail_info.dart';
+import 'package:Deal_Connect/pages/profile/other_profile.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
@@ -171,7 +172,11 @@ class _VerticalList extends StatelessWidget {
 
           return GestureDetector(
             onTap: () {
-              print('클릭했다~');
+              Navigator.push(
+                context,
+                CupertinoPageRoute(builder: (context) => OtherProfileIndex()
+                ),
+              );
             },
             child: ListCard(
               avaterImagePath: verticalData['avaterImagePath'],

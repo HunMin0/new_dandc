@@ -5,7 +5,7 @@ import 'package:Deal_Connect/pages/home/home_index.dart';
 import 'package:Deal_Connect/pages/profile/profile_index.dart';
 import 'package:Deal_Connect/pages/search/search_index.dart';
 import 'package:Deal_Connect/pages/search/search_partner_list.dart';
-import 'package:Deal_Connect/pages/transaction/transaction_index.dart';
+import 'package:Deal_Connect/pages/trade/trade_index.dart';
 import 'package:flutter/material.dart';
 
 import 'group/group_index.dart';
@@ -22,7 +22,7 @@ class _DefaultPageState extends State<DefaultPage> {
   final _pages = [
     HomeIndex(), // 메인홈
     HistoryIndex(), // 거래내역
-    TransactionIndex(), // 거래추가
+    TradeIndex(), // 거래추가
     BusinessIndex(), // 사업장찾기
     ProfileIndex(), // 프로필
   ];

@@ -1,3 +1,5 @@
+import 'package:Deal_Connect/pages/group/group_board/group_board_create.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class GroupButton extends StatelessWidget {
@@ -7,7 +9,9 @@ class GroupButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        _reanderButton(btnName: '글쓰기', onPressed: (){},),
+        _reanderButton(btnName: '글쓰기', onPressed: (){
+          Navigator.push(context, CupertinoPageRoute(builder: (context) => GroupBoardCreate()));
+        },),
         SizedBox(
           width: 10.0,
         ),

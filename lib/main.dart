@@ -6,9 +6,8 @@ import 'package:Deal_Connect/pages/auth/terms/terms_index.dart';
 import 'package:Deal_Connect/pages/default_page.dart';
 import 'package:Deal_Connect/pages/intro/intro_index.dart';
 import 'package:Deal_Connect/pages/root_page.dart';
-import 'package:Deal_Connect/utils/shared_pref_utils.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -26,6 +25,14 @@ class MyApp extends StatelessWidget {
         title: 'Deal&Connect', // 디바이스의 작업줄에 표시역할
         theme: SettingThemes.lightTheme,
         debugShowCheckedModeBanner: false,
+        localizationsDelegates: [
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        supportedLocales: [
+          const Locale('ko', 'KR'),
+        ],
         initialRoute: '/',
         routes: {
           '/': (context) => RootPage(),
