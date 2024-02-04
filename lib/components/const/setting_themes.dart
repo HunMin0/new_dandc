@@ -6,18 +6,22 @@ class SettingThemes {
   static ThemeData get lightTheme => ThemeData(
     useMaterial3: true,
     fontFamily: 'NotoSans',
-    appBarTheme: AppBarTheme(
-        surfaceTintColor: Colors.transparent
+    colorScheme: ColorScheme.light(
+      surface: Colors.transparent,
     ),
+    appBarTheme: AppBarTheme(surfaceTintColor: Colors.transparent),
+    bottomAppBarTheme: BottomAppBarTheme( surfaceTintColor: Colors.transparent ),
     elevatedButtonTheme: ElevatedButtonThemeData(
         style: ButtonStyle( surfaceTintColor: MaterialStateProperty.resolveWith<Color>(
                 (states) => Colors.transparent), )
     ),
-    datePickerTheme: DatePickerThemeData(surfaceTintColor: Colors.transparent),
+      scaffoldBackgroundColor: Colors.white,
+      datePickerTheme: DatePickerThemeData(surfaceTintColor: Colors.transparent),
+
     dialogTheme: DialogTheme(surfaceTintColor: Colors.transparent),
     buttonTheme: ButtonThemeData(hoverColor:Colors.transparent, splashColor: Colors.transparent, highlightColor: Colors.transparent),
     textTheme: _textTheme,
-    brightness: Brightness.light, // 디폴트는 light , dark 테마
+    //brightness: Brightness.light, // 디폴트는 light , dark 테마
   );
 
   // dark 테마
