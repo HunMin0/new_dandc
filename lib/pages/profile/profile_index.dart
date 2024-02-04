@@ -44,7 +44,7 @@ class _ProfileIndexState extends State<ProfileIndex>
           return [
             SliverAppBar(
               pinned: false,
-              expandedHeight: 260.0,
+              expandedHeight: 270.0,
               flexibleSpace: FlexibleSpaceBar(
                 background: Padding(
                   padding: EdgeInsets.all(12.0),

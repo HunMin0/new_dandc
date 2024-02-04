@@ -4,19 +4,26 @@ import 'package:Deal_Connect/components/const/setting_colors.dart';
 // light 테마
 class SettingThemes {
   static ThemeData get lightTheme => ThemeData(
-    useMaterial3: false,
+    useMaterial3: true,
     fontFamily: 'NotoSans',
-    primarySwatch: SettingColors.primaryMeterialColor, // AppBar와 플롯액션버튼 프라이머리 컬러 지정
-    scaffoldBackgroundColor: Colors.white,
-    // splashColor: Colors.pink, // 픗롯액션버튼 클릭시 색상
+    appBarTheme: AppBarTheme(
+        surfaceTintColor: Colors.transparent
+    ),
+    elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ButtonStyle( surfaceTintColor: MaterialStateProperty.resolveWith<Color>(
+                (states) => Colors.transparent), )
+    ),
+    datePickerTheme: DatePickerThemeData(surfaceTintColor: Colors.transparent),
+    dialogTheme: DialogTheme(surfaceTintColor: Colors.transparent),
+    buttonTheme: ButtonThemeData(hoverColor:Colors.transparent, splashColor: Colors.transparent, highlightColor: Colors.transparent),
     textTheme: _textTheme,
     brightness: Brightness.light, // 디폴트는 light , dark 테마
-
   );
 
   // dark 테마
   static ThemeData get darkTheme => ThemeData(
       fontFamily: 'NotoSans',
+      colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.blue),
       primarySwatch: SettingColors.primaryMeterialColor, // AppBar와 플롯액션버튼 프라이머리 컬러 지정
       // scaffoldBackgroundColor: Colors.white,
       // splashColor: Colors.pink, // 픗롯액션버튼 클릭시 색상

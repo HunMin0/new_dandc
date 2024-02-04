@@ -1,9 +1,11 @@
 import 'dart:io';
 import 'dart:ui';
 
+import 'package:Deal_Connect/components/const/setting_colors.dart';
 import 'package:Deal_Connect/components/custom/date_picker_text_field.dart';
 import 'package:Deal_Connect/components/custom/join_text_form_field.dart';
 import 'package:flutter/material.dart';
+import 'package:hexcolor/hexcolor.dart';
 import 'package:image_picker/image_picker.dart';
 
 class TradeBuyCreateForm extends StatefulWidget {
@@ -15,9 +17,16 @@ class TradeBuyCreateForm extends StatefulWidget {
 
 class _TradeBuyCreateFormState extends State<TradeBuyCreateForm> {
   File? _pickedImage;
+  DateTime? selectedDate;
 
   @override
   Widget build(BuildContext context) {
+    final baseBorder = OutlineInputBorder(
+      borderSide: BorderSide(
+        color: INPUT_BORDER_COLOR,
+        width: 1.0,
+      ),
+    );
     final bottomTextStyle = TextStyle(
       color: Color(0xFF232323),
       fontSize: 14.0,
@@ -37,13 +46,35 @@ class _TradeBuyCreateFormState extends State<TradeBuyCreateForm> {
             SizedBox(
               height: 10,
             ),
-            JoinTextFormField(
-              label: "거래일자",
-              hintText: '거래일자를 입력해주세요.',
-              onChanged: (String value) {
-              }
+            GestureDetector(
+              onTap: () {
+                _selectDate(context);
+              },
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 10.0),
+                    child: Text("거래일자", style: TextStyle(fontWeight: FontWeight.w400, fontSize: 13.0)),
+                  ),
+                  Container(
+                    padding: EdgeInsets.all(12.0),
+                    decoration: BoxDecoration(
+                      color: INPUT_BG_COLOR,
+                      borderRadius: BorderRadius.all(Radius.circular(5.0)),
+                      border: Border.all(color: INPUT_BORDER_COLOR)
+                    ),
+                    child: Row(
+                      children: [
+                        Text( selectedDate != null ? selectedDate.toString().split(" ")[0] : "날짜를 선택하세요.", style: TextStyle(fontWeight: FontWeight.w500, color: BODY_TEXT_COLOR),),
+                        Spacer(),
+                        Icon(Icons.date_range),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
-            // DatePickerTextField(),
             SizedBox(height: 10,),
             JoinTextFormField(
                 label: "거래항목",
@@ -172,4 +203,21 @@ class _TradeBuyCreateFormState extends State<TradeBuyCreateForm> {
       ),
     );
   }
+
+  Future<void> _selectDate(BuildContext context) async {
+
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: selectedDate,
+      firstDate: DateTime(2000),
+      lastDate: DateTime.now(),
+    );
+
+    if (picked != null && picked != selectedDate) {
+      setState(() {
+        selectedDate = picked;
+      });
+    }
+  }
+
 }

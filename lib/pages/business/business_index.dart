@@ -146,6 +146,7 @@ class BusinessUserTabHeaderDelegate extends SliverPersistentHeaderDelegate {
         dividerColor: Colors.white,
         unselectedLabelColor: Colors.grey[500],
         isScrollable: true,
+        tabAlignment: TabAlignment.start,
         onTap: (value) {
           print(value);
         },

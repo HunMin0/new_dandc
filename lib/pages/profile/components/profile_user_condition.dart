@@ -1,3 +1,5 @@
+import 'package:Deal_Connect/pages/default_page.dart';
+import 'package:Deal_Connect/pages/history/history_index.dart';
 import 'package:Deal_Connect/pages/profile/other_profile.dart';
 import 'package:Deal_Connect/pages/profile/profile_partner/profile_partner_index.dart';
 import 'package:flutter/cupertino.dart';
@@ -41,9 +43,17 @@ class ProfileUserCondition extends StatelessWidget {
             '소속그룹',
           ),
           _buildTabLine(),
-          _buildUserTab(
-            history,
-            '거래내역',
+          GestureDetector(
+            onTap: () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => DefaultPage(currentIndex: 1)),
+              );
+            },
+            child: _buildUserTab(
+              history,
+              '거래내역',
+            ),
           ),
         ],
       ),

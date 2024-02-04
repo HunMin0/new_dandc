@@ -25,13 +25,13 @@ class MyApp extends StatelessWidget {
         title: 'Deal&Connect', // 디바이스의 작업줄에 표시역할
         theme: SettingThemes.lightTheme,
         debugShowCheckedModeBanner: false,
-        localizationsDelegates: [
+        localizationsDelegates: const [
           GlobalMaterialLocalizations.delegate,
           GlobalWidgetsLocalizations.delegate,
           GlobalCupertinoLocalizations.delegate,
         ],
-        supportedLocales: [
-          const Locale('ko', 'KR'),
+        supportedLocales: const [
+          Locale('ko', 'KR'),
         ],
         initialRoute: '/',
         routes: {

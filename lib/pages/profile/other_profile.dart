@@ -25,7 +25,6 @@ class OtherProfileIndex extends StatefulWidget {
 }
 
 class _OtherProfileIndexState extends State<OtherProfileIndex> {
-
   @override
   void initState() {
     super.initState();
@@ -67,13 +66,23 @@ class _OtherProfileIndexState extends State<OtherProfileIndex> {
                       ),
                       Row(
                         children: [
-                          _reanderButton(btnName: '프로필 공유하기', onPressed: (){},),
+                          _reanderButton(
+                            btnName: '프로필 공유하기',
+                            onPressed: () {},
+                          ),
                           SizedBox(
                             width: 10.0,
                           ),
-                          _reanderButton(btnName: '파트너 신청', onPressed: (){
-                            Navigator.push(context, CupertinoPageRoute(builder: (context) => PartnerAttendIndex()));
-                          },),
+                          _reanderButton(
+                            btnName: '파트너 신청',
+                            onPressed: () {
+                              Navigator.push(
+                                  context,
+                                  CupertinoPageRoute(
+                                      builder: (context) =>
+                                          PartnerAttendIndex()));
+                            },
+                          ),
                         ],
                       ),
                     ],
@@ -95,31 +104,31 @@ class _OtherProfileIndexState extends State<OtherProfileIndex> {
           child: SizedBox(
             child: companyDataList.isNotEmpty
                 ? CustomScrollView(
-              slivers: [
-                SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                          (BuildContext context, int index) {
-                        Map<String, dynamic> verticalData =
-                        companyDataList[index];
+                    slivers: [
+                      SliverList(
+                        delegate: SliverChildBuilderDelegate(
+                            (BuildContext context, int index) {
+                          Map<String, dynamic> verticalData =
+                              companyDataList[index];
 
-                        return GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              CupertinoPageRoute(builder: (context) => BusinessDetailInfo()
-                              ),
-                            );
-                          },
-                          child: ListLineBusinessCard(
-                            bgImagePath: verticalData['bgImagePath'],
-                            companyName: verticalData['companyName'],
-                            tagList: verticalData['tagList'],
-                          ),
-                        );
-                      }, childCount: companyDataList.length),
-                ),
-              ],
-            )
+                          return GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                CupertinoPageRoute(
+                                    builder: (context) => BusinessDetailInfo()),
+                              );
+                            },
+                            child: ListLineBusinessCard(
+                              bgImagePath: verticalData['bgImagePath'],
+                              companyName: verticalData['companyName'],
+                              tagList: verticalData['tagList'],
+                            ),
+                          );
+                        }, childCount: companyDataList.length),
+                      ),
+                    ],
+                  )
                 : NotUserRegistered(isTabType: true),
           ),
         ),
@@ -127,7 +136,6 @@ class _OtherProfileIndexState extends State<OtherProfileIndex> {
     );
   }
 }
-
 
 class _reanderButton extends StatelessWidget {
   final String btnName;
@@ -147,17 +155,15 @@ class _reanderButton extends StatelessWidget {
         child: Text(
           btnName,
           style: TextStyle(
-              color: Colors.black,
-              fontSize: 14.0,
-              fontWeight: FontWeight.w500),
+              color: Colors.black, fontSize: 14.0, fontWeight: FontWeight.w500),
         ),
         style: ElevatedButton.styleFrom(
           minimumSize: Size(double.infinity, 50),
           backgroundColor: Color(0xFFF5F6FA),
           foregroundColor: Color(0xFFF5F6FA),
           elevation: 0,
-          shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8.0)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
         ),
       ),
     );

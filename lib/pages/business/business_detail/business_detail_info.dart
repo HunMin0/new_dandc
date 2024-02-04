@@ -32,7 +32,7 @@ class _BusinessDetailInfoState extends State<BusinessDetailInfo> {
               SliverAppBar(
                   automaticallyImplyLeading: false,
                   pinned: false,
-                  expandedHeight: 615.0,
+                  expandedHeight: 640.0,
                   flexibleSpace: FlexibleSpaceBar(
                       collapseMode: CollapseMode.pin,
                       background: Column(

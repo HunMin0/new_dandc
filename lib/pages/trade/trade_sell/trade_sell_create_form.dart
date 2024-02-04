@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:ui';
 
+import 'package:Deal_Connect/components/const/setting_colors.dart';
 import 'package:Deal_Connect/components/custom/join_text_form_field.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -14,6 +15,7 @@ class TradeSellCreateForm extends StatefulWidget {
 
 class _TradeSellCreateFormState extends State<TradeSellCreateForm> {
   File? _pickedImage;
+  DateTime? selectedDate;
 
   @override
   Widget build(BuildContext context) {
@@ -36,11 +38,34 @@ class _TradeSellCreateFormState extends State<TradeSellCreateForm> {
             SizedBox(
               height: 10,
             ),
-            JoinTextFormField(
-                label: "거래일자",
-                hintText: '거래일자를 입력해주세요.',
-                onChanged: (String value) {
-                }
+            GestureDetector(
+              onTap: () {
+                _selectDate(context);
+              },
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 10.0),
+                    child: Text("거래일자", style: TextStyle(fontWeight: FontWeight.w400, fontSize: 13.0)),
+                  ),
+                  Container(
+                    padding: EdgeInsets.all(12.0),
+                    decoration: BoxDecoration(
+                        color: INPUT_BG_COLOR,
+                        borderRadius: BorderRadius.all(Radius.circular(5.0)),
+                        border: Border.all(color: INPUT_BORDER_COLOR)
+                    ),
+                    child: Row(
+                      children: [
+                        Text( selectedDate != null ? selectedDate.toString().split(" ")[0] : "날짜를 선택하세요.", style: TextStyle(fontWeight: FontWeight.w500, color: BODY_TEXT_COLOR),),
+                        Spacer(),
+                        Icon(Icons.date_range),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
             SizedBox(height: 10,),
             JoinTextFormField(
@@ -169,5 +194,21 @@ class _TradeSellCreateFormState extends State<TradeSellCreateForm> {
         ),
       ),
     );
+  }
+
+  Future<void> _selectDate(BuildContext context) async {
+
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: selectedDate,
+      firstDate: DateTime(2000),
+      lastDate: DateTime.now(),
+    );
+
+    if (picked != null && picked != selectedDate) {
+      setState(() {
+        selectedDate = picked;
+      });
+    }
   }
 }

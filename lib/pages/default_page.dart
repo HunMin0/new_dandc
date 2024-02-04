@@ -2,23 +2,26 @@ import 'package:Deal_Connect/components/const/setting_colors.dart';
 import 'package:Deal_Connect/pages/business/business_index.dart';
 import 'package:Deal_Connect/pages/history/history_index.dart';
 import 'package:Deal_Connect/pages/home/home_index.dart';
+import 'package:Deal_Connect/pages/notice/notice_index.dart';
 import 'package:Deal_Connect/pages/profile/profile_index.dart';
 import 'package:Deal_Connect/pages/search/search_index.dart';
 import 'package:Deal_Connect/pages/search/search_partner_list.dart';
 import 'package:Deal_Connect/pages/trade/trade_index.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'group/group_index.dart';
 
 class DefaultPage extends StatefulWidget {
-  const DefaultPage({Key? key}) : super(key: key);
+  int currentIndex;
+
+  DefaultPage({this.currentIndex = 0, Key? key}) : super(key: key);
 
   @override
   State<DefaultPage> createState() => _DefaultPageState();
 }
 
 class _DefaultPageState extends State<DefaultPage> {
-  int _currentIndex = 0;
   final _pages = [
     HomeIndex(), // 메인홈
     HistoryIndex(), // 거래내역
@@ -39,7 +42,7 @@ class _DefaultPageState extends State<DefaultPage> {
           //floatingActionButtonLocation: FloatingActionButtonLocation.endFloat, // floatingAction위치
           body: Padding(
             padding: const EdgeInsets.symmetric(vertical: 10.0),
-            child: _pages[_currentIndex],
+            child: _pages[widget.currentIndex],
           ),
           bottomNavigationBar: Padding(
               padding: EdgeInsets.only(bottom: 10),
@@ -47,6 +50,14 @@ class _DefaultPageState extends State<DefaultPage> {
         ),
       ),
     );
+  }
+
+
+  // 새로운 메서드를 추가합니다.
+  void changeCurrentIndex(int newIndex) {
+    setState(() {
+      widget.currentIndex = newIndex;
+    });
   }
 
   // AppBar 영역
@@ -58,7 +69,7 @@ class _DefaultPageState extends State<DefaultPage> {
       title: GestureDetector(
         onTap: (){
           setState(() {
-            _currentIndex = 0;
+            widget.currentIndex = 0;
           });
         },
         child: Image.asset(
@@ -72,12 +83,14 @@ class _DefaultPageState extends State<DefaultPage> {
         _AppBarAction(
           imagePath: 'search',
           onTap: () {
-            Navigator.push(context, MaterialPageRoute(builder: (context) => SearchIndex()));
+            Navigator.push(context, CupertinoPageRoute(builder: (context) => SearchIndex()));
           },
         ),
         _AppBarAction(
           imagePath: 'alarm',
-          onTap: () {},
+          onTap: () {
+            Navigator.push(context, CupertinoPageRoute(builder: (context) => NoticeIndex()));
+          },
         ),
         _AppBarAction(
           imagePath: 'more',
@@ -101,10 +114,10 @@ class _DefaultPageState extends State<DefaultPage> {
       elevation: 0,
       onTap: (index) {
         setState(() {
-          _currentIndex = index;
+          widget.currentIndex = index;
         });
       },
-      currentIndex: _currentIndex, // 선택된 인덱스의 값을 얻는다
+      currentIndex: widget.currentIndex, // 선택된 인덱스의 값을 얻는다
       selectedItemColor: Color(0xFF3c3c3c),
       unselectedItemColor: Color(0xFFc3c3c3),
       type: BottomNavigationBarType.fixed, // 라벨의 텍스트 노출
@@ -128,7 +141,7 @@ class _DefaultPageState extends State<DefaultPage> {
       icon: Container(
         height: 30,
         padding: EdgeInsets.only(bottom: 5),
-        child: _currentIndex == index
+        child: widget.currentIndex == index
             ? ImageIcon(
           AssetImage('assets/images/icons/$imagePath'+'_over.png'),
           size: 22.0,
@@ -144,7 +157,7 @@ class _DefaultPageState extends State<DefaultPage> {
 
   // Floating 액션 버튼
    _renderFloatingActionButton() {
-    if(_currentIndex == 0){
+    if(widget.currentIndex == 0){
       return FloatingActionButton(
         onPressed: (){
           Navigator.push(context, MaterialPageRoute(builder: (context)
@@ -160,6 +173,8 @@ class _DefaultPageState extends State<DefaultPage> {
       return null;
     }
   }
+
+
 }
 
 // AppBar 액션 영역

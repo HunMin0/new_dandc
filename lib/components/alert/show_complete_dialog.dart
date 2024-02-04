@@ -1,3 +1,4 @@
+import 'package:Deal_Connect/components/const/setting_style.dart';
 import 'package:flutter/material.dart';
 
 class ShowCompleteDialog extends StatelessWidget {
@@ -43,7 +44,7 @@ class ShowCompleteDialog extends StatelessWidget {
               child: ElevatedButton(
                 onPressed: onConfirmed,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Color(0xFF75A8E4),
+                  backgroundColor: SettingStyle.MAIN_COLOR,
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8.0)),
                   elevation: 0,
