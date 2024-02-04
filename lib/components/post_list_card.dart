@@ -4,7 +4,7 @@ class PostListCard extends StatelessWidget {
   final String bgImagePath;
   final String postTitle;
   final String postSubject;
-  final int comment;
+  final String groupName;
   final String date;
   final bool newMark;
 
@@ -12,7 +12,7 @@ class PostListCard extends StatelessWidget {
       {required this.bgImagePath,
       required this.postTitle,
       required this.postSubject,
-      required this.comment,
+      required this.groupName,
       required this.date,
       required this.newMark,
       Key? key})
@@ -99,7 +99,7 @@ class PostListCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              _comment(comment),
+              _groupName(groupName),
               Text(date, style: TextStyle(fontSize: 12.0, color: Colors.grey[500]),),
             ],
           ),
@@ -129,7 +129,7 @@ class PostListCard extends StatelessWidget {
   }
 
   // 댓글 공통
-  Container _comment(int num) {
+  Container _groupName(String text) {
     return Container(
       decoration: BoxDecoration(
         color: Color(0xFF75a8e4),
@@ -138,7 +138,7 @@ class PostListCard extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 7.0),
         child: Text(
-          '댓글 ${num.toString()}',
+          text,
           style: TextStyle(
               color: Color(0xFFFFFFFF),
               fontSize: 11.0,

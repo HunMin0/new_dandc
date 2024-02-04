@@ -171,7 +171,7 @@ class _ProfileIndexState extends State<ProfileIndex>
                                 bgImagePath: postData['bgImagePath'],
                                 postTitle: postData['postTitle'],
                                 postSubject: postData['postSubject'],
-                                comment: postData['comment'],
+                                groupName: postData['groupName'],
                                 date: postData['date'],
                                 newMark: postData['newMark'],
                               ),
