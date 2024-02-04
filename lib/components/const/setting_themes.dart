@@ -7,7 +7,7 @@ class SettingThemes {
     useMaterial3: true,
     fontFamily: 'NotoSans',
     colorScheme: ColorScheme.light(
-      surface: Colors.transparent,
+      surface: Colors.white,
     ),
     appBarTheme: AppBarTheme(surfaceTintColor: Colors.transparent),
     bottomAppBarTheme: BottomAppBarTheme( surfaceTintColor: Colors.transparent ),
