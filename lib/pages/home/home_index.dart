@@ -29,7 +29,6 @@ class _HomeIndexState extends State<HomeIndex> {
   @override
   void initState() {
     _initMyUser();
-
     super.initState();
   }
 
@@ -132,11 +131,10 @@ class _HomeIndexState extends State<HomeIndex> {
     });
   }
 
+
+
   @override
   void dispose() {
-    // marketingVideoControllers.forEach((controller) {
-    //   controller.dispose();
-    // });
     super.dispose();
   }
 }
@@ -159,24 +157,9 @@ class _HorizontalList extends StatelessWidget {
 
             return GestureDetector(
               onTap: () {
-                //  print('클릭됨');
-                //  GroupView();
-                /*
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => GroupView(),
-                    builder: (context) => GroupView(id: groupData['id']),
-                  ),
-                );
-                */
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => GroupView(
-                        id: groupData['id'],
-                      )
-                    ),
-                );
+                Navigator.pushNamed(context, '/group/info', arguments: {
+                  'group_id' : groupData['id']
+                });
               },
               child: GroupCard(
                 id: groupData['id'],

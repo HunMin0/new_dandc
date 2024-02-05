@@ -35,6 +35,7 @@ class _HistoryIndexState extends State<HistoryIndex>
         slivers: [
           SliverAppBar(
             expandedHeight: 510.0,
+            automaticallyImplyLeading: false,
             flexibleSpace: FlexibleSpaceBar(
               background: Padding(
                 padding: EdgeInsets.all(12.0),

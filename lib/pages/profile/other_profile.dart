@@ -1,3 +1,4 @@
+import 'package:Deal_Connect/components/alert/show_complete_dialog.dart';
 import 'package:Deal_Connect/components/layout/default_basic_layout.dart';
 import 'package:Deal_Connect/components/layout/default_logo_layout.dart';
 import 'package:Deal_Connect/components/list_line_business_card.dart';
@@ -13,6 +14,7 @@ import 'package:Deal_Connect/pages/profile/components/tab_list/not_user_register
 import 'package:Deal_Connect/pages/profile/components/tab_list/tabBarButton.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:hexcolor/hexcolor.dart';
 
 import 'partner_attend/partner_attend_index.dart';
 
@@ -68,7 +70,73 @@ class _OtherProfileIndexState extends State<OtherProfileIndex> {
                         children: [
                           _reanderButton(
                             btnName: '프로필 공유하기',
-                            onPressed: () {},
+                            onPressed: () {
+                              showModalBottomSheet(
+                                  backgroundColor: Colors.white,
+                                  showDragHandle: false,
+                                  context: context,
+                                  builder: (_) {
+                                    return Container(
+                                      width: double.infinity,
+                                      height: 150,
+                                      padding: EdgeInsets.only(top: 20.0),
+                                      color: HexColor("FFFFFF"),
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.center,
+                                        children: [
+                                          Text("공유 방법을 선택해주세요."),
+                                          SizedBox(height: 20,),
+                                          Expanded(
+                                            child: Row(
+                                              mainAxisAlignment: MainAxisAlignment.center,
+                                              crossAxisAlignment: CrossAxisAlignment.center,
+                                              children: [
+                                                Spacer(),
+                                                Column(
+                                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                                  children: [
+                                                    Icon(Icons.messenger),
+                                                    SizedBox(height: 5,),
+                                                    Text("문자")
+                                                  ],
+                                                ),
+                                                Spacer(),
+                                                Column(
+                                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                                  children: [
+                                                    Icon(Icons.messenger),
+                                                    SizedBox(height: 5,),
+                                                    Text("카카오")
+                                                  ],
+                                                ),
+                                                Spacer(),
+                                                Column(
+                                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                                  children: [
+                                                    Icon(Icons.messenger),
+                                                    SizedBox(height: 5,),
+                                                    Text("뭐시기")
+                                                  ],
+                                                ),
+                                                Spacer(),
+                                                Column(
+                                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                                  children: [
+                                                    Icon(Icons.messenger),
+                                                    SizedBox(height: 5,),
+                                                    Text("문자")
+                                                  ],
+                                                ),
+                                                Spacer(),
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  }
+                              );
+                            },
                           ),
                           SizedBox(
                             width: 10.0,
@@ -76,11 +144,7 @@ class _OtherProfileIndexState extends State<OtherProfileIndex> {
                           _reanderButton(
                             btnName: '파트너 신청',
                             onPressed: () {
-                              Navigator.push(
-                                  context,
-                                  CupertinoPageRoute(
-                                      builder: (context) =>
-                                          PartnerAttendIndex()));
+                              _showCompleteDialog(context);
                             },
                           ),
                         ],
@@ -134,6 +198,27 @@ class _OtherProfileIndexState extends State<OtherProfileIndex> {
         ),
       ),
     );
+
+
+  }
+
+
+  void _showCompleteDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return ShowCompleteDialog(
+          messageTitle: '파트너',
+          messageText: '등록이 완료되었습니다.',
+          buttonText: '확인',
+          onConfirmed: () {
+            Navigator.pop(context);
+            Navigator.pop(context);
+          },
+        );
+      },
+    );
   }
 }
 
@@ -168,4 +253,5 @@ class _reanderButton extends StatelessWidget {
       ),
     );
   }
+
 }

@@ -24,6 +24,8 @@ class ProfileUserButton extends StatelessWidget {
                    child: Column(
                      crossAxisAlignment: CrossAxisAlignment.center,
                      children: [
+                       Text("공유 방법을 선택해주세요."),
+                       SizedBox(height: 20,),
                        Expanded(
                          child: Row(
                            mainAxisAlignment: MainAxisAlignment.center,

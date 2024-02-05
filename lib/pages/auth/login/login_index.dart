@@ -75,7 +75,7 @@ class LoginIndexState extends State<LoginIndex> {
                         Container(
                           margin: EdgeInsets.only(bottom: 20),
                           child: Text(
-                            '로그인 계정 방법을 선택하여 주세요.\n오늘도 좋은하루 보내세요.',
+                            '로그인 방법을 선택하여 주세요.\n오늘도 좋은하루 보내세요.',
                             style: TextStyle(
                               fontSize: 14.0,
                               fontWeight: FontWeight.w400,
@@ -118,23 +118,7 @@ class LoginIndexState extends State<LoginIndex> {
       children: [
         TextButton(
           onPressed: () {
-            Navigator.push(
-              context,
-              PageRouteBuilder(
-                pageBuilder: (context, animation, secondaryAnimation) => TermsIndex(),
-                transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                  const begin = Offset(1.0, 0.0);
-                  const end = Offset.zero;
-                  const curve = Curves.easeInOut;
-
-                  var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-
-                  var offsetAnimation = animation.drive(tween);
-
-                  return SlideTransition(position: offsetAnimation, child: child);
-                },
-              ),
-            );
+            Navigator.pushNamed(context, '/register/terms');
           },
           child: Text(
             '회원가입',
@@ -287,7 +271,8 @@ class LoginIndexState extends State<LoginIndex> {
                 width: 25,
                 height: 25,
                 child: Icon(
-                  Icons.person_outline
+                  Icons.person_outline,
+                  color: Colors.white,
                 ),
               ),
               Expanded(

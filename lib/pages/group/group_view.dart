@@ -12,15 +12,35 @@ import 'package:flutter/material.dart';
 import 'components/group_data.dart';
 
 class GroupView extends StatefulWidget {
-  final int id;
-
-  const GroupView({required this.id, Key? key}) : super(key: key);
+  const GroupView({Key? key}) : super(key: key);
 
   @override
   State<GroupView> createState() => _GroupViewState();
 }
 
 class _GroupViewState extends State<GroupView> {
+  String? group_id;
+
+  var args;
+
+  @override
+  void initState() {
+    super.initState();
+
+    final widgetsBinding = WidgetsBinding.instance;
+    widgetsBinding?.addPostFrameCallback((callback) {
+      if (ModalRoute.of(context)?.settings.arguments != null) {
+        args = ModalRoute.of(context)?.settings.arguments;
+
+        if (args != null) {
+          setState(() {
+            group_id = args['group_id'];
+          });
+        }
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return DefaultNextLayout(

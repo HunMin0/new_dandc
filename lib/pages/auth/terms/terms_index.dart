@@ -3,7 +3,9 @@ import 'package:Deal_Connect/components/layout/default_logo_layout.dart';
 import 'package:Deal_Connect/pages/auth/join/join_index.dart';
 import 'package:Deal_Connect/pages/auth/terms/privacy_terms.dart';
 import 'package:Deal_Connect/pages/auth/terms/terms_of_use.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:hexcolor/hexcolor.dart';
 
 class TermsIndex extends StatefulWidget {
   const TermsIndex({Key? key}) : super(key: key);
@@ -13,10 +15,13 @@ class TermsIndex extends StatefulWidget {
 }
 
 class _TermsIndexState extends State<TermsIndex> {
-  bool allAgreed = false;
-  bool termAgreed = false;
-  bool privacyAgreed = false;
-  bool ageVerification = false;
+  bool isAllAgree = false;
+
+  bool isAgreeService = false;
+  bool isAgreePersonal = false;
+  bool isAgreeMarketing = false;
+  bool isAgreeAppNotification = false;
+  bool isAgreeAppMarketing = false;
 
   @override
   Widget build(BuildContext context) {
@@ -54,10 +59,12 @@ class _TermsIndexState extends State<TermsIndex> {
                   borderRadius: BorderRadius.circular(20.0),
                   onTap: () {
                     setState(() {
-                      allAgreed = !allAgreed;
-                      termAgreed = allAgreed;
-                      privacyAgreed = allAgreed;
-                      ageVerification = allAgreed;
+                      isAllAgree = !isAllAgree;
+                      isAgreeService = isAllAgree;
+                      isAgreePersonal = isAllAgree;
+                      isAgreeMarketing = isAllAgree;
+                      isAgreeAppNotification = isAllAgree;
+                      isAgreeAppMarketing = isAllAgree;
                       checkNextButtonState(); // 변경된 상태를 확인하여 버튼 갱신
                     });
                   },
@@ -85,9 +92,11 @@ class _TermsIndexState extends State<TermsIndex> {
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             border: Border.all(
-                                color: allAgreed ? PRIMARY_COLOR : Color(0xFFDDDDDD),
+                                color: isAllAgree
+                                    ? PRIMARY_COLOR
+                                    : Color(0xFFDDDDDD),
                                 width: 2.0),
-                            color: allAgreed
+                            color: isAllAgree
                                 ? PRIMARY_COLOR
                                 : Colors.transparent, // 클릭 시 배경색 변경
                           ),
@@ -97,7 +106,7 @@ class _TermsIndexState extends State<TermsIndex> {
                               Icons.check,
                               size: 16.0,
                               color:
-                                  allAgreed ? Colors.white : Color(0xFFDDDDDD),
+                                  isAllAgree ? Colors.white : Color(0xFFDDDDDD),
                             ),
                           ),
                         ),
@@ -119,7 +128,7 @@ class _TermsIndexState extends State<TermsIndex> {
                                   builder: (context) => TermsOfUse()));
                         },
                         child: _termsText(
-                          underText: '이용약관',
+                          underText: '서비스 이용 약관',
                           subText: ' (필수)',
                         ),
                       ),
@@ -127,14 +136,14 @@ class _TermsIndexState extends State<TermsIndex> {
                         borderRadius: BorderRadius.circular(20.0),
                         onTap: () {
                           setState(() {
-                            termAgreed = !termAgreed;
-                            if (!termAgreed) {
-                              allAgreed = false;
+                            isAgreeService = !isAgreeService;
+                            if (!isAgreeService) {
+                              isAllAgree = false;
                             }
                             checkNextButtonState(); // 변경된 상태를 확인하여 버튼 갱신
                           });
                         },
-                        child: _checkType(termAgreed: termAgreed),
+                        child: _checkType(termAgreed: isAgreeService),
                       ),
                     ],
                   ),
@@ -153,7 +162,7 @@ class _TermsIndexState extends State<TermsIndex> {
                                   builder: (context) => PrivacyTerms()));
                         },
                         child: _termsText(
-                          underText: '개인정보 수집 이용',
+                          underText: '개인정보 처리 방침',
                           subText: ' (필수)',
                         ),
                       ),
@@ -161,14 +170,41 @@ class _TermsIndexState extends State<TermsIndex> {
                         borderRadius: BorderRadius.circular(20.0),
                         onTap: () {
                           setState(() {
-                            privacyAgreed = !privacyAgreed;
-                            if (!privacyAgreed) {
-                              allAgreed = false;
+                            isAgreePersonal = !isAgreePersonal;
+                            if (!isAgreePersonal) {
+                              isAllAgree = false;
                             }
                             checkNextButtonState(); // 변경된 상태를 확인하여 버튼 갱신
                           });
                         },
-                        child: _checkType(termAgreed: privacyAgreed),
+                        child: _checkType(termAgreed: isAgreePersonal),
+                      ),
+                    ],
+                  ),
+                ),
+                Divider(
+                  thickness: 1,
+                  color: HexColor("#f1faf1"),
+                ),
+                Container(
+                  padding:
+                      EdgeInsets.symmetric(horizontal: 30.0, vertical: 14.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      _termsText(
+                        underText: '이벤트 및 마케팅 활용 동의',
+                        subText: ' (선택)',
+                        showUnderline: false,
+                      ),
+                      InkWell(
+                        borderRadius: BorderRadius.circular(20.0),
+                        onTap: () {
+                          setState(() {
+                            isAgreeMarketing = !isAgreeMarketing;
+                          });
+                        },
+                        child: _checkType(termAgreed: isAgreeMarketing),
                       ),
                     ],
                   ),
@@ -180,22 +216,41 @@ class _TermsIndexState extends State<TermsIndex> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       _termsText(
-                          underText: '만 14세 이상 확인',
-                          subText: ' (필수)',
-                          showUnderline: false,
-                        ),
+                        underText: '푸시 알림 동의',
+                        subText: ' (선택)',
+                        showUnderline: false,
+                      ),
                       InkWell(
                         borderRadius: BorderRadius.circular(20.0),
                         onTap: () {
                           setState(() {
-                            ageVerification = !ageVerification;
-                            if (!ageVerification) {
-                              allAgreed = false;
-                            }
-                            checkNextButtonState(); // 변경된 상태를 확인하여 버튼 갱신
+                            isAgreeAppNotification = !isAgreeAppNotification;
                           });
                         },
-                        child: _checkType(termAgreed: ageVerification),
+                        child: _checkType(termAgreed: isAgreeAppNotification),
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                  padding:
+                      EdgeInsets.symmetric(horizontal: 30.0, vertical: 14.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      _termsText(
+                        underText: '마케팅 푸시 알림 동의',
+                        subText: ' (선택)',
+                        showUnderline: false,
+                      ),
+                      InkWell(
+                        borderRadius: BorderRadius.circular(20.0),
+                        onTap: () {
+                          setState(() {
+                            isAgreeAppMarketing = !isAgreeAppMarketing;
+                          });
+                        },
+                        child: _checkType(termAgreed: isAgreeAppMarketing),
                       ),
                     ],
                   ),
@@ -204,33 +259,21 @@ class _TermsIndexState extends State<TermsIndex> {
             ),
           ),
           TextButton(
-            onPressed: allAgreed
+            onPressed: isAllAgree
                 ? () {
-                    Navigator.push(
+                    Navigator.pushNamed(
                       context,
-                      PageRouteBuilder(
-                        pageBuilder: (context, animation, secondaryAnimation) =>
-                            JoinIndex(),
-                        transitionsBuilder:
-                            (context, animation, secondaryAnimation, child) {
-                          const begin = Offset(1.0, 0.0);
-                          const end = Offset.zero;
-                          const curve = Curves.easeInOut;
-
-                          var tween = Tween(begin: begin, end: end)
-                              .chain(CurveTween(curve: curve));
-
-                          var offsetAnimation = animation.drive(tween);
-
-                          return SlideTransition(
-                              position: offsetAnimation, child: child);
-                        },
-                      ),
+                      '/register',
+                      arguments: {
+                        'isAgreeMarketing': isAgreeMarketing,
+                        'isAgreeAppNotification': isAgreeAppNotification,
+                        'isAgreeAppMarketing': isAgreeAppMarketing,
+                      },
                     );
                   }
                 : null,
             style: TextButton.styleFrom(
-              backgroundColor: allAgreed
+              backgroundColor: isAllAgree
                   ? PRIMARY_COLOR
                   : Colors.grey[300], // 버튼 상태에 따라 색상 조정
               padding: EdgeInsets.all(16.0),
@@ -260,7 +303,7 @@ class _TermsIndexState extends State<TermsIndex> {
   void checkNextButtonState() {
     // (필수) 약관들이 모두 동의되었는지 확인하여 버튼 상태 갱신
     setState(() {
-      allAgreed = termAgreed && privacyAgreed && ageVerification;
+      isAllAgree = isAgreeService && isAgreePersonal;
     });
   }
 }
@@ -290,10 +333,9 @@ class _termsText extends StatelessWidget {
             TextSpan(
               text: underText,
               style: TextStyle(
-                decoration:
-                showUnderline
-                ? TextDecoration.underline
-                : TextDecoration.none,
+                decoration: showUnderline
+                    ? TextDecoration.underline
+                    : TextDecoration.none,
                 decorationThickness: 2.0,
               ),
             ),

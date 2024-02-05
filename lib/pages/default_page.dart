@@ -86,18 +86,21 @@ class _DefaultPageState extends State<DefaultPage> {
             Navigator.push(context, CupertinoPageRoute(builder: (context) => SearchIndex()));
           },
         ),
+        SizedBox(width: 15,),
         _AppBarAction(
           imagePath: 'alarm',
           onTap: () {
             Navigator.push(context, CupertinoPageRoute(builder: (context) => NoticeIndex()));
           },
         ),
+        SizedBox(width: 15,),
         _AppBarAction(
           imagePath: 'more',
           onTap: () {
             Navigator.of(context).pushReplacementNamed('/');
           },
         ),
+        SizedBox(width: 15,),
       ],
     );
   }

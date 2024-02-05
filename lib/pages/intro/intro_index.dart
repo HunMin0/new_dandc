@@ -1,5 +1,8 @@
 import 'package:Deal_Connect/Utils/custom_dialog.dart';
 import 'package:Deal_Connect/Utils/shared_pref_utils.dart';
+import 'package:Deal_Connect/pages/auth/terms/terms_index.dart';
+import 'package:Deal_Connect/pages/home/home_index.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
 
@@ -86,14 +89,13 @@ class IntroIndex extends StatelessWidget {
                       borderRadius: BorderRadius.circular(40.0),
                     )),
                 onPressed: () {
-                  CustomDialog.showProgressDialog(context);
-                  SharedPrefUtils.clearAccessToken().then((value) {
-                    SharedPrefUtils.clearUser().then((value) {
-                      CustomDialog.dismissProgressDialog();
-                      Navigator.pushNamedAndRemoveUntil(
-                          context, '/home', (route) => false);
-                    });
-                  });
+
+
+                  Navigator.push(
+                    context,
+                    CupertinoPageRoute(
+                        builder: (context) => HomeIndex()),
+                  );
                 },
                 child: Text(
                   '시작하기',
@@ -134,17 +136,7 @@ class IntroIndex extends StatelessWidget {
               ],
             ),
           ),
-          Container(
-            padding: EdgeInsets.only(bottom: 50),
-            child: Text(
-              '계속 진행시, 서비스 이용약관 및 개인정보 취급방침에 동의하게 됩니다',
-              style: textStyle.copyWith(
-                color: HexColor('#c3c3c3'),
-                fontSize: 14.0,
-                fontWeight: FontWeight.w400,
-              ),
-            ),
-          )
+          SizedBox(height: 80,)
         ],
       ),
     );

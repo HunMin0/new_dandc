@@ -38,9 +38,14 @@ class ProfileUserCondition extends StatelessWidget {
             ),
           ),
           _buildTabLine(),
-          _buildUserTab(
-            company.toString(),
-            '소속그룹',
+          GestureDetector(
+            onTap: () {
+              Navigator.pushNamed(context, '/profile/groups');
+            },
+            child: _buildUserTab(
+              company.toString(),
+              '소속그룹',
+            ),
           ),
           _buildTabLine(),
           GestureDetector(

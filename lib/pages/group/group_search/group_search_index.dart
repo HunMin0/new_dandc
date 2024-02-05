@@ -1,6 +1,6 @@
 import 'package:Deal_Connect/components/layout/default_search_layout.dart';
 import 'package:Deal_Connect/components/list_card.dart';
-import 'package:Deal_Connect/components/list_group_card.dart';
+import 'package:Deal_Connect/components/grid_group_card.dart';
 import 'package:Deal_Connect/db/group_data.dart';
 import 'package:Deal_Connect/db/vertical_data.dart';
 import 'package:Deal_Connect/pages/group/group_view.dart';
@@ -56,16 +56,12 @@ class _GroupSearchIndexState extends State<GroupSearchIndex> {
           Map<String, dynamic> groupData = groupDataList[index];
           return GestureDetector(
             onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => GroupView(
-                          id: groupData['id'],
-                        )),
-              );
+              Navigator.pushNamed(context, '/group/info', arguments: {
+                'group_id' : groupData['id']
+              });
             },
             child: Container(
-              child: ListGroupCard(
+              child: GridGroupCard(
                 bgImagePath: groupData['imagePath'],
                 groupName: groupData['title'],
               ),

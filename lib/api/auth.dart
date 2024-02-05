@@ -47,6 +47,28 @@ Future<ResponseData> postRegister(Map mapData) async {
   return ResponseData.fromJSON(jsonBody, response.statusCode);
 }
 
+Future<ResponseData> postCheckId(Map mapData) async {
+  var url = ServerConfig.SERVER_API_URL + 'auth/checkId';
+  var body = json.encode(mapData);
+  http.Response response = await http.post(Uri.parse(url),
+      headers: {"Content-Type": "application/json"},
+      body: body
+  );
+  var jsonBody = json.decode(utf8.decode(response.bodyBytes));
+  return ResponseData.fromJSON(jsonBody, response.statusCode);
+}
+
+Future<ResponseData> postCheckRecommendCode(Map mapData) async {
+  var url = ServerConfig.SERVER_API_URL + 'auth/checkCode';
+  var body = json.encode(mapData);
+  http.Response response = await http.post(Uri.parse(url),
+      headers: {"Content-Type": "application/json"},
+      body: body
+  );
+  var jsonBody = json.decode(utf8.decode(response.bodyBytes));
+  return ResponseData.fromJSON(jsonBody, response.statusCode);
+}
+
 Future<ResponseData> getMyPageData() async {
   var url = ServerConfig.SERVER_API_URL + 'user/my_page_data';
   String? token = await SharedPrefUtils.getAccessToken();
