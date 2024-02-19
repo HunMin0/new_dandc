@@ -6,7 +6,7 @@ import 'package:Deal_Connect/components/post_list_card.dart';
 import 'package:Deal_Connect/db/company_data.dart';
 import 'package:Deal_Connect/db/post_data.dart';
 import 'package:Deal_Connect/pages/business/business_detail/business_detail_info.dart';
-import 'package:Deal_Connect/pages/profile/company_add/company_add_index.dart';
+import 'package:Deal_Connect/pages/profile/company_create/company_create_index.dart';
 import 'package:Deal_Connect/pages/profile/components/profile_user_button.dart';
 import 'package:Deal_Connect/pages/profile/components/profile_user_condition.dart';
 import 'package:Deal_Connect/pages/profile/components/profile_user_info.dart';
@@ -50,19 +50,19 @@ class _OtherProfileIndexState extends State<OtherProfileIndex> {
                   padding: EdgeInsets.all(12.0),
                   child: Column(
                     children: [
-                      ProfileUserInfo(
-                        userName: '홍길동',
-                        userInfo: '다양한 소프트웨어 개발을 통해 서비스',
-                        imgPath: 'main_sample01',
-                      ),
+                      // ProfileUserInfo(
+                      //   userName: (myUser != null ? myUser!.name : ''),
+                      //   hasUserProfile: myUser?.has_user_profile,
+                      // ),
                       SizedBox(
                         height: 24.0,
                       ),
-                      ProfileUserCondition(
-                        partner: 123,
-                        company: 3,
-                        history: '10k',
-                      ),
+                      // ProfileUserCondition(
+                      //   partner: 123,
+                      //   company: 3,
+                      //   history: '10k',
+                      //   onTab: () {},
+                      // ),
                       SizedBox(
                         height: 24.0,
                       ),

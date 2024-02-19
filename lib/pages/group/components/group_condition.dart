@@ -4,11 +4,15 @@ import 'package:flutter/material.dart';
 
 class GroupCondition extends StatelessWidget {
   final int partner;
-  final dynamic history;
+  final int history;
+  final int groupId;
+  final String groupName;
 
   const GroupCondition({
     required this.partner,
     required this.history,
+    required this.groupId,
+    required this.groupName,
 
     Key? key}) : super(key: key);
 
@@ -21,7 +25,7 @@ class GroupCondition extends StatelessWidget {
         children: [
           GestureDetector(
             onTap: (){
-              Navigator.push(context, MaterialPageRoute(builder: (context) => GroupPartnerIndex()));
+              Navigator.pushNamed(context, '/group/partner', arguments: { 'groupId': groupId, 'groupName': groupName });
             },
             child: _buildUserTab(
               partner.toString(),
@@ -31,10 +35,10 @@ class GroupCondition extends StatelessWidget {
           _buildTabLine(),
           GestureDetector(
             onTap: (){
-              Navigator.push(context, MaterialPageRoute(builder: (context) => GroupTradeIndex()));
+              Navigator.pushNamed(context, '/group/trade');
             },
             child: _buildUserTab(
-              history,
+              history.toString(),
               '거래내역',
             ),
           ),

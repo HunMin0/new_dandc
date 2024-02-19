@@ -6,7 +6,10 @@ class SettingThemes {
   static ThemeData get lightTheme => ThemeData(
     useMaterial3: true,
     fontFamily: 'NotoSans',
-    colorScheme: ColorScheme.light(
+    colorScheme: ColorScheme.fromSeed(
+      background: Colors.white, // 기본 색상 설정
+      seedColor: Colors.white, // 기본 색상 설정
+      surfaceTint: Colors.transparent,
       surface: Colors.white,
     ),
     appBarTheme: AppBarTheme(surfaceTintColor: Colors.transparent),

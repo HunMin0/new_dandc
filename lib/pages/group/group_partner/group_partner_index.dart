@@ -1,12 +1,19 @@
+import 'package:Deal_Connect/api/group.dart';
+import 'package:Deal_Connect/api/group_user.dart';
 import 'package:Deal_Connect/components/layout/default_logo_layout.dart';
 import 'package:Deal_Connect/components/list_business_card.dart';
 import 'package:Deal_Connect/components/list_card.dart';
+import 'package:Deal_Connect/components/list_partner_card.dart';
+import 'package:Deal_Connect/components/no_items.dart';
 import 'package:Deal_Connect/db/company_data.dart';
 import 'package:Deal_Connect/db/vertical_data.dart';
+import 'package:Deal_Connect/model/group_user.dart';
+import 'package:Deal_Connect/model/user.dart';
 import 'package:Deal_Connect/pages/business/business_detail/business_detail_info.dart';
 import 'package:Deal_Connect/pages/profile/other_profile.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:hexcolor/hexcolor.dart';
 
 class GroupPartnerIndex extends StatefulWidget {
@@ -19,10 +26,17 @@ class GroupPartnerIndex extends StatefulWidget {
 class _GroupPartnerIndexState extends State<GroupPartnerIndex>
     with TickerProviderStateMixin {
   late final TabController tabController;
+  int? groupId;
+  String? groupName;
+  List<GroupUser>? groupPartnerList = [];
+  bool _isLoading = true;
+
+  var args;
 
   @override
   void initState() {
     super.initState();
+    _initData();
     // tab컨트롤러 초기화
     tabController = TabController(
       length: 2,
@@ -30,15 +44,48 @@ class _GroupPartnerIndexState extends State<GroupPartnerIndex>
     );
   }
 
+  void _initData() async {
+    final widgetsBinding = WidgetsBinding.instance;
+    widgetsBinding?.addPostFrameCallback((callback) async {
+      if (ModalRoute.of(context)?.settings.arguments != null) {
+        setState(() {
+          args = ModalRoute.of(context)?.settings.arguments;
+        });
+
+        if (args != null) {
+          setState(() {
+            groupId = args['groupId'];
+            groupName = args['groupName'];
+          });
+        }
+
+        if (groupId != null) {
+          getGroupUsers(queryMap: {
+            'group_id': groupId,
+            'is_approved': true
+          }).then((response) {
+            if (response.status == 'success') {
+              Iterable iterable = response.data;
+              List<GroupUser> dataList =
+                  List<GroupUser>.from(iterable.map((e) => GroupUser.fromJSON(e)));
+              setState(() {
+                groupPartnerList = dataList;
+              });
+            }
+          });
+        }
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    final titleStyle = TextStyle(
-      fontWeight: FontWeight.w700,
-      fontSize: 20.0,
-    );
 
     return DefaultLogoLayout(
-        titleName: '서초구 고기집 사장모임',
+        titleName: groupName,
         isNotInnerPadding: 'true',
         child: NestedScrollView(
             headerSliverBuilder: (context, innerBoxIsScrolled) {
@@ -111,47 +158,71 @@ class _GroupPartnerIndexState extends State<GroupPartnerIndex>
                     child: TabBarView(
                       controller: tabController,
                       children: [
-                        _VerticalList(),
+                        groupPartnerList != null ? Container(
+                          decoration: BoxDecoration(
+                            color: Color(0xFFf5f6f8),
+                          ),
+                          child: ListView.builder(
+                            itemCount: groupPartnerList!.length,
+                            itemBuilder: (context, index) {
+                              GroupUser item = groupPartnerList![index];
+
+                              return GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    CupertinoPageRoute(builder: (context) => OtherProfileIndex()),
+                                  );
+                                },
+                                child: ListPartnerCard(
+                                  item: item,
+                                  onApprovePressed: () {},
+                                  onDeclinePressed: () {},
+                                  onOutPressed: () {},
+                                  onManagerPressed: () {},
+                                ),
+                              );
+                            },
+                          ),
+                        ) : const NoItems(),
                         Container(
                           decoration: BoxDecoration(
                             color: Color(0xFFf5f6f8),
                           ),
-                          child: companyDataList.isNotEmpty
+                          child: groupPartnerList!.isNotEmpty
                               ? GridView.builder(
-                            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 2, // 한 줄에 2개의 아이템
-                              crossAxisSpacing: 10.0, // 아이템 간의 가로 간격
-                              mainAxisSpacing: 10.0, // 아이템 간의 세로 간격
-                              childAspectRatio: 1 / 1.4,
-                            ),
-                            itemCount: companyDataList.length, // 아이템 개수
-                            itemBuilder: (context, index) {
-                              Map<String, dynamic> companyData = companyDataList[index];
-                              return GestureDetector(
-                                onTap: () {
-                                  print('클릭했다~ ');
-                                  Navigator.push(context, MaterialPageRoute(builder: (context) => BusinessDetailInfo()));
-                                },
-                                child: Container(
-                                  child: ListBusinessCard(
-                                    bgImagePath: companyData['bgImagePath'],
-                                    avaterImagePath: companyData['avaterImagePath'],
-                                    companyName: companyData['companyName'],
-                                    tagList : companyData['tagList'],
+                                  gridDelegate:
+                                      const SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount: 2, // 한 줄에 2개의 아이템
+                                    crossAxisSpacing: 10.0, // 아이템 간의 가로 간격
+                                    mainAxisSpacing: 10.0, // 아이템 간의 세로 간격
+                                    childAspectRatio: 1 / 1.4,
                                   ),
-                                ),
-                              );
-                            },
-                          ) : const Text('등록된 데이터가 없습니다'),
+                                  itemCount: groupPartnerList!.length, // 아이템 개수
+                                  itemBuilder: (context, index) {
+                                    GroupUser item =
+                                    groupPartnerList![index];
+                                    return GestureDetector(
+                                      child: Container(
+                                        child: ListPartnerCard(
+                                          item: item,
+                                          onOutPressed: () {},
+                                          onDeclinePressed: () {},
+                                          onApprovePressed: () {},
+                                          onManagerPressed: () {},
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                )
+                              : const Text('등록된 데이터가 없습니다'),
                         ),
                       ],
                     ),
                   ),
                 ),
               ],
-            )
-        )
-    );
+            )));
   }
 }
 
@@ -174,8 +245,7 @@ class _VerticalList extends StatelessWidget {
             onTap: () {
               Navigator.push(
                 context,
-                CupertinoPageRoute(builder: (context) => OtherProfileIndex()
-                ),
+                CupertinoPageRoute(builder: (context) => OtherProfileIndex()),
               );
             },
             child: ListCard(
@@ -191,9 +261,6 @@ class _VerticalList extends StatelessWidget {
     );
   }
 }
-
-
-
 
 class GroupPartnerTabHeaderDelegate extends SliverPersistentHeaderDelegate {
   final TabController tabController;

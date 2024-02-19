@@ -1,4 +1,5 @@
 
+import 'package:Deal_Connect/model/user_business.dart';
 import 'package:Deal_Connect/model/user_keyword.dart';
 import 'package:Deal_Connect/model/user_profile.dart';
 
@@ -17,8 +18,9 @@ class User {
   final String? sns_type;
   final String? email;
   final String? phone;
-  final UserProfile?has_user_profile;
-  final UserKeyword? has_keywords;
+  final UserProfile? has_user_profile;
+  final List<UserKeyword>? has_keywords;
+  final UserBusiness? main_business;
 
   User({
     required this.id,
@@ -32,6 +34,7 @@ class User {
     required this.is_agree_app_notification,
     required this.is_agree_app_marketing,
     this.has_user_profile,
+    this.main_business,
 
     this.has_keywords,
     this.email,
@@ -47,7 +50,10 @@ class User {
       List<UserKeyword> list = List<UserKeyword>.from(iterable.map((e) => UserKeyword.fromJSON(e)));
       has_keywords = list;
     }
+
+
     var has_user_profile = json['has_user_profile'] != null ? UserProfile.fromJSON(json['has_user_profile']) : null;
+    var main_business = json['main_business'] != null ? UserBusiness.fromJSON(json['main_business']) : null;
 
     return User(
       id: json['id'],
@@ -59,7 +65,8 @@ class User {
       is_active: json['is_active'],
       sns_type: json['sns_type'],
       has_user_profile: has_user_profile,
-      has_keywords: json['has_keywords'],
+      main_business: main_business,
+      has_keywords: has_keywords,
       is_agree_service: json['is_agree_service'] ?? false,
       is_agree_personal: json['is_agree_personal'] ?? false,
       is_agree_marketing: json['is_agree_marketing'] ?? false,

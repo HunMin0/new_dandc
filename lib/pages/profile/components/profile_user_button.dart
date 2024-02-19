@@ -18,7 +18,7 @@ class ProfileUserButton extends StatelessWidget {
                builder: (_) {
                  return Container(
                    width: double.infinity,
-                   height: 90,
+                   height: 150,
                    padding: EdgeInsets.only(top: 20.0),
                    color: HexColor("FFFFFF"),
                    child: Column(

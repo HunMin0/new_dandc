@@ -1,33 +1,58 @@
+import 'dart:io';
+
 import 'package:Deal_Connect/components/custom/join_text_form_field.dart';
 import 'package:Deal_Connect/components/layout/default_next_layout.dart';
-import 'package:Deal_Connect/pages/profile/company_add/company_add_step_three.dart';
+import 'package:Deal_Connect/pages/profile/company_create/company_create_step_three.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-class CompanyAddStepTwo extends StatefulWidget {
-  const CompanyAddStepTwo({super.key});
+class CompanyCreateStepTwo extends StatefulWidget {
+  const CompanyCreateStepTwo({super.key});
 
   @override
-  State<CompanyAddStepTwo> createState() => _CompanyAddStepTwoState();
+  State<CompanyCreateStepTwo> createState() => _CompanyCreateStepTwoState();
 }
 
-class _CompanyAddStepTwoState extends State<CompanyAddStepTwo> {
+class _CompanyCreateStepTwoState extends State<CompanyCreateStepTwo> {
+  int userBusinessCategoryId = 0;
+  File? imageFile;
+  String name = '';
+  String phone = '';
+  String address1 = '';
+  String address2 = '';
+
+
   bool isProcessable = false;
 
-  // 휴무일이 있는지 없는지
   bool hasHoliday = false;
+  bool hasWeekend = true;
+  String workTime = '';
+  String holiday = '';
+  String weekend = '';
 
-  // 공휴일 시간이 같은지 다른지
-  bool hasTimeDay = true;
+  var args;
 
-  // 운영시간 데이터
-  String closedData = '';
+  @override
+  void initState() {
+    super.initState();
 
-  // 휴무일 추가 입력 데이터
-  String operatingData = '';
-
-  // 공휴일 추가 입력 데이터
-  String weekendData = '';
+    final widgetsBinding = WidgetsBinding.instance;
+    widgetsBinding?.addPostFrameCallback((callback) {
+      if (ModalRoute.of(context)?.settings.arguments != null) {
+        args = ModalRoute.of(context)?.settings.arguments;
+        if (args != null) {
+          setState(() {
+            userBusinessCategoryId = args['userBusinessCategoryId'];
+            imageFile = args['imageFile'];
+            name = args['name'];
+            phone = args['phone'];
+            address1 = args['address1'];
+            address2 = args['address2'];
+          });
+        }
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -59,11 +84,11 @@ class _CompanyAddStepTwoState extends State<CompanyAddStepTwo> {
       elevation: 0,
     );
 
-    final hasTimeDayButtonStyle = ElevatedButton.styleFrom(
-      foregroundColor: hasTimeDay == true ? Colors.white : Color(0xFFABABAB),
-      backgroundColor: hasTimeDay == true ? Color(0xFF75A8E4) : Colors.white,
+    final hasWeekendButtonStyle = ElevatedButton.styleFrom(
+      foregroundColor: hasWeekend == true ? Colors.white : Color(0xFFABABAB),
+      backgroundColor: hasWeekend == true ? Color(0xFF75A8E4) : Colors.white,
       side: BorderSide(
-        color: hasTimeDay == true ? Color(0xFF75A8E4) : Color(0xFFD9D9D9),
+        color: hasWeekend == true ? Color(0xFF75A8E4) : Color(0xFFD9D9D9),
         width: 1.0,
       ),
       shape: RoundedRectangleBorder(
@@ -73,11 +98,11 @@ class _CompanyAddStepTwoState extends State<CompanyAddStepTwo> {
       elevation: 0,
     );
 
-    final noHasTimeDayButtonStyle = ElevatedButton.styleFrom(
-      foregroundColor: hasTimeDay == false ? Colors.white : Color(0xFFABABAB),
-      backgroundColor: hasTimeDay == false ? Color(0xFF75A8E4) : Colors.white,
+    final nohasWeekendButtonStyle = ElevatedButton.styleFrom(
+      foregroundColor: hasWeekend == false ? Colors.white : Color(0xFFABABAB),
+      backgroundColor: hasWeekend == false ? Color(0xFF75A8E4) : Colors.white,
       side: BorderSide(
-        color: hasTimeDay == false ? Color(0xFF75A8E4) : Color(0xFFD9D9D9),
+        color: hasWeekend == false ? Color(0xFF75A8E4) : Color(0xFFD9D9D9),
         width: 1.0,
       ),
       shape: RoundedRectangleBorder(
@@ -129,33 +154,27 @@ class _CompanyAddStepTwoState extends State<CompanyAddStepTwo> {
           Navigator.of(context).popUntil((route) => route.isFirst);
         },
         nextOnPressed: () {
-          Navigator.push(
-            context,
-            PageRouteBuilder(
-              pageBuilder: (context, animation, secondaryAnimation) =>
-                  CompanyAddStepThree(),
-              transitionsBuilder:
-                  (context, animation, secondaryAnimation, child) {
-                const begin = Offset(1.0, 0.0);
-                const end = Offset.zero;
-                const curve = Curves.easeInOut;
-
-                var tween = Tween(begin: begin, end: end)
-                    .chain(CurveTween(curve: curve));
-
-                var offsetAnimation = animation.drive(tween);
-
-                return SlideTransition(position: offsetAnimation, child: child);
-              },
-            ),
-          );
+          Navigator.pushNamed(context, '/profile/company/create/step3',
+              arguments: {
+                'userBusinessCategoryId': userBusinessCategoryId,
+                'imageFile': imageFile,
+                'name': name,
+                'phone': phone,
+                'address1': address1,
+                'address2': address2,
+                'hasHoliday': hasHoliday,
+                'hasWeekend': hasWeekend,
+                'workTime': workTime,
+                'holiday': holiday,
+                'weekend': weekend,
+              });
         },
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                closedData.isNotEmpty
+                workTime.isNotEmpty
                     ? '다음을 눌러 업체등록을 완성해주세요'
                     : '업체운영 사항을 입력해주세요.',
                 style: TextStyle(
@@ -208,7 +227,7 @@ class _CompanyAddStepTwoState extends State<CompanyAddStepTwo> {
                         label: '휴무일을 입력해주세요',
                         hintText: '예) 공휴일 휴무, 월요일 마다 휴무',
                         onChanged: (String value) {
-                          operatingData = value;
+                          holiday = value;
                         }),
                   SizedBox(
                     height: 10.0,
@@ -217,8 +236,8 @@ class _CompanyAddStepTwoState extends State<CompanyAddStepTwo> {
                       clearBottomSheetButtonStyle,
                       bottomSheetButtonStyle,
                       context,
-                      hasTimeDayButtonStyle,
-                      noHasTimeDayButtonStyle),
+                      hasWeekendButtonStyle,
+                      nohasWeekendButtonStyle),
                 ],
               ),
             ],
@@ -232,8 +251,8 @@ class _CompanyAddStepTwoState extends State<CompanyAddStepTwo> {
       ButtonStyle clearBottomSheetButtonStyle,
       ButtonStyle bottomSheetButtonStyle,
       BuildContext context,
-      ButtonStyle hasTimeDayButtonStyle,
-      ButtonStyle noHasTimeDayButtonStyle) {
+      ButtonStyle hasWeekendButtonStyle,
+      ButtonStyle nohasWeekendButtonStyle) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -245,7 +264,7 @@ class _CompanyAddStepTwoState extends State<CompanyAddStepTwo> {
           children: [
             Expanded(
                 child: ElevatedButton(
-                    style: closedData.isNotEmpty
+                    style: workTime.isNotEmpty
                         ? clearBottomSheetButtonStyle
                         : bottomSheetButtonStyle,
                     onPressed: () {
@@ -267,7 +286,7 @@ class _CompanyAddStepTwoState extends State<CompanyAddStepTwo> {
                                       "${startTime.hour}:${startTime.minute.toString().padLeft(2, '0')}";
                                   String formattedEndTime =
                                       "${endTime.hour}:${endTime.minute.toString().padLeft(2, '0')}";
-                                  closedData =
+                                  workTime =
                                       '영업시간: $formattedStartTime ~ $formattedEndTime';
                                 });
                               },
@@ -279,7 +298,7 @@ class _CompanyAddStepTwoState extends State<CompanyAddStepTwo> {
                       children: [
                         Icon(
                           Icons.access_time,
-                          color: closedData.isNotEmpty
+                          color: workTime.isNotEmpty
                               ? Colors.white
                               : Color(0xFF75A8E4),
                           size: 20.0,
@@ -288,11 +307,11 @@ class _CompanyAddStepTwoState extends State<CompanyAddStepTwo> {
                           width: 8.0,
                         ),
                         Text(
-                          closedData.isNotEmpty ? closedData : '여기를 눌러서 시간선택',
+                          workTime.isNotEmpty ? workTime : '여기를 눌러서 시간선택',
                           style: TextStyle(
                               fontSize: 13.0,
                               fontWeight: FontWeight.w700,
-                              color: closedData.isNotEmpty
+                              color: workTime.isNotEmpty
                                   ? Colors.white
                                   : Color(0xFF75A8E4)),
                         ),
@@ -300,7 +319,7 @@ class _CompanyAddStepTwoState extends State<CompanyAddStepTwo> {
                     ))),
           ],
         ),
-        if (closedData.isNotEmpty)
+        if (workTime.isNotEmpty)
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -317,10 +336,10 @@ class _CompanyAddStepTwoState extends State<CompanyAddStepTwo> {
                 children: [
                   Expanded(
                       child: ElevatedButton(
-                          style: hasTimeDayButtonStyle,
+                          style: hasWeekendButtonStyle,
                           onPressed: () {
                             setState(() {
-                              hasTimeDay = true;
+                              hasWeekend = true;
                             });
                           },
                           child: Text(
@@ -332,10 +351,10 @@ class _CompanyAddStepTwoState extends State<CompanyAddStepTwo> {
                   ),
                   Expanded(
                       child: ElevatedButton(
-                          style: noHasTimeDayButtonStyle,
+                          style: nohasWeekendButtonStyle,
                           onPressed: () {
                             setState(() {
-                              hasTimeDay = false;
+                              hasWeekend = false;
                             });
                           },
                           child: Text(
@@ -347,12 +366,12 @@ class _CompanyAddStepTwoState extends State<CompanyAddStepTwo> {
               SizedBox(
                 height: 10.0,
               ),
-              if (!hasTimeDay)
+              if (!hasWeekend)
                 JoinTextFormField(
                     label: '주말/공휴일 시간을 입력해주세요',
                     hintText: '예) 주말 13:00~18:00',
                     onChanged: (String value) {
-                      weekendData = value;
+                      weekend = value;
                     }),
             ],
           )

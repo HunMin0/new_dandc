@@ -6,8 +6,45 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
 
-class GroupManageIndex extends StatelessWidget {
+class GroupManageIndex extends StatefulWidget {
   const GroupManageIndex({super.key});
+
+  @override
+  State<GroupManageIndex> createState() => _GroupManageIndexState();
+}
+
+class _GroupManageIndexState extends State<GroupManageIndex> {
+  int? groupId;
+  String? groupName;
+
+  var args;
+
+  @override
+  void initState() {
+    super.initState();
+
+    final widgetsBinding = WidgetsBinding.instance;
+    widgetsBinding?.addPostFrameCallback((callback) async {
+      if (ModalRoute
+          .of(context)
+          ?.settings
+          .arguments != null) {
+        setState(() {
+          args = ModalRoute
+              .of(context)
+              ?.settings
+              .arguments;
+        });
+
+        if (args != null) {
+          setState(() {
+            groupId = args['groupId'];
+            groupName = args['groupName'];
+          });
+        }
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -16,7 +53,7 @@ class GroupManageIndex extends StatelessWidget {
         color: Colors.black, fontSize: 20, fontWeight: FontWeight.bold);
 
     return DefaultLogoLayout(
-        titleName: '서초구 고깃집 사장모임',
+        titleName: groupName,
         isNotInnerPadding: 'true',
         child: Padding(
         padding: const EdgeInsets.all(15.0),
@@ -37,29 +74,7 @@ class GroupManageIndex extends StatelessWidget {
                 children: [
                   InkWell(
                     onTap: () {
-                      Navigator.push(
-                        context,
-                        PageRouteBuilder(
-                          pageBuilder: (context, animation, secondaryAnimation) =>
-                              GroupManageInfo(),
-                          transitionsBuilder:
-                              (context, animation, secondaryAnimation, child) {
-                            const begin = Offset(1.0, 0.0);
-                            const end = Offset.zero;
-                            const curve = Curves.easeInOut;
-
-                            var tween = Tween(begin: begin, end: end)
-                                .chain(CurveTween(curve: curve));
-
-                            var offsetAnimation = animation.drive(tween);
-
-                            return SlideTransition(
-                              position: offsetAnimation,
-                              child: child,
-                            );
-                          },
-                        ),
-                      );
+                      Navigator.pushNamed(context, '/group/manage/info', arguments: { "groupId": groupId, "groupName": groupName });
                     },
                     child:
                     Stack(
@@ -104,29 +119,7 @@ class GroupManageIndex extends StatelessWidget {
                   ),
                   InkWell(
                     onTap: () {
-                      Navigator.push(
-                        context,
-                        PageRouteBuilder(
-                          pageBuilder: (context, animation, secondaryAnimation) =>
-                              GroupManagePartner(),
-                          transitionsBuilder:
-                              (context, animation, secondaryAnimation, child) {
-                            const begin = Offset(1.0, 0.0);
-                            const end = Offset.zero;
-                            const curve = Curves.easeInOut;
-
-                            var tween = Tween(begin: begin, end: end)
-                                .chain(CurveTween(curve: curve));
-
-                            var offsetAnimation = animation.drive(tween);
-
-                            return SlideTransition(
-                              position: offsetAnimation,
-                              child: child,
-                            );
-                          },
-                        ),
-                      );
+                      Navigator.pushNamed(context, '/group/manage/partner', arguments: { "groupId": groupId, "groupName": groupName });
                     },
                     child:
                     Stack(

@@ -285,12 +285,12 @@ class _JoinIndexState extends State<JoinIndex> {
       label: '아이디',
       hintText: '아이디를 입력해주세요.',
       helperText: _isIDValid == null
-          ? '영문/숫자 4자 이상을 입력해 주세요.'
+          ? '아이디를 입력하고, 중복체크를 해주세요.'
           : _isIDValid!
               ? '사용가능한 아이디 입니다.'
               : '영문/숫자 4자 이상을 입력해 주세요.',
       errorText: _isIDValid == null
-          ? '아이디 중복체크를 해주세요.'
+          ? null
           : _isIDValid!
               ? null
               : '아이디가 중복 입니다',

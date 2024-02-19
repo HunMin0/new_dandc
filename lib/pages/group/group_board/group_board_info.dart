@@ -1,30 +1,148 @@
+import 'package:Deal_Connect/api/board.dart';
 import 'package:Deal_Connect/components/image_builder.dart';
 import 'package:Deal_Connect/components/layout/default_logo_layout.dart';
 import 'package:Deal_Connect/components/layout/default_next_layout.dart';
+import 'package:Deal_Connect/components/loading.dart';
+import 'package:Deal_Connect/model/board_file.dart';
+import 'package:Deal_Connect/model/board_write.dart';
+import 'package:Deal_Connect/model/user.dart';
+import 'package:Deal_Connect/utils/shared_pref_utils.dart';
+import 'package:Deal_Connect/utils/utils.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:hexcolor/hexcolor.dart';
 
 class GroupBoardInfo extends StatefulWidget {
-  final int id;
-
-  const GroupBoardInfo({required this.id, Key? key}) : super(key: key);
+  const GroupBoardInfo({Key? key}) : super(key: key);
 
   @override
   State<GroupBoardInfo> createState() => _GroupBoardInfoState();
 }
 
 class _GroupBoardInfoState extends State<GroupBoardInfo> {
+  int? boardWriteId;
+  String? groupName;
+  BoardWrite? boardWriteData;
+  bool _isLoading = true;
+  bool _isMine = false;
+  User? myUser;
+
+  var args;
+
+  @override
+  void initState() {
+    super.initState();
+    _initData();
+    _initMyUser();
+  }
+
+  void _initMyUser() {
+    SharedPrefUtils.getUser().then((value) => myUser = value);
+  }
+
+  void _initData() async {
+    final widgetsBinding = WidgetsBinding.instance;
+    widgetsBinding?.addPostFrameCallback((callback) async {
+      if (ModalRoute.of(context)?.settings.arguments != null) {
+        setState(() {
+          args = ModalRoute.of(context)?.settings.arguments;
+        });
+
+        if (args != null) {
+          setState(() {
+            boardWriteId = args['boardWriteId'];
+            groupName = args['groupName'];
+          });
+        }
+
+        if (boardWriteId != null) {
+          await getBoardWrite(boardWriteId!).then((response) {
+            if (response.status == 'success') {
+              BoardWrite resultData = BoardWrite.fromJSON(response.data);
+              setState(() {
+                boardWriteData = resultData;
+                if (boardWriteData != null && boardWriteData!.has_writer != null && myUser != null) {
+                  if (boardWriteData!.has_writer!.id == myUser!.id) {
+                    _isMine = true;
+                  }
+                }
+              });
+            } else {
+              Fluttertoast.showToast(
+                  msg: '게시물 정보를 받아오는 도중 오류가 발생했습니다.\n오류코드: 462');
+            }
+          });
+
+          _updateHits();
+        }
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    });
+  }
+
+  void _updateHits() async {
+    await updateBoardWriteHits(boardWriteId!).then((response) {
+      if (response.status == 'success') {
+        BoardWrite resultData = BoardWrite.fromJSON(response.data);
+
+      } else {
+        Fluttertoast.showToast(
+            msg: '조회수 업데이트 중 오류가 발생했습니다.\n오류코드: 463');
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    ImageProvider? avatarImage;
+
+    if (
+    boardWriteData != null &&
+        boardWriteData!.has_writer != null &&
+        boardWriteData!.has_writer!.has_user_profile != null &&
+        boardWriteData!.has_writer!.has_user_profile!.has_profile_image !=
+            null) {
+      avatarImage = CachedNetworkImageProvider(
+        Utils.getImageFilePath(
+            boardWriteData!.has_writer!.has_user_profile!.has_profile_image!),
+      );
+    } else {
+      avatarImage = AssetImage('assets/images/no-image.png');
+    }
+
+    List<String> imgUrls = [];
+    if (boardWriteData != null) {
+      if (boardWriteData!.has_files != null && boardWriteData!.has_files!.isNotEmpty) {
+        imgUrls.addAll(boardWriteData!.has_files!.map((e) => Utils.getImageFilePath(e.has_file!)));
+      }
+    }
+
+    if (_isLoading) {
+      // 로딩 중 인디케이터 표시
+      return Loading();
+    }
     return DefaultNextLayout(
-      titleName: '서초구 고기집 사장모임',
+      titleName: groupName,
       nextTitle: '수정',
       prevTitle: '삭제',
-      isCancel: true,
+      isCancel: _isMine,
+      isNext: _isMine,
       isProcessable: true,
       bottomBar: true,
-      nextOnPressed: (){Navigator.pop(context);},
-      prevOnPressed: (){},
+      nextOnPressed: () {
+        Navigator.pushNamed(
+            context, '/group/board/edit',
+            arguments: {
+              'boardWriteId': boardWriteData!.id,
+              'groupName': groupName
+            }).then((value) {
+          _initData();
+        });
+      },
+      prevOnPressed: () {},
       child: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -32,8 +150,13 @@ class _GroupBoardInfoState extends State<GroupBoardInfo> {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text("연초 모임을 어디서 갖는게 좋을까요??", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20.0),  ),
-                SizedBox(height: 15,),
+                Text(
+                  boardWriteData != null ? boardWriteData!.title : '',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20.0),
+                ),
+                SizedBox(
+                  height: 15,
+                ),
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
@@ -44,7 +167,7 @@ class _GroupBoardInfoState extends State<GroupBoardInfo> {
                           height: 30,
                           decoration: BoxDecoration(
                             image: DecorationImage(
-                              image: AssetImage('assets/images/sample/main_sample05.jpg'),
+                              image: avatarImage,
                               fit: BoxFit.cover,
                             ),
                             borderRadius: BorderRadius.circular(30.0),
@@ -54,13 +177,16 @@ class _GroupBoardInfoState extends State<GroupBoardInfo> {
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
+                            if (boardWriteData != null && boardWriteData!.has_writer != null)
                             Text(
-                              '우스헤라',
-                              style: TextStyle(fontWeight: FontWeight.w500, fontSize: 14.0),
+                              boardWriteData!.has_writer!.name,
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w500, fontSize: 14.0),
                             ),
                             Text(
-                              '2024-01-01 16:30:25',
-                              style: TextStyle(color: HexColor("#aaaaaa"), fontSize: 11.0),
+                              boardWriteData != null ? boardWriteData!.created_at : '',
+                              style: TextStyle(
+                                  color: HexColor("#aaaaaa"), fontSize: 11.0),
                             ),
                           ],
                         ),
@@ -70,25 +196,38 @@ class _GroupBoardInfoState extends State<GroupBoardInfo> {
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        Icon(Icons.remove_red_eye_sharp, color: Colors.grey, size: 18.0,),
+                        Icon(
+                          Icons.remove_red_eye_sharp,
+                          color: Colors.grey,
+                          size: 18.0,
+                        ),
                         SizedBox(width: 3.0),
-                        Text('10', style: TextStyle(color: Colors.grey, fontSize: 14.0)),
+                        Text(boardWriteData != null ? boardWriteData!.hits.toString() : '0',
+                            style:
+                                TextStyle(color: Colors.grey, fontSize: 14.0)),
                       ],
                     ),
                   ],
                 ),
               ],
             ),
-            SizedBox(height: 20.0,),
+            SizedBox(
+              height: 20.0,
+            ),
             Column(
               children: [
-                Container(
-                  child: Image(
-                    image: AssetImage('assets/images/sample/main_sample01.jpg'),
+                if (imgUrls.isNotEmpty)
+                  Container(
+                    child: Image(
+                      image: CachedNetworkImageProvider(imgUrls[0]),
+                    ),
                   ),
-                ),
-                SizedBox(height: 10,),
-                Text('이번 모임은 고깃집 어떠세요!? 홍길동님이 운영하시는 집이 아주 괜찮습니다.이번 모임은 고깃집 어떠세요!? 홍길동님이 운영하시는 집이 아주 괜찮습니다.이번 모임은 고깃집 어떠세요!? 홍길동님이 운영하시는 집이 아주 괜찮습니다.이번 모임은 고깃집 어떠세요!? 홍길동님이 운영하시는 집이 아주 괜찮습니다.이번 모임은 고깃집 어떠세요!? 홍길동님이 운영하시는 집이 아주 괜찮습니다.이번 모임은 고깃집 어떠세요!? 홍길동님이 운영하시는 집이 아주 괜찮습니다.이번 모임은 고깃집 어떠세요!? 홍길동님이 운영하시는 집이 아주 괜찮습니다.이번 모임은 고깃집 어떠세요!? 홍길동님이 운영하시는 집이 아주 괜찮습니다.이번 모임은 고깃집 어떠세요!? 홍길동님이 운영하시는 집이 아주 괜찮습니다.')
+                  SizedBox(
+                    height: 10,
+                  ),
+                Container(
+                    width: double.infinity,
+                    child: Text(boardWriteData != null ? boardWriteData!.content : '', textAlign: TextAlign.start,)),
               ],
             ),
           ],

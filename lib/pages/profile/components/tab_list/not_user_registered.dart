@@ -1,4 +1,4 @@
-import 'package:Deal_Connect/pages/profile/company_add/company_add_index.dart';
+import 'package:Deal_Connect/pages/profile/company_create/company_create_index.dart';
 import 'package:Deal_Connect/pages/profile/components/tab_list/tabBarButton.dart';
 import 'package:flutter/material.dart';
 
@@ -79,7 +79,7 @@ class NotUserRegistered extends StatelessWidget {
                               Expanded(
                                 child: TabBarButton(
                                     btnTitle: '내 업체 등록하기', onPressed: () {
-                                      Navigator.push(context, MaterialPageRoute(builder: (context) => CompanyAddIndex()));
+                                      Navigator.pushNamed(context, '/profile/company/create');
                                 }),
                               ),
                             ],

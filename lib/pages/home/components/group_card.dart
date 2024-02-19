@@ -1,17 +1,12 @@
+import 'package:Deal_Connect/model/group.dart';
+import 'package:Deal_Connect/utils/utils.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
 class GroupCard extends StatefulWidget {
-  final int id;
-  final String imagePath;
-  final String title;
-  final int memberCount;
+  final Group item;
 
-  const GroupCard({
-    required this.id,
-    required this.imagePath,
-    required this.title,
-    required this.memberCount,
-    Key? key})
+  GroupCard({Key? key, required this.item})
     : super(key: key);
 
   @override
@@ -28,18 +23,24 @@ class _GroupCardState extends State<GroupCard> {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Stack(
-          children: [
-            _CardBackground(),
-            _CardData(),
-          ],
-        ),
-        SizedBox(
-          width: 10.0,
-        ),
-      ],
+    return GestureDetector(
+      onTap: () {
+        Navigator.pushNamed(context, '/group/info',
+            arguments: {'groupId': widget.item.id});
+      },
+      child: Row(
+        children: [
+          Stack(
+            children: [
+              _CardBackground(),
+              _CardData(),
+            ],
+          ),
+          SizedBox(
+            width: 10.0,
+          ),
+        ],
+      ),
     );
   }
 
@@ -72,7 +73,7 @@ class _GroupCardState extends State<GroupCard> {
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
           Text(
-            widget.title,
+            widget.item.name,
             style: textStyle,
           ),
           SizedBox(
@@ -99,66 +100,33 @@ class _GroupCardState extends State<GroupCard> {
               ),
             ),
             Text(
-              '${widget.memberCount}명',
+              widget.item.users_count.toString() + '명',
               style: textStyle.copyWith(
                 fontSize: 12.0,
               ),
             ),
-            // Padding(
-            //   padding:
-            //       const EdgeInsets.symmetric(horizontal: 3.0),
-            //   child: Text(
-            //     '·',
-            //     style: textStyle.copyWith(
-            //       fontSize: 12.0,
-            //     ),
-            //   ),
-            // ),
-            // Text(
-            //   widget.category,
-            //   style: textStyle.copyWith(
-            //     fontSize: 12.0,
-            //     color: Color(0xFF6793c8),
-            //   ),
-            // ),
           ],
         ),
-        // Row(
-        //   children: [
-        //     Container(
-        //       width: 20.0,
-        //       height: 20.0,
-        //       child: IconButton(
-        //         iconSize: 18.0,
-        //         padding: EdgeInsets.all(0.0),
-        //         icon: isFavorite
-        //             ? Icon(
-        //                 Icons.favorite,
-        //                 color: Color(0xFF6793c8),
-        //               )
-        //             : Icon(
-        //                 Icons.favorite_border,
-        //                 color: Colors.white,
-        //               ),
-        //         onPressed: () {
-        //           setState(() {
-        //             toggleFavorite();
-        //           });
-        //         },
-        //       ),
-        //     ),
-        //   ],
-        // ),
       ],
     );
   }
 
   Container _CardBackground() {
+    ImageProvider? backgroundImage;
+
+    if (widget.item.has_group_image != null && widget.item.has_group_image != null) {
+      backgroundImage = CachedNetworkImageProvider(
+        Utils.getImageFilePath(widget.item.has_group_image!),
+      );
+    } else {
+      backgroundImage = AssetImage('assets/images/no-image.png');
+    }
+
     return Container(
       width: 180.0,
       decoration: BoxDecoration(
         image: DecorationImage(
-          image: AssetImage('assets/images/sample/${widget.imagePath}.jpg'),
+          image: backgroundImage,
           fit: BoxFit.cover,
         ),
         borderRadius: BorderRadius.circular(10.0),

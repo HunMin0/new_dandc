@@ -59,6 +59,7 @@ dependencies:
   image_cropper: ^4.0.1
   cached_network_image: ^3.3.1
   carousel_slider: ^4.0.0
+  webview_flutter: ^3.0.0
 
 dev_dependencies:
   flutter_test:

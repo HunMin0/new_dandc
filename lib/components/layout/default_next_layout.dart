@@ -6,6 +6,7 @@ class DefaultNextLayout extends StatelessWidget {
   final Color? backgroundColor;
   final String? titleName;
 
+  final bool isNext;
   final bool isCancel;
   final bool bottomBar;
   final bool isProcessable;
@@ -54,6 +55,7 @@ class DefaultNextLayout extends StatelessWidget {
       ),
       bottomNavigationBar: bottomBar
           ? BottomButtons(
+              isNext: isNext,
               isCancel: isCancel,
               isProcessable: isProcessable!,
               nextOnPressed: nextOnPressed!,
@@ -75,6 +77,7 @@ class DefaultNextLayout extends StatelessWidget {
       this.nextTitle,
       this.prevOnPressed,
       this.nextOnPressed,
+      this.isNext = true,
       this.isCancel = true, // 기본값 true로 설정
       this.isNotInnerPadding,
       this.rightMoreBtn = false,
@@ -90,6 +93,7 @@ class BottomButtons extends StatelessWidget {
   final VoidCallback? nextOnPressed;
   final VoidCallback prevOnPressed;
   final bool isCancel;
+  final bool isNext;
 
   const BottomButtons(
       {required this.nextOnPressed,
@@ -98,6 +102,7 @@ class BottomButtons extends StatelessWidget {
       required this.prevTitle,
       required this.isProcessable,
       required this.isCancel,
+      required this.isNext,
       super.key});
 
   @override
@@ -138,6 +143,7 @@ class BottomButtons extends StatelessWidget {
                 SizedBox(
                   width: 10.0,
                 ),
+              if (isNext)
               Expanded(
                 child: ElevatedButton(
                   style: isProcessable

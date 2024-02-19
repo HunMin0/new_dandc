@@ -2,21 +2,41 @@ import 'dart:io';
 
 import 'package:Deal_Connect/components/const/setting_colors.dart';
 import 'package:Deal_Connect/components/layout/default_next_layout.dart';
-import 'package:Deal_Connect/pages/profile/company_add/company_add_step_one.dart';
+import 'package:Deal_Connect/pages/profile/company_create/company_create_step_one.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
-class CompanyAddAlbum extends StatefulWidget {
-  const CompanyAddAlbum({super.key});
+class CompanyCreatePhoto extends StatefulWidget {
+  const CompanyCreatePhoto({super.key});
 
   @override
-  State<CompanyAddAlbum> createState() => _CompanyAddAlbumState();
+  State<CompanyCreatePhoto> createState() => _CompanyCreatePhotoState();
 }
 
-class _CompanyAddAlbumState extends State<CompanyAddAlbum> {
+class _CompanyCreatePhotoState extends State<CompanyCreatePhoto> {
   File? _pickedImage;
   bool isProcessable = false;
   bool checkState = false;
+  int userBusinessCategoryId = 0;
+
+  var args;
+
+  @override
+  void initState() {
+    super.initState();
+
+    final widgetsBinding = WidgetsBinding.instance;
+    widgetsBinding?.addPostFrameCallback((callback) {
+      if (ModalRoute.of(context)?.settings.arguments != null) {
+        args = ModalRoute.of(context)?.settings.arguments;
+        if (args != null) {
+          setState(() {
+            userBusinessCategoryId = args['userBusinessCategoryId'];
+          });
+        }
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,26 +56,11 @@ class _CompanyAddAlbumState extends State<CompanyAddAlbum> {
         Navigator.of(context).popUntil((route) => route.isFirst);
       },
       nextOnPressed: () {
-        Navigator.push(
-          context,
-          PageRouteBuilder(
-            pageBuilder: (context, animation, secondaryAnimation) =>
-                CompanyAddStepOne(),
-            transitionsBuilder:
-                (context, animation, secondaryAnimation, child) {
-              const begin = Offset(1.0, 0.0);
-              const end = Offset.zero;
-              const curve = Curves.easeInOut;
-
-              var tween =
-              Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-
-              var offsetAnimation = animation.drive(tween);
-
-              return SlideTransition(position: offsetAnimation, child: child);
-            },
-          ),
-        );
+        Navigator.pushNamed(context, '/profile/company/create/step1',
+            arguments: {
+              'userBusinessCategoryId': userBusinessCategoryId,
+              'imageFile': _pickedImage,
+            });
       },
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -71,10 +76,9 @@ class _CompanyAddAlbumState extends State<CompanyAddAlbum> {
           ),
           GestureDetector(
             onTap: () {
-
               showModalBottomSheet(
-                backgroundColor: Colors.white,
-                showDragHandle: true,
+                  backgroundColor: Colors.white,
+                  showDragHandle: true,
                   context: context,
                   builder: (context) {
                     return SafeArea(
@@ -85,13 +89,16 @@ class _CompanyAddAlbumState extends State<CompanyAddAlbum> {
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-
                               GestureDetector(
                                 child: Padding(
-                                  padding: const EdgeInsets.symmetric(vertical: 16.0),
-                                  child: Text('카메라로 촬영', style: bottomTextStyle,),
+                                  padding: const EdgeInsets.symmetric(
+                                      vertical: 16.0),
+                                  child: Text(
+                                    '카메라로 촬영',
+                                    style: bottomTextStyle,
+                                  ),
                                 ),
-                                onTap: (){
+                                onTap: () {
                                   ImagePicker()
                                       .pickImage(source: ImageSource.camera)
                                       .then((xfile) {
@@ -105,15 +112,20 @@ class _CompanyAddAlbumState extends State<CompanyAddAlbum> {
                                   });
                                 },
                               ),
-
-                              Divider(height: 1.0, color: Color(0xFFdddddd),),
-
+                              Divider(
+                                height: 1.0,
+                                color: Color(0xFFdddddd),
+                              ),
                               GestureDetector(
                                 child: Padding(
-                                  padding: const EdgeInsets.symmetric(vertical: 16.0),
-                                  child: Text('앨범에서 가져오기', style: bottomTextStyle,),
+                                  padding: const EdgeInsets.symmetric(
+                                      vertical: 16.0),
+                                  child: Text(
+                                    '앨범에서 가져오기',
+                                    style: bottomTextStyle,
+                                  ),
                                 ),
-                                onTap: (){
+                                onTap: () {
                                   ImagePicker()
                                       .pickImage(source: ImageSource.gallery)
                                       .then((xfile) {

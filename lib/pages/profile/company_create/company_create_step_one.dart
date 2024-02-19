@@ -1,21 +1,57 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:Deal_Connect/components/const/setting_colors.dart';
 import 'package:Deal_Connect/components/custom/join_text_form_field.dart';
 import 'package:Deal_Connect/components/layout/default_next_layout.dart';
-import 'package:Deal_Connect/pages/profile/company_add/company_add_step_two.dart';
+import 'package:Deal_Connect/model/search_address_result.dart';
+import 'package:Deal_Connect/pages/profile/company_create/company_create_step_two.dart';
 import 'package:flutter/material.dart';
 
-class CompanyAddStepOne extends StatefulWidget {
-  const CompanyAddStepOne({super.key});
+class CompanyCreateStepOne extends StatefulWidget {
+  const CompanyCreateStepOne({super.key});
 
   @override
-  State<CompanyAddStepOne> createState() => _CompanyAddStepOneState();
+  State<CompanyCreateStepOne> createState() => _CompanyCreateStepOneState();
 }
 
-class _CompanyAddStepOneState extends State<CompanyAddStepOne> {
+class _CompanyCreateStepOneState extends State<CompanyCreateStepOne> {
+  int userBusinessCategoryId = 0;
+  File? imageFile;
+
+  String name = '';
+  String phone = '';
+  String zipcode = '';
+  double? latitude;
+  double? longitude;
+  String address1 = '';
+  String address2 = '';
+
   bool isProcessable = false;
+  bool isPhoneFilled = false;
   bool isCompanyNameFilled = false;
   bool isAddressFilled = true;
   bool isDetailedAddressFilled = false;
+
+  var args;
+
+  @override
+  void initState() {
+    super.initState();
+
+    final widgetsBinding = WidgetsBinding.instance;
+    widgetsBinding?.addPostFrameCallback((callback) {
+      if (ModalRoute.of(context)?.settings.arguments != null) {
+        args = ModalRoute.of(context)?.settings.arguments;
+        if (args != null) {
+          setState(() {
+            userBusinessCategoryId = args['userBusinessCategoryId'];
+            imageFile = args['imageFile'];
+          });
+        }
+      }
+    });
+  }
 
   void _showPopup(BuildContext context) {
     showDialog(
@@ -52,26 +88,15 @@ class _CompanyAddStepOneState extends State<CompanyAddStepOne> {
           Navigator.of(context).popUntil((route) => route.isFirst);
         },
         nextOnPressed: () {
-          Navigator.push(
-            context,
-            PageRouteBuilder(
-              pageBuilder: (context, animation, secondaryAnimation) =>
-                  CompanyAddStepTwo(),
-              transitionsBuilder:
-                  (context, animation, secondaryAnimation, child) {
-                const begin = Offset(1.0, 0.0);
-                const end = Offset.zero;
-                const curve = Curves.easeInOut;
-
-                var tween = Tween(begin: begin, end: end)
-                    .chain(CurveTween(curve: curve));
-
-                var offsetAnimation = animation.drive(tween);
-
-                return SlideTransition(position: offsetAnimation, child: child);
-              },
-            ),
-          );
+          Navigator.pushNamed(context, '/profile/company/create/step2',
+              arguments: {
+                'userBusinessCategoryId': userBusinessCategoryId,
+                'imageFile': imageFile,
+                'name': name,
+                'phone': phone,
+                'address1': address1,
+                'address2': address2,
+              });
         },
         child: SingleChildScrollView(
           child: Column(
@@ -101,6 +126,7 @@ class _CompanyAddStepOneState extends State<CompanyAddStepOne> {
                     hintText: '업체명을 입력해주세요',
                     onChanged: (String value) {
                       setState(() {
+                        name = value;
                         isCompanyNameFilled = value.isNotEmpty;
                         isProcessable = isCompanyNameFilled &&
                             isAddressFilled &&
@@ -112,6 +138,23 @@ class _CompanyAddStepOneState extends State<CompanyAddStepOne> {
                     height: 10.0,
                   ),
                   _buildAddressSearchBtn(context),
+                  SizedBox(
+                    height: 10.0,
+                  ),
+                  JoinTextFormField(
+                    label: '연락처',
+                    hintText: '연락처를 입력해주세요',
+                    onChanged: (String value) {
+                      setState(() {
+                        phone = value;
+                        isPhoneFilled = value.isNotEmpty;
+                        isProcessable = isCompanyNameFilled &&
+                            isAddressFilled &&
+                            isPhoneFilled &&
+                            isDetailedAddressFilled;
+                      });
+                    },
+                  ),
                 ],
               ),
             ],
@@ -119,6 +162,8 @@ class _CompanyAddStepOneState extends State<CompanyAddStepOne> {
         ),
       ),
     );
+
+
   }
 
   Column _buildAddressSearchBtn(BuildContext context) {
@@ -133,7 +178,7 @@ class _CompanyAddStepOneState extends State<CompanyAddStepOne> {
         ),
         GestureDetector(
           onTap: () {
-            _showPopup(context);
+            _searchEvent();
           },
           child: Container(
             width: double.infinity,
@@ -153,7 +198,7 @@ class _CompanyAddStepOneState extends State<CompanyAddStepOne> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        '여기를 눌러 주소 검색',
+                        address1 ?? '여기를 눌러 주소 검색',
                         style: TextStyle(color: BODY_TEXT_COLOR),
                       ),
                       Icon(
@@ -168,9 +213,9 @@ class _CompanyAddStepOneState extends State<CompanyAddStepOne> {
         JoinTextFormField(
           label: '상세주소',
           hintText: '상세주소를 입력 해주세요',
-          helperText: '주소가 올바르지 않으면 주소검색을 다시 진행 해주세요',
           onChanged: (String value) {
             setState(() {
+              address2 = value;
               isDetailedAddressFilled = value.isNotEmpty;
               isProcessable = isCompanyNameFilled &&
                   isAddressFilled &&
@@ -181,4 +226,21 @@ class _CompanyAddStepOneState extends State<CompanyAddStepOne> {
       ],
     );
   }
+  void _searchEvent() {
+    Navigator.pushNamed(context, '/address/search').then((value) {
+      if (value != null) {
+        String valueStr = value as String;
+        var jsonBody = json.decode(valueStr);
+        SearchAddressResult searchAddressResult = SearchAddressResult.fromJSON(jsonBody);
+        setState(() {
+          address1 = searchAddressResult.addr;
+          zipcode = searchAddressResult.zonecode;
+
+          // latitude = double.parse(searchAddressResult.lat);
+          // longitude = double.parse(searchAddressResult.lon);
+        });
+      }
+    });
+  }
+
 }

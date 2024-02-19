@@ -1,12 +1,31 @@
 import 'package:Deal_Connect/api/server_config.dart';
 import 'package:Deal_Connect/model/file.dart';
+import 'package:Deal_Connect/utils/shared_pref_utils.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 import 'package:image/image.dart' as IMG;
 import 'dart:io' as IO;
 
 class Utils {
+
+// 로그인 정보 초기화 후 '/intro'로 리다이렉션하는 함수
+  Future<void> logoutAndRedirectToIntro(BuildContext context) async {
+    // 토큰 초기화
+    bool tokenCleared = await SharedPrefUtils.clearAccessToken();
+    // 사용자 정보 초기화
+    bool userCleared = await SharedPrefUtils.clearUser();
+
+    if (tokenCleared && userCleared) {
+      // 초기화 성공 시, '/intro'로 리다이렉션
+      Navigator.of(context).pushNamedAndRemoveUntil('/intro', (Route<dynamic> route) => false);
+    } else {
+      // 초기화 실패 시, 오류 메시지 표시
+      Fluttertoast.showToast(msg: "로그아웃 실패. 다시 시도해주세요.");
+    }
+  }
+
   static String parsePrice(int price) {
     String resultStr = '';
     if (price >= 10000) {

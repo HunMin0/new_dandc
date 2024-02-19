@@ -35,6 +35,7 @@ class _BusinessIndexState extends State<BusinessIndex> with TickerProviderStateM
           headerSliverBuilder: (context, innerBoxIsScrolled) {
           return [
             SliverAppBar(
+              automaticallyImplyLeading: false,
               pinned: false,
               expandedHeight: 80,
               flexibleSpace: FlexibleSpaceBar(

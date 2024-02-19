@@ -13,22 +13,29 @@ import 'package:flutter/material.dart';
 import 'group/group_index.dart';
 
 class DefaultPage extends StatefulWidget {
-  int currentIndex;
-
-  DefaultPage({this.currentIndex = 0, Key? key}) : super(key: key);
-
   @override
   State<DefaultPage> createState() => _DefaultPageState();
 }
 
 class _DefaultPageState extends State<DefaultPage> {
-  final _pages = [
-    HomeIndex(), // 메인홈
-    HistoryIndex(), // 거래내역
-    TradeIndex(), // 거래추가
-    BusinessIndex(), // 사업장찾기
-    ProfileIndex(), // 프로필
-  ];
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
+  int _selectedIndex = 0;
+  late List<Widget> _widgetOptions;
+
+  @override
+  void initState() {
+    _widgetOptions = <Widget>[
+      HomeIndex(onTab: _onTab),
+      HistoryIndex(),
+      TradeIndex(),
+      BusinessIndex(),
+      ProfileIndex(onTab: _onTab),
+    ];
+
+    super.initState();
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -37,12 +44,13 @@ class _DefaultPageState extends State<DefaultPage> {
       child: SafeArea(
         top: false, // safearea까지 먹힌 색을 top은 미적용 처리
         child: Scaffold(
+          key: _scaffoldKey,
           appBar: renderAppBar(),
           //floatingActionButton: _renderFloatingActionButton(),
           //floatingActionButtonLocation: FloatingActionButtonLocation.endFloat, // floatingAction위치
           body: Padding(
             padding: const EdgeInsets.symmetric(vertical: 10.0),
-            child: _pages[widget.currentIndex],
+            child: _widgetOptions.elementAt(_selectedIndex),
           ),
           bottomNavigationBar: Padding(
               padding: EdgeInsets.only(bottom: 10),
@@ -53,10 +61,9 @@ class _DefaultPageState extends State<DefaultPage> {
   }
 
 
-  // 새로운 메서드를 추가합니다.
-  void changeCurrentIndex(int newIndex) {
+  _onTab(int index) {
     setState(() {
-      widget.currentIndex = newIndex;
+      _selectedIndex = index;
     });
   }
 
@@ -69,7 +76,7 @@ class _DefaultPageState extends State<DefaultPage> {
       title: GestureDetector(
         onTap: (){
           setState(() {
-            widget.currentIndex = 0;
+            _selectedIndex = 0;
           });
         },
         child: Image.asset(
@@ -115,12 +122,8 @@ class _DefaultPageState extends State<DefaultPage> {
     return BottomNavigationBar(
       backgroundColor: SettingColors.primaryMeterialColor,
       elevation: 0,
-      onTap: (index) {
-        setState(() {
-          widget.currentIndex = index;
-        });
-      },
-      currentIndex: widget.currentIndex, // 선택된 인덱스의 값을 얻는다
+      onTap: _onTab,
+      currentIndex: _selectedIndex, // 선택된 인덱스의 값을 얻는다
       selectedItemColor: Color(0xFF3c3c3c),
       unselectedItemColor: Color(0xFFc3c3c3),
       type: BottomNavigationBarType.fixed, // 라벨의 텍스트 노출
@@ -144,7 +147,7 @@ class _DefaultPageState extends State<DefaultPage> {
       icon: Container(
         height: 30,
         padding: EdgeInsets.only(bottom: 5),
-        child: widget.currentIndex == index
+        child: _selectedIndex == index
             ? ImageIcon(
           AssetImage('assets/images/icons/$imagePath'+'_over.png'),
           size: 22.0,
@@ -160,7 +163,7 @@ class _DefaultPageState extends State<DefaultPage> {
 
   // Floating 액션 버튼
    _renderFloatingActionButton() {
-    if(widget.currentIndex == 0){
+    if(_selectedIndex == 0){
       return FloatingActionButton(
         onPressed: (){
           Navigator.push(context, MaterialPageRoute(builder: (context)

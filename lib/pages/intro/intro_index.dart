@@ -1,7 +1,6 @@
 import 'package:Deal_Connect/Utils/custom_dialog.dart';
 import 'package:Deal_Connect/Utils/shared_pref_utils.dart';
 import 'package:Deal_Connect/pages/auth/terms/terms_index.dart';
-import 'package:Deal_Connect/pages/home/home_index.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
@@ -89,13 +88,7 @@ class IntroIndex extends StatelessWidget {
                       borderRadius: BorderRadius.circular(40.0),
                     )),
                 onPressed: () {
-
-
-                  Navigator.push(
-                    context,
-                    CupertinoPageRoute(
-                        builder: (context) => HomeIndex()),
-                  );
+                  Navigator.of(context).pushReplacementNamed('/register/terms');
                 },
                 child: Text(
                   '시작하기',

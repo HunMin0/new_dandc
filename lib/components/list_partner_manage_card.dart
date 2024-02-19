@@ -1,20 +1,13 @@
+import 'package:Deal_Connect/model/group_user.dart';
+import 'package:Deal_Connect/model/user_keyword.dart';
 import 'package:flutter/material.dart';
 
+
 class ListPartnerManageCard extends StatelessWidget {
-  final String bgImagePath;
-  final String avaterImagePath;
-  final String companyName;
-  final String userName;
-  final bool isNew;
-  final List<String> tagList;
+  final GroupUser item;
 
   const ListPartnerManageCard(
-      {required this.bgImagePath,
-      required this.avaterImagePath,
-      required this.companyName,
-      required this.userName,
-      required this.tagList,
-      this.isNew = false,
+      {required this.item,
       Key? key})
       : super(key: key);
 
@@ -41,7 +34,7 @@ class ListPartnerManageCard extends StatelessWidget {
             width: 18.0,
           ),
           _ListRightText(),
-          isNew
+          item.is_approved == null
               ? Container(
                   child: Column(
                     children: [
@@ -117,14 +110,14 @@ class ListPartnerManageCard extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(
-            userName,
+            item.has_user!.name,
             style: TextStyle(fontWeight: FontWeight.w500, fontSize: 16.0),
           ),
           SizedBox(
             height: 5.0,
           ),
           Text(
-            companyName,
+            item.has_user!.main_business!.name,
             style: TextStyle(
                 fontWeight: FontWeight.w500,
                 fontSize: 14.0,
@@ -135,7 +128,6 @@ class ListPartnerManageCard extends StatelessWidget {
           ),
           SingleChildScrollView(
             scrollDirection: Axis.horizontal, // 가로 스크롤
-            child: _buildTags(tagList),
           ),
         ],
       ),
@@ -151,10 +143,6 @@ class ListPartnerManageCard extends StatelessWidget {
           width: 70,
           height: 70,
           decoration: BoxDecoration(
-            image: DecorationImage(
-              image: AssetImage('assets/images/sample/${bgImagePath}.jpg'),
-              fit: BoxFit.cover,
-            ),
             borderRadius: BorderRadius.circular(10.0),
           ),
         ),
@@ -171,8 +159,6 @@ class ListPartnerManageCard extends StatelessWidget {
             ),
             child: CircleAvatar(
               radius: 18.0,
-              backgroundImage:
-                  AssetImage('assets/images/sample/${avaterImagePath}.jpg'),
             ),
           ),
         ),
@@ -181,13 +167,13 @@ class ListPartnerManageCard extends StatelessWidget {
   }
 
   // 반복태그
-  Widget _buildTags(List<String> tagList) {
+  Widget _buildTags(List<UserKeyword> tagList) {
     List<Widget> tagWidgets = [];
     for (int i = 0; i < tagList.length; i++) {
       if (i < 3) {
         tagWidgets.add(Padding(
           padding: const EdgeInsets.only(right: 5.0),
-          child: _cardTag(tagList[i]),
+          child: _cardTag(tagList[i].keyword),
         ));
       } else {
         break;

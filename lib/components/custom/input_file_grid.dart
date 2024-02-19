@@ -11,11 +11,14 @@ import 'package:path/path.dart';
 
 class InputFileGrid extends StatefulWidget {
   List<ImagePickerItem> imageList;
+  List<File>? beforeFileList;
+
   bool isAddable = true;
   bool isOnlyImage = true;
 
   InputFileGrid({Key? key,
     required this.imageList,
+    this.beforeFileList,
     this.isAddable = true,
     this.isOnlyImage = true,
   }) : super(key: key);

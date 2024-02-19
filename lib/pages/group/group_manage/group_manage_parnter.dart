@@ -1,13 +1,18 @@
+import 'package:Deal_Connect/api/group_user.dart';
+import 'package:Deal_Connect/components/alert/show_complete_dialog.dart';
 import 'package:Deal_Connect/components/layout/default_logo_layout.dart';
-import 'package:Deal_Connect/components/list_business_card.dart';
-import 'package:Deal_Connect/components/list_card.dart';
+import 'package:Deal_Connect/components/list_partner_card.dart';
 import 'package:Deal_Connect/components/list_partner_manage_card.dart';
-import 'package:Deal_Connect/db/company_data.dart';
+import 'package:Deal_Connect/components/loading.dart';
+import 'package:Deal_Connect/components/no_items.dart';
 import 'package:Deal_Connect/db/vertical_data.dart';
-import 'package:Deal_Connect/pages/business/business_detail/business_detail_info.dart';
-import 'package:Deal_Connect/pages/group/group_partner/group_partner_index.dart';
+import 'package:Deal_Connect/model/group_user.dart';
+import 'package:Deal_Connect/model/user.dart';
+import 'package:Deal_Connect/utils/custom_dialog.dart';
+import 'package:Deal_Connect/utils/shared_pref_utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:hexcolor/hexcolor.dart';
 
 class GroupManagePartner extends StatefulWidget {
@@ -20,21 +25,99 @@ class GroupManagePartner extends StatefulWidget {
 class _GroupManagePartnerState extends State<GroupManagePartner>
     with TickerProviderStateMixin {
   late final TabController tabController;
+  int? groupId;
+  String? groupName;
+  List<GroupUser> groupUserList = [];
+  bool _isLoading = true;
+  User? myUser;
+
+  var args;
 
   @override
   void initState() {
     super.initState();
-    // tab컨트롤러 초기화
+    final widgetsBinding = WidgetsBinding.instance;
+    widgetsBinding?.addPostFrameCallback((callback) async {
+      if (ModalRoute.of(context)?.settings.arguments != null) {
+        setState(() {
+          args = ModalRoute.of(context)?.settings.arguments;
+        });
+
+        if (args != null) {
+          setState(() {
+            groupId = args['groupId'];
+            groupName = args['groupName'];
+          });
+        }
+      }
+      _initData();
+      _initMyUser();
+    });
+
     tabController = TabController(
       length: 2,
       vsync: this,
     );
+    tabController.addListener(_handleTabSelection);
+  }
+
+  @override
+  void dispose() {
+    tabController.removeListener(_handleTabSelection);
+    tabController.dispose();
+    super.dispose();
+  }
+
+  void _handleTabSelection() {
+    if (tabController.indexIsChanging) {
+      _initData();
+    }
+  }
+
+  void _initData() async {
+    setState(() {
+      _isLoading = true; // 데이터 로딩 시작
+    });
+
+    bool? isApproved =
+        tabController.index == 0 ? null : true; // 탭 인덱스에 따라 조건 변경
+
+    if (groupId != null) {
+      await getGroupUsers(queryMap: {
+        'group_id': groupId,
+        'is_approved': isApproved,
+      }).then((response) {
+        if (response.status == 'success') {
+          Iterable iterable = response.data;
+          List<GroupUser> dataList =
+              List<GroupUser>.from(iterable.map((e) => GroupUser.fromJSON(e)));
+          setState(() {
+            groupUserList = dataList;
+          });
+        } else {
+          Fluttertoast.showToast(
+              msg: '그룹유저 정보를 받아 오는 도중 오류가 발생했습니다.\n오류코드: 463');
+        }
+      });
+    }
+    setState(() {
+      _isLoading = false;
+    });
+  }
+
+  void _initMyUser() {
+    SharedPrefUtils.getUser().then((value) => myUser = value);
   }
 
   @override
   Widget build(BuildContext context) {
+    if (_isLoading) {
+      // 로딩 중 인디케이터 표시
+      return Loading();
+    }
+
     return DefaultLogoLayout(
-        titleName: '서초구 고깃집 사장모임',
+        titleName: groupName,
         isNotInnerPadding: 'true',
         child: NestedScrollView(
             headerSliverBuilder: (context, innerBoxIsScrolled) {
@@ -98,58 +181,104 @@ class _GroupManagePartnerState extends State<GroupManagePartner>
                 ),
               ];
             },
-            body: Column(
-              children: [
-                Expanded(
-                  child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 10.0),
-                    color: Color(0xFFF5F6FA),
-                    child: TabBarView(
-                      controller: tabController,
-                      children: [
-                        _VerticalList(isNew: true),
-                        _VerticalList(isNew: false),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            )));
+            body: groupUserList != null && groupUserList.isNotEmpty
+                ? Column(
+                    children: [
+                      Expanded(
+                        child: Container(
+                          padding: EdgeInsets.symmetric(horizontal: 10.0),
+                          color: Color(0xFFF5F6FA),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Color(0xFFf5f6f8),
+                            ),
+                            child: ListView.builder(
+                              itemCount: groupUserList.length,
+                              itemBuilder: (context, index) {
+                                GroupUser item = groupUserList[index];
+                                return ListPartnerCard(
+                                  item: item,
+                                  isMine: myUser != null ? (item.user_id == myUser!.id ? true : false) : false,
+                                  isManager: true,
+                                  onApprovePressed: () {
+                                    onManageButtonPressed(item, 'approve');
+                                  },
+                                  onDeclinePressed: () {
+                                    onManageButtonPressed(item, 'decline');
+                                  },
+                                  onOutPressed: () {
+                                    onManageButtonPressed(item, 'out');
+                                  },
+                                  onManagerPressed: () {
+                                    onManageButtonPressed(item, 'manager');
+                                  },
+                                );
+                              },
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  )
+                : NoItems()));
   }
-}
 
-// 회원 세로 리스트
-class _VerticalList extends StatelessWidget {
-  bool isNew;
+  void onManageButtonPressed(GroupUser user, String division) {
+    String rightBtnText = '승인';
+    if (division == 'approve') {
+      rightBtnText = '승인';
+    } else if (division == 'decline') {
+      rightBtnText = '반려';
+    } else if (division == 'out') {
+      rightBtnText = '방출';
+    } else if (division == 'manager') {
+      rightBtnText = '관리자로 승급';
+    }
 
-  _VerticalList({this.isNew = false, Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Color(0xFFf5f6f8),
-      ),
-      child: ListView.builder(
-        itemCount: verticalDataList.length,
-        itemBuilder: (context, index) {
-          Map<String, dynamic> verticalData = verticalDataList[index];
-
-          return GestureDetector(
-            onTap: () {
-              print('클릭했다~');
-            },
-            child: ListPartnerManageCard(
-              avaterImagePath: verticalData['avaterImagePath'],
-              bgImagePath: verticalData['bgImagePath'],
-              companyName: verticalData['companyName'],
-              userName: verticalData['userName'],
-              tagList: verticalData['tagList'],
-              isNew: isNew,
-            ),
-          );
+    CustomDialog.showDoubleBtnDialog(
+        context: context,
+        leftBtnText: '취소',
+        rightBtnText: rightBtnText,
+        msg: user.has_user!.name + ' 회원을 ' + rightBtnText + '하시겠습니까?',
+        onLeftBtnClick: () {},
+        onRightBtnClick: () {
+          approveSubmit(user, division);
         },
-      ),
+    );
+  }
+
+  void approveSubmit(GroupUser user, String division) {
+    CustomDialog.showProgressDialog(context);
+    manageGroupUser({
+      'group_user_id': user.id,
+      'division': division,
+    }).then((response) async {
+      CustomDialog.dismissProgressDialog();
+      if (response.status == 'success') {
+        _showCompleteDialog(context);
+      } else {
+        CustomDialog.showServerValidatorErrorMsg(response);
+      }
+    });
+  }
+
+
+
+  void _showCompleteDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return ShowCompleteDialog(
+          messageTitle: '처리 완료',
+          messageText: '처리 되었습니다.',
+          buttonText: '확인',
+          onConfirmed: () {
+            Navigator.of(context).pop();
+            _initData();
+          },
+        );
+      },
     );
   }
 }
