@@ -20,12 +20,13 @@ class _CompanyCreateStepTwoState extends State<CompanyCreateStepTwo> {
   String phone = '';
   String address1 = '';
   String address2 = '';
+  String description = '';
 
 
   bool isProcessable = false;
 
   bool hasHoliday = false;
-  bool hasWeekend = true;
+  bool hasWeekend = false;
   String workTime = '';
   String holiday = '';
   String weekend = '';
@@ -48,6 +49,7 @@ class _CompanyCreateStepTwoState extends State<CompanyCreateStepTwo> {
             phone = args['phone'];
             address1 = args['address1'];
             address2 = args['address2'];
+            description = args['description'];
           });
         }
       }
@@ -167,6 +169,7 @@ class _CompanyCreateStepTwoState extends State<CompanyCreateStepTwo> {
                 'workTime': workTime,
                 'holiday': holiday,
                 'weekend': weekend,
+                'description': description,
               });
         },
         child: SingleChildScrollView(
@@ -336,10 +339,10 @@ class _CompanyCreateStepTwoState extends State<CompanyCreateStepTwo> {
                 children: [
                   Expanded(
                       child: ElevatedButton(
-                          style: hasWeekendButtonStyle,
+                          style: nohasWeekendButtonStyle,
                           onPressed: () {
                             setState(() {
-                              hasWeekend = true;
+                              hasWeekend = false;
                             });
                           },
                           child: Text(
@@ -351,10 +354,10 @@ class _CompanyCreateStepTwoState extends State<CompanyCreateStepTwo> {
                   ),
                   Expanded(
                       child: ElevatedButton(
-                          style: nohasWeekendButtonStyle,
+                          style: hasWeekendButtonStyle,
                           onPressed: () {
                             setState(() {
-                              hasWeekend = false;
+                              hasWeekend = true;
                             });
                           },
                           child: Text(
@@ -366,7 +369,7 @@ class _CompanyCreateStepTwoState extends State<CompanyCreateStepTwo> {
               SizedBox(
                 height: 10.0,
               ),
-              if (!hasWeekend)
+              if (hasWeekend)
                 JoinTextFormField(
                     label: '주말/공휴일 시간을 입력해주세요',
                     hintText: '예) 주말 13:00~18:00',

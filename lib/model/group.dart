@@ -9,7 +9,8 @@ class Group {
   final List<GroupKeyword>? has_keywords;
 
   final int? group_image_id;
-  final int? users_count;
+  final int? approved_users_count;
+  final int? un_approved_users_count;
   final int? price_sum;
   final String? description;
   final String? created_at;
@@ -24,7 +25,8 @@ class Group {
     this.is_leader,
     this.is_member,
     this.description,
-    this.users_count,
+    this.approved_users_count,
+    this.un_approved_users_count,
     this.price_sum,
     this.has_group_image,
     this.has_keywords,
@@ -33,7 +35,7 @@ class Group {
   });
 
   factory Group.fromJSON(Map<String, dynamic> json) {
-    var has_group_image = json['group_image_id'] != null ? File.fromJSON(json['has_group_image']) : null;
+    var has_group_image = json['has_group_image'] != null ? File.fromJSON(json['has_group_image']) : null;
 
     var has_keywords = null;
     if (json['has_keywords'] != null) {
@@ -49,7 +51,8 @@ class Group {
         group_image_id: json['group_image_id'],
         created_at: json['created_at'],
         updated_at: json['updated_at'],
-        users_count: json['users_count'],
+        approved_users_count: json['approved_users_count'],
+        un_approved_users_count: json['un_approved_users_count'],
         price_sum: json['price_sum'],
         is_leader: json['is_leader'],
         is_member: json['is_member'],

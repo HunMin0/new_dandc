@@ -6,6 +6,7 @@ import 'package:Deal_Connect/api/server_config.dart';
 import 'package:Deal_Connect/model/response_data.dart';
 import 'package:Deal_Connect/model/user.dart';
 import 'package:Deal_Connect/utils/utils.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
@@ -32,7 +33,7 @@ Future<ResponseData> postSnsLogin(Map mapData) async {
       headers: {"Content-Type": "application/json"},
       body: body
   );
-  print(response.body);
+  // print(response.body);
   var jsonBody = json.decode(utf8.decode(response.bodyBytes));
   return ResponseData.fromJSON(jsonBody, response.statusCode);
 }
@@ -132,59 +133,57 @@ Future<ResponseData> updateProfile(Map mapData, File? imageFile) async {
   print(response.statusCode);
 
   final res = await http.Response.fromStream(response);
-  print(utf8.decode(res.bodyBytes));
+  // print(utf8.decode(res.bodyBytes));
   var jsonBody = json.decode(utf8.decode(res.bodyBytes));
   return ResponseData.fromJSON(jsonBody, response.statusCode);
 }
 
+Future<ResponseData> updateFcmToken(Map mapData) async {
+  var url = ServerConfig.SERVER_API_URL + 'app/fcm_token';
+  var body = json.encode(mapData);
+  String? token = await SharedPrefUtils.getAccessToken();
+  http.Response response = await http.post(Uri.parse(url),
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": token!,
+    },
+    body: body,
+  );
+  var jsonBody = json.decode(utf8.decode(response.bodyBytes));
+  return ResponseData.fromJSON(jsonBody, response.statusCode);
+}
 
-//
-// Future<ResponseData> updateFcmToken(Map mapData) async {
-//   var url = ServerConfig.SERVER_API_URL + 'fcm_token';
-//   var body = json.encode(mapData);
-//   // String? token = await SharedPrefUtils.getAccessToken();
-//   http.Response response = await http.post(Uri.parse(url),
-//     headers: {
-//       "Content-Type": "application/json",
-//       // "Authorization": token!,
-//     },
-//     body: body,
-//   );
-//   var jsonBody = json.decode(utf8.decode(response.bodyBytes));
-//   return ResponseData.fromJSON(jsonBody, response.statusCode);
-// }
-//
-// Future<bool> refreshFcmToken() async {
-//   // String? token = await FirebaseMessaging.instance
-//   //     .getToken(
-//   //     vapidKey: 'BE5qrDhfiSkOYxn1V0DZdxrFO8QVU15Ct5vfg4U9ccP1vHQ60yd6JonEq6mom56evzbrv_nlpRGcyuvJmIQTiSM');
-//   //
-//   // print('fcm token: $token');
-//
-//   User? myUser = await SharedPrefUtils.getUser();
-//
-//   ResponseData responseData;
-//   if (myUser != null) {
-//     responseData = await updateFcmToken({
-//       'token': token,
-//       'user_id': myUser.id,
-//     });
-//   } else {
-//     responseData = await updateFcmToken({
-//       'token': token,
-//     });
-//   }
-//
-//   if (responseData.status == 'success') {
-//     print(responseData.data);
-//     print('token update success');
-//   } else {
-//     print('token update failed');
-//     print('message: ${responseData.message}');
-//   }
-//
-//   return true;
-// }
+Future<bool> refreshFcmToken() async {
+  String? token = await FirebaseMessaging.instance
+      .getToken(
+      vapidKey: 'BA1nj53YVUK7e3AtouYjGoyMNK4BBn0Pofo_YZhK6CBXIhzlj2KpvFITzLjyXT8nvpupZ4lxQudQUz9b0it_Tl4');
+
+  print('fcm token: $token');
+
+  User? myUser = await SharedPrefUtils.getUser();
+
+  ResponseData responseData;
+  if (myUser != null) {
+    responseData = await updateFcmToken({
+      'token': token,
+      'user_id': myUser.id,
+    });
+  } else {
+    responseData = await updateFcmToken({
+      'token': token,
+    });
+  }
+
+  if (responseData.status == 'success') {
+    print(responseData.data);
+    print('token update success');
+  } else {
+    print('token update failed');
+    print('message: ${responseData.message}');
+  }
+
+  return true;
+}
 
 Future<bool> initLoginUserData(User user, String tokenType, String accessToken) async {
   print('initLoginUserData');

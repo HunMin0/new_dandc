@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:Deal_Connect/api/auth.dart';
 import 'package:Deal_Connect/utils/shared_pref_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
@@ -14,7 +15,6 @@ class RootPageState extends State<RootPage> {
 
   @override
   void initState() {
-    // refreshFcmToken().then((value) {});
 
     _checkLoginStatus();
 
@@ -30,6 +30,7 @@ class RootPageState extends State<RootPage> {
   Future<void> _checkLoginStatus() async {
     SharedPrefUtils.getUser().then((user) {
       if (user != null) {
+        refreshFcmToken().then((value) {});
         Navigator.pushReplacementNamed(context, '/home');
       } else {
         Navigator.pushReplacementNamed(context, '/intro');

@@ -1,42 +1,53 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:Deal_Connect/components/const/setting_colors.dart';
 
 // light 테마
 class SettingThemes {
-  static ThemeData get lightTheme => ThemeData(
-    useMaterial3: true,
-    fontFamily: 'NotoSans',
-    colorScheme: ColorScheme.fromSeed(
-      background: Colors.white, // 기본 색상 설정
-      seedColor: Colors.white, // 기본 색상 설정
-      surfaceTint: Colors.transparent,
-      surface: Colors.white,
-    ),
-    appBarTheme: AppBarTheme(surfaceTintColor: Colors.transparent),
-    bottomAppBarTheme: BottomAppBarTheme( surfaceTintColor: Colors.transparent ),
-    elevatedButtonTheme: ElevatedButtonThemeData(
-        style: ButtonStyle( surfaceTintColor: MaterialStateProperty.resolveWith<Color>(
-                (states) => Colors.transparent), )
-    ),
-      scaffoldBackgroundColor: Colors.white,
-      datePickerTheme: DatePickerThemeData(surfaceTintColor: Colors.transparent),
+  static CupertinoThemeData get cupertinoTheme => CupertinoThemeData(
+      );
 
-    dialogTheme: DialogTheme(surfaceTintColor: Colors.transparent),
-    buttonTheme: ButtonThemeData(hoverColor:Colors.transparent, splashColor: Colors.transparent, highlightColor: Colors.transparent),
-    textTheme: _textTheme,
-    //brightness: Brightness.light, // 디폴트는 light , dark 테마
-  );
+  static ThemeData get lightTheme => ThemeData(
+        useMaterial3: true,
+        fontFamily: 'NotoSans',
+        colorScheme: ColorScheme.fromSeed(
+          background: Colors.white, // 기본 색상 설정
+          seedColor: Colors.white, // 기본 색상 설정
+          surfaceTint: Colors.transparent,
+          surface: Colors.white,
+        ),
+        appBarTheme: AppBarTheme(surfaceTintColor: Colors.transparent),
+        bottomAppBarTheme:
+            BottomAppBarTheme(surfaceTintColor: Colors.transparent),
+        elevatedButtonTheme: ElevatedButtonThemeData(
+            style: ButtonStyle(
+          surfaceTintColor: MaterialStateProperty.resolveWith<Color>(
+              (states) => Colors.transparent),
+        )),
+        scaffoldBackgroundColor: Colors.white,
+        datePickerTheme:
+            DatePickerThemeData(surfaceTintColor: Colors.transparent),
+
+        dialogTheme: DialogTheme(surfaceTintColor: Colors.transparent),
+        buttonTheme: ButtonThemeData(
+            hoverColor: Colors.transparent,
+            splashColor: Colors.transparent,
+            highlightColor: Colors.transparent),
+        textTheme: _textTheme,
+        //brightness: Brightness.light, // 디폴트는 light , dark 테마
+      );
 
   // dark 테마
   static ThemeData get darkTheme => ThemeData(
       fontFamily: 'NotoSans',
       colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.blue),
-      primarySwatch: SettingColors.primaryMeterialColor, // AppBar와 플롯액션버튼 프라이머리 컬러 지정
+      primarySwatch: SettingColors.primaryMeterialColor,
+      // AppBar와 플롯액션버튼 프라이머리 컬러 지정
       // scaffoldBackgroundColor: Colors.white,
       // splashColor: Colors.pink, // 픗롯액션버튼 클릭시 색상
       textTheme: _textTheme,
       brightness: Brightness.dark // 디폴트는 dark  , light 테마
-  );
+      );
 
   static const TextTheme _textTheme = TextTheme(
     headline4: TextStyle(

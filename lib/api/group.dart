@@ -31,7 +31,7 @@ Future<ResponseData> getGroups({Map? queryMap}) async {
     },
   );
   var jsonBody = json.decode(utf8.decode(response.bodyBytes));
-  print(url.toString());
+  // print(url.toString());
   return ResponseData.fromJSON(jsonBody, response.statusCode);
 }
 
@@ -45,12 +45,47 @@ Future<ResponseData> getGroup(int id) async {
     },
   );
   var jsonBody = json.decode(utf8.decode(response.bodyBytes));
-  // print(jsonBody.toString());
+  print(jsonBody.toString());
   return ResponseData.fromJSON(jsonBody, response.statusCode);
 }
 
 Future<ResponseData> storeGroup(Map mapData, File? imageFile) async {
   var url = ServerConfig.SERVER_API_URL + 'app/group/create';
+  var postUri = Uri.parse(url);
+  http.MultipartRequest request = http.MultipartRequest("POST", postUri);
+
+  if (mapData.isNotEmpty) {
+    mapData.forEach((key, value) {
+      request.fields[key] = value.toString();
+    });
+  }
+
+  if (imageFile != null) {
+    request.files.add(http.MultipartFile.fromBytes(
+      'imageFile',
+      Utils.encodeResizedImage(imageFile.path),
+      filename: basename(imageFile.path),
+      contentType: MediaType.parse('image/jpeg'),
+    ));
+  }
+
+  String? token = await SharedPrefUtils.getAccessToken();
+  request.headers
+      .addAll({"Content-Type": "application/json", "Authorization": token!});
+
+  http.StreamedResponse response = await request.send();
+  // print(response.statusCode);
+
+  final res = await http.Response.fromStream(response);
+  // print(utf8.decode(res.bodyBytes));
+  var jsonBody = json.decode(utf8.decode(res.bodyBytes));
+  return ResponseData.fromJSON(jsonBody, response.statusCode);
+}
+
+
+
+Future<ResponseData> updateGroup(int id, Map mapData, File? imageFile) async {
+  var url = ServerConfig.SERVER_API_URL + 'app/group/update/$id';
   var postUri = Uri.parse(url);
   http.MultipartRequest request = http.MultipartRequest("POST", postUri);
 

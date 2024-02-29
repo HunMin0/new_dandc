@@ -1,40 +1,96 @@
+import 'package:Deal_Connect/api/auth.dart';
+import 'package:Deal_Connect/api/business.dart';
+import 'package:Deal_Connect/components/common_item/grey_chip.dart';
+import 'package:Deal_Connect/components/const/setting_style.dart';
 import 'package:Deal_Connect/components/list_card.dart';
+import 'package:Deal_Connect/components/list_user_card.dart';
+import 'package:Deal_Connect/components/loading.dart';
+import 'package:Deal_Connect/model/user.dart';
+import 'package:Deal_Connect/model/user_business.dart';
+import 'package:Deal_Connect/model/user_business_keyword.dart';
+import 'package:Deal_Connect/utils/shared_pref_utils.dart';
+import 'package:Deal_Connect/utils/utils.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:intl/intl.dart';
 
 class TradeBuyCreateConfirm extends StatefulWidget {
-  const TradeBuyCreateConfirm({super.key});
+  int? userBusinessId;
+
+  TradeBuyCreateConfirm({this.userBusinessId, Key? key}) : super(key: key);
 
   @override
   State<TradeBuyCreateConfirm> createState() => _TradeBuyCreateConfirmState();
 }
 
 class _TradeBuyCreateConfirmState extends State<TradeBuyCreateConfirm> {
+  UserBusiness? userBusiness;
+  User? myUserInfo;
+
+  bool _isLoading = true;
+  User? myUser;
+
+  @override
+  void initState() {
+    getMyUser().then((response) {
+      if (response.status == 'success') {
+        User newUser = User.fromJSON(response.data);
+        SharedPrefUtils.setUser(newUser).then((value) {
+          SharedPrefUtils.getUser().then((user) {
+            setState(() {
+              myUser = user;
+              myUserInfo = newUser;
+            });
+          });
+        });
+      }
+    });
+    _initData();
+    super.initState();
+  }
+
+  void _initData() {
+    if (widget.userBusinessId != null) {
+      getUserBusiness(widget.userBusinessId!).then((response) {
+        if (response.status == 'success') {
+          UserBusiness resultData = UserBusiness.fromJSON(response.data);
+          setState(() {
+            userBusiness = resultData;
+          });
+        }
+      });
+    }
+    setState(() {
+      _isLoading = false;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    String? storeName = '';
+    String? storeDescription = '';
+    String? storeUserName = '';
+
+    if (_isLoading || userBusiness == null || myUserInfo == null) {
+      // 로딩 중 인디케이터 표시
+      return Loading();
+    }
+
+    if (userBusiness != null) {
+      storeName = userBusiness!.name;
+      storeDescription = userBusiness!.description;
+      if (userBusiness!.has_owner != null) {
+        storeUserName = userBusiness!.has_owner!.name;
+      }
+    }
+
     return SingleChildScrollView(
       child: Container(
         color: HexColor("#f5f6fa"),
         child: Column(
           children: [
-            Container(
-              color: HexColor("#ffffff"),
-              padding: EdgeInsets.all(15.0),
-              width: MediaQuery.of(context).size.width,
-              child: Text(
-                "청년한다발 서초점(홍길동) 과 \n박철수(본인)의\n거래내역을 등록합니다.",
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
-                ),
-                textAlign: TextAlign.start,
-              ),
-            ),
-            SizedBox(
-              height: 15,
-            ),
             Container(
               padding: EdgeInsets.symmetric(vertical: 15),
               decoration: BoxDecoration(
@@ -45,24 +101,28 @@ class _TradeBuyCreateConfirmState extends State<TradeBuyCreateConfirm> {
                 children: [
                   _ListLeftBg(),
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 5),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 15.0, vertical: 5),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Row(
                           children: [
                             Text(
-                              "청년한다발 서초점",
-                              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                              storeName,
+                              style: TextStyle(
+                                  fontSize: 20, fontWeight: FontWeight.bold),
                             ),
                           ],
                         ),
                         Text(
-                          "이쁜 꽃을 파는 집입니다.",
-                          style: TextStyle(fontSize: 16, color: HexColor("#5D5D5D")),
+                          storeDescription ?? '',
+                          style: SettingStyle.SUB_GREY_TEXT,
                         ),
-                        SizedBox(height: 15),
-                        _buildTags(['키워드1', '키워드2']),
+                        SizedBox(height: 5),
+                        if (userBusiness != null &&
+                            userBusiness!.has_keywords != null)
+                          _buildTags(userBusiness!.has_keywords!),
                       ],
                     ),
                   ),
@@ -70,35 +130,56 @@ class _TradeBuyCreateConfirmState extends State<TradeBuyCreateConfirm> {
               ),
             ),
             SizedBox(
-              height: 10,
+              height: 20,
             ),
-            Icon(Icons.compare_arrows_sharp, size: 60, color: HexColor("#5566ff")),
+            Icon(CupertinoIcons.arrow_2_squarepath,
+                size: 50, color: HexColor("#5566ff")),
             SizedBox(
-              height: 10,
+              height: 20,
             ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 15.0),
-              child: ListCard(
-                  bgImagePath: "main_sample02",
-                  avaterImagePath: "main_sample_avater2",
-                  companyName: "회사명",
-                  userName: "박철수",
-                  tagList: ["#키워드1", "#키워드2"]
+            if (myUserInfo != null)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                child: ListUserCard(
+                  item: myUserInfo!,
+                ),
               ),
-            )
+            Container(
+              color: HexColor("#ffffff"),
+              padding: EdgeInsets.all(15.0),
+              width: MediaQuery.of(context).size.width,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '$storeName($storeUserName)',
+                    style: SettingStyle.TITLE_STYLE
+                        .copyWith(color: SettingStyle.MAIN_COLOR),
+                    textAlign: TextAlign.start,
+                  ),
+                  Text(
+                    '업체의 서비스를 구매합니다.',
+                    style: SettingStyle.SUB_TITLE_STYLE,
+                    textAlign: TextAlign.start,
+                  ),
+                ],
+              ),
+            ),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildTags(List<String> tagList) {
+  Widget _buildTags(List<UserBusinessKeyword> tagList) {
     List<Widget> tagWidgets = [];
     for (int i = 0; i < tagList.length; i++) {
       if (i < 3) {
         tagWidgets.add(Padding(
           padding: const EdgeInsets.only(right: 5.0),
-          child: _cardTag(tagList[i]),
+          child: GreyChip(
+            chipText: '#' + tagList[i].keyword,
+          ),
         ));
       } else {
         break;
@@ -107,43 +188,30 @@ class _TradeBuyCreateConfirmState extends State<TradeBuyCreateConfirm> {
     return Row(children: tagWidgets);
   }
 
-// 태그 공통
-  Container _cardTag(String text) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Color(0xFFf5f6fa),
-        borderRadius: BorderRadius.circular(10.0),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 7.0),
-        child: Text(
-          text,
-          style: TextStyle(
-              color: Color(0xFF5f5f66),
-              fontSize: 11.0,
-              fontWeight: FontWeight.w500),
-        ),
-      ),
-    );
-  }
-
-  Row _iconText(IconData prefixIcon, String text) {
-    return Row(
-      children: [
-        Icon(
-          prefixIcon,
-          color: HexColor("#ABABAB"),
-          size: 18,
-        ),
-        SizedBox(
-          width: 10,
-        ),
-        Text(text)
-      ],
-    );
-  }
-
   Stack _ListLeftBg() {
+    ImageProvider? profileThumbnailImage =
+        AssetImage('assets/images/no-image.png');
+    ImageProvider? businessThumbnailImage =
+        AssetImage('assets/images/no-image.png');
+
+    if (userBusiness != null &&
+        userBusiness!.has_owner != null &&
+        userBusiness!.has_owner!.has_user_profile != null &&
+        userBusiness!.has_owner!.has_user_profile!.has_profile_image != null) {
+      final profileImage =
+          userBusiness!.has_owner!.has_user_profile!.has_profile_image!;
+      profileThumbnailImage = CachedNetworkImageProvider(
+        Utils.getImageFilePath(profileImage),
+      );
+    }
+
+    if (userBusiness != null && userBusiness!.has_business_image != null) {
+      final businessImage = userBusiness!.has_business_image!;
+      businessThumbnailImage = CachedNetworkImageProvider(
+        Utils.getImageFilePath(businessImage),
+      );
+    }
+
     return Stack(
       clipBehavior: Clip.none,
       children: [
@@ -154,7 +222,7 @@ class _TradeBuyCreateConfirmState extends State<TradeBuyCreateConfirm> {
             child: Container(
               decoration: BoxDecoration(
                 image: DecorationImage(
-                  image: AssetImage('assets/images/sample/main_sample01.jpg'),
+                  image: businessThumbnailImage,
                   fit: BoxFit.cover,
                 ),
                 borderRadius: BorderRadius.circular(10.0),
@@ -175,8 +243,7 @@ class _TradeBuyCreateConfirmState extends State<TradeBuyCreateConfirm> {
             ),
             child: CircleAvatar(
               radius: 40.0,
-              backgroundImage:
-                  AssetImage('assets/images/sample/main_sample_avater.jpg'),
+              backgroundImage: profileThumbnailImage,
             ),
           ),
         ),

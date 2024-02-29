@@ -35,6 +35,7 @@ Future<ResponseData> manageGroupUser(Map mapData) async {
       body: body
   );
   var jsonBody = json.decode(utf8.decode(response.bodyBytes));
+  print(jsonBody.toString());
   return ResponseData.fromJSON(jsonBody, response.statusCode);
 }
 
@@ -87,6 +88,6 @@ Future<ResponseData> getGroupUser({Map? queryMap}) async {
     },
   );
   var jsonBody = json.decode(utf8.decode(response.bodyBytes));
-  print(jsonBody.toString());
+  // print(jsonBody.toString());
   return ResponseData.fromJSON(jsonBody, response.statusCode);
 }

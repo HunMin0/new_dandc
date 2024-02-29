@@ -1,4 +1,4 @@
-package com.example.new_dandc_app
+package com.flutter.new_dandc_app
 
 import io.flutter.embedding.android.FlutterActivity
 

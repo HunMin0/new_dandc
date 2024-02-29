@@ -1,4 +1,11 @@
+import 'package:Deal_Connect/api/group_trade.dart';
+import 'package:Deal_Connect/components/const/setting_style.dart';
+import 'package:Deal_Connect/components/list_group_trade_card.dart';
+import 'package:Deal_Connect/components/list_trade_card.dart';
+import 'package:Deal_Connect/components/loading.dart';
+import 'package:Deal_Connect/components/no_items.dart';
 import 'package:Deal_Connect/db/trade_data.dart';
+import 'package:Deal_Connect/model/group_trade.dart';
 import 'package:Deal_Connect/pages/history/history_detail/history_detail_index.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -7,7 +14,10 @@ import 'package:hexcolor/hexcolor.dart';
 import '../../history/components/list_card.dart';
 
 class GroupTradeMineList extends StatefulWidget {
-  const GroupTradeMineList({super.key});
+  int? groupId;
+  String? groupName;
+
+  GroupTradeMineList({this.groupId, this.groupName, super.key});
 
   @override
   State<GroupTradeMineList> createState() => _GroupTradeMineListState();
@@ -16,448 +26,169 @@ class GroupTradeMineList extends StatefulWidget {
 class _GroupTradeMineListState extends State<GroupTradeMineList>
     with TickerProviderStateMixin {
   late final TabController tabController;
+  List<GroupTrade> groupTradeList = [];
+  bool _isLoading = true;
+  String tradeType = '';
 
   @override
   void initState() {
     super.initState();
-    // tab컨트롤러 초기화
+    super.initState();
+    _initData();
     tabController = TabController(
       length: 3,
       vsync: this,
     );
   }
 
+  void _initData() {
+    getGroupTrades(queryMap: {'group_id': widget.groupId, 'trade_type': tradeType}).then((response) {
+      if (response.status == 'success') {
+        Iterable iterable = response.data;
+
+        List<GroupTrade>? resData =
+        List<GroupTrade>.from(iterable.map((e) => GroupTrade.fromJSON(e)));
+        setState(() {
+          this.groupTradeList = resData;
+        });
+      }
+    });
+    setState(() {
+      _isLoading = false;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    if (_isLoading) {
+      // 로딩 중 인디케이터 표시
+      return Loading();
+    }
+
     return Expanded(
-      child: CustomScrollView(
-        slivers: [
-          SliverPersistentHeader(
-            delegate: MySliverPersistentHeaderDelegate(tabController),
-            pinned: true,
+      child: Container(
+        color: SettingStyle.GREY_COLOR,
+        child: RefreshIndicator(
+          onRefresh: () async {
+            setState(() {
+              _isLoading = true;
+            });
+            _initData();
+          },
+          child: CustomScrollView(
+            slivers: [
+              SliverPersistentHeader(
+                delegate: _SliverAppBarDelegate(
+                  TabBar(
+                    controller: tabController,
+                    indicatorColor: Colors.black,
+                    indicatorWeight: 2.0,
+                    labelColor: Colors.black,
+                    dividerColor: Colors.white,
+                    unselectedLabelColor: Colors.grey[500],
+                    labelStyle: TextStyle(
+                      fontSize: 15.0,
+                      fontWeight: FontWeight.w600,
+                    ),
+                    unselectedLabelStyle: TextStyle(
+                      fontWeight: FontWeight.w500,
+                    ),
+                    indicatorSize: TabBarIndicatorSize.tab,
+                    onTap: (value) {
+                      setState(() {
+                        if (value == 0) {
+                          tradeType = '';
+                        }
+                        if (value == 1) {
+                          tradeType = 'buy';
+                        }
+                        if (value == 2) {
+                          tradeType = 'sell';
+                        }
+                      });
+                      _initData();
+                    },
+                    tabs: const [
+                      Tab(
+                        child: Text(
+                          '전체',
+                        ),
+                      ),
+                      Tab(
+                        child: Text(
+                          '구매',
+                        ),
+                      ),
+                      Tab(
+                        child: Text(
+                          '판매',
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                pinned: true,
+              ),
+              const SliverToBoxAdapter(
+                child: Divider(
+                  color: Color(0xFFF5F6FA),
+                  thickness: 16.0,
+                ),
+              ),
+              groupTradeList.isNotEmpty
+                  ? SliverList(
+                delegate: SliverChildBuilderDelegate(
+                      (BuildContext context, int index) {
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 13.0),
+                      child: GestureDetector(
+                          onTap: () {
+                            Navigator.pushNamed(
+                                context, '/trade/history/info',
+                                arguments: {'tradeId': groupTradeList[index].has_trade!.id});
+                          },
+                          child: ListGroupTradeCard(
+                            item: groupTradeList[index],
+                          )),
+                    );
+                  },
+                  childCount: groupTradeList.length,
+                ),
+              )
+                  : const SliverToBoxAdapter(
+                child: NoItems(),
+              ),
+            ],
           ),
-          SliverToBoxAdapter(
-            child: Divider(
-              color: Color(0xFFF5F6FA),
-              thickness: 16.0,
-            ),
-          ),
-          SliverList(
-            delegate: SliverChildBuilderDelegate(
-                  (BuildContext context, int index) {
-                return Container(
-                  child: tradeDataList.isNotEmpty
-                      ? ListCard(
-                    created_at: tradeDataList[index]['created_at'],
-                    companyCeo: tradeDataList[index]['companyCeo'],
-                    companyName: tradeDataList[index]['companyName'],
-                    trade_name: tradeDataList[index]['trade_name'],
-                    trade_price: tradeDataList[index]['trade_price'],
-                    buyer: tradeDataList[index]['buyer'],
-                  )
-                      : const Text('등록된 데이터가 없습니다'),
-                );
-              },
-              childCount: tradeDataList.length,
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
 }
 
 
-class MySliverPersistentHeaderDelegate extends SliverPersistentHeaderDelegate {
-  final TabController tabController;
+class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
+  final TabBar _tabBar;
 
-  MySliverPersistentHeaderDelegate(this.tabController);
+  _SliverAppBarDelegate(this._tabBar);
+
+  @override
+  double get minExtent => _tabBar.preferredSize.height;
+
+  @override
+  double get maxExtent => _tabBar.preferredSize.height;
 
   @override
   Widget build(
       BuildContext context, double shrinkOffset, bool overlapsContent) {
-    return Container(
-      height: 50.0,
-      color: Colors.white,
-      child: TabBar(
-        controller: tabController,
-        indicatorColor: Colors.black,
-        indicatorWeight: 2.0,
-        labelColor: Colors.black,
-        dividerColor: Colors.white,
-        unselectedLabelColor: Colors.grey[500],
-        labelStyle: TextStyle(
-          fontSize: 15.0,
-          fontWeight: FontWeight.w600,
-        ),
-        unselectedLabelStyle: TextStyle(
-          fontWeight: FontWeight.w500,
-        ),
-        indicatorSize: TabBarIndicatorSize.tab,
-        tabs: [
-          Tab(
-            child: Text(
-              '전체',
-            ),
-          ),
-          Tab(
-            child: Text(
-              '구매',
-            ),
-          ),
-          Tab(
-            child: Text(
-              '판매',
-            ),
-          ),
-        ],
-      ),
+    return Material(
+      elevation: 1.0,
+      child: _tabBar,
     );
   }
 
   @override
-  double get maxExtent => 50.0;
-
-  @override
-  double get minExtent => 50.0;
-
-  @override
-  bool shouldRebuild(covariant SliverPersistentHeaderDelegate oldDelegate) {
+  bool shouldRebuild(_SliverAppBarDelegate oldDelegate) {
     return false;
-  }
-}
-
-class _buildHistoryBox extends StatelessWidget {
-  const _buildHistoryBox({
-    super.key,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16.0),
-      decoration: BoxDecoration(
-        color: HexColor('#F5F6FA'),
-        borderRadius: BorderRadius.circular(10.0),
-      ),
-      child: Column(
-        children: [
-          Row(
-            children: [
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10.0,
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('판매내역'),
-                      Text(
-                        '788,793원',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18.0,
-                        ),
-                      )
-                    ],
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                child: Container(
-                  width: 1,
-                  height: 40,
-                  color: Color(0xFFDDDDDD),
-                ),
-              ),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10.0,
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('구매내역'),
-                      Text(
-                        '788,793원',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18,
-                        ),
-                      )
-                    ],
-                  ),
-                ),
-              )
-            ],
-          ),
-          SizedBox(
-            height: 16.0,
-          ),
-          Container(
-            padding:
-            const EdgeInsets.symmetric(vertical: 14.0, horizontal: 20.0),
-            decoration: BoxDecoration(
-              color: HexColor('#FFFFFF'),
-              borderRadius: BorderRadius.circular(9.0),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Text(
-                      "판매",
-                      style: TextStyle(
-                        fontSize: 12,
-                      ),
-                    ),
-                    Spacer(),
-                    Text(
-                      "구매",
-                      style: TextStyle(
-                        fontSize: 12,
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(
-                  height: 5,
-                ),
-                Row(
-                  children: [
-                    Expanded(
-                      child: LinearProgressIndicator(
-                        value: 0.6,
-                        borderRadius: BorderRadius.all(Radius.circular(10)),
-                        minHeight: 6,
-                        backgroundColor: HexColor('#D9D9D9'),
-                        valueColor:
-                        AlwaysStoppedAnimation<Color>(HexColor('#75A8E4')),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(
-                  height: 5,
-                ),
-                const Row(
-                  children: [
-                    Text(
-                      "60건",
-                      style:
-                      TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
-                    ),
-                    Spacer(),
-                    Text(
-                      "37건",
-                      style:
-                      TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(
-            height: 10,
-          ),
-          RichText(
-            text: const TextSpan(
-              text: '총 누적거래 ',
-              style: TextStyle(
-                  fontWeight: FontWeight.w500,
-                  color: Color(0xFF666666),
-                  fontSize: 13),
-              children: <TextSpan>[
-                TextSpan(
-                  text: '97건',
-                  style: TextStyle(
-                    color: Color(0xFF75A8E4),
-                  ),
-                ),
-                TextSpan(
-                  text: ' 중 ',
-                ),
-                TextSpan(
-                  text: '판매내역이 ',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                TextSpan(
-                  text: '23건',
-                  style: TextStyle(
-                    color: Color(0xFF75A8E4),
-                  ),
-                ),
-                TextSpan(
-                  text: " 많아요\u{1f525}",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _buildMyRanking extends StatelessWidget {
-  const _buildMyRanking({
-    super.key,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 14.0),
-      decoration: BoxDecoration(
-        color: HexColor('#75A8E4'),
-        borderRadius: const BorderRadius.all(Radius.circular(10)),
-      ),
-      child: Row(
-        children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                '나의 파트너들 중 누가 제일 큰손일까요!?',
-                style: TextStyle(
-                  color: HexColor('#FFFFFF'),
-                  fontSize: 13,
-                ),
-              ),
-              Text(
-                '랭킹 보러가기',
-                style: TextStyle(
-                    color: HexColor('#FFFFFF'),
-                    fontSize: 15,
-                    fontWeight: FontWeight.bold),
-              )
-            ],
-          ),
-          const Spacer(),
-          const Icon(
-            Icons.chevron_right,
-            color: Colors.white,
-            size: 24.0,
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _buildApproval extends StatelessWidget {
-  const _buildApproval({
-    super.key,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(
-        vertical: 10.0,
-        horizontal: 18.0,
-      ),
-      decoration: BoxDecoration(
-        color: HexColor('#F5F6FA'),
-        borderRadius: const BorderRadius.all(Radius.circular(10)),
-      ),
-      child: Column(
-        children: [
-          GestureDetector(
-            onTap: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => HistoryDetailIndex(
-                        historyType: 'mine',
-                      )));
-            },
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 10.0),
-              child: Row(
-                children: [
-                  Icon(
-                    Icons.add_alert_rounded,
-                    color: HexColor('#666666'),
-                    size: 20.0,
-                  ),
-                  const SizedBox(
-                    width: 5,
-                  ),
-                  Text('나의 승인 내역'),
-                  const Spacer(),
-                  Text(
-                    '10건',
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(
-                    width: 10,
-                  ),
-                  Icon(
-                    Icons.chevron_right,
-                    color: HexColor('#666666'),
-                    size: 20.0,
-                  ),
-                ],
-              ),
-            ),
-          ),
-          Divider(
-            color: HexColor('#D9D9D9'),
-          ),
-          GestureDetector(
-            onTap: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => HistoryDetailIndex(
-                        historyType: 'partner',
-                      )));
-            },
-            child: Padding(
-              padding: const EdgeInsets.symmetric(
-                vertical: 10.0,
-              ),
-              child: Row(
-                children: [
-                  Icon(
-                    Icons.list_alt,
-                    color: HexColor('#666666'),
-                    size: 20.0,
-                  ),
-                  const SizedBox(
-                    width: 5,
-                  ),
-                  Text('파트너 승인 요청 내역'),
-                  const Spacer(),
-                  Text(
-                    '3건',
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(
-                    width: 10,
-                  ),
-                  Icon(
-                    Icons.chevron_right,
-                    color: HexColor('#666666'),
-                    size: 20.0,
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
   }
 }

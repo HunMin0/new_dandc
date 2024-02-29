@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 
 class SearchTermSelect extends StatefulWidget {
-  const SearchTermSelect({super.key});
+  VoidCallback onChange;
+  SearchTermSelect({required this.onChange, super.key});
 
   @override
   State<SearchTermSelect> createState() => _SearchTermSelectState();
@@ -17,6 +18,7 @@ class _SearchTermSelectState extends State<SearchTermSelect> {
       onChanged: (String? newValue) {
         setState(() {
           selectedOption = newValue!;
+          widget.onChange;
         });
       },
       items: [

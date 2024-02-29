@@ -1,8 +1,7 @@
 import 'package:Deal_Connect/api/group_user.dart';
 import 'package:Deal_Connect/components/alert/show_complete_dialog.dart';
 import 'package:Deal_Connect/components/layout/default_logo_layout.dart';
-import 'package:Deal_Connect/components/list_partner_card.dart';
-import 'package:Deal_Connect/components/list_partner_manage_card.dart';
+import 'package:Deal_Connect/components/list_group_user_card.dart';
 import 'package:Deal_Connect/components/loading.dart';
 import 'package:Deal_Connect/components/no_items.dart';
 import 'package:Deal_Connect/db/vertical_data.dart';
@@ -80,7 +79,7 @@ class _GroupManagePartnerState extends State<GroupManagePartner>
     });
 
     bool? isApproved =
-        tabController.index == 0 ? null : true; // 탭 인덱스에 따라 조건 변경
+        tabController.index == 0 ? false : true; // 탭 인덱스에 따라 조건 변경
 
     if (groupId != null) {
       await getGroupUsers(queryMap: {
@@ -196,7 +195,7 @@ class _GroupManagePartnerState extends State<GroupManagePartner>
                               itemCount: groupUserList.length,
                               itemBuilder: (context, index) {
                                 GroupUser item = groupUserList[index];
-                                return ListPartnerCard(
+                                return ListGroupUserCard(
                                   item: item,
                                   isMine: myUser != null ? (item.user_id == myUser!.id ? true : false) : false,
                                   isManager: true,

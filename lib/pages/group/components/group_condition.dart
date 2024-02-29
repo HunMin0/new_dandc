@@ -1,5 +1,7 @@
+import 'package:Deal_Connect/components/const/setting_style.dart';
 import 'package:Deal_Connect/pages/group/group_partner/group_partner_index.dart';
 import 'package:Deal_Connect/pages/group/group_trade/group_trade_index.dart';
+import 'package:Deal_Connect/utils/utils.dart';
 import 'package:flutter/material.dart';
 
 class GroupCondition extends StatelessWidget {
@@ -35,10 +37,10 @@ class GroupCondition extends StatelessWidget {
           _buildTabLine(),
           GestureDetector(
             onTap: (){
-              Navigator.pushNamed(context, '/group/trade');
+              Navigator.pushNamed(context, '/group/trade', arguments: { 'groupId': groupId, 'groupName': groupName });
             },
             child: _buildUserTab(
-              history.toString(),
+              Utils.moneyGenerator(history),
               '거래내역',
             ),
           ),
@@ -49,26 +51,17 @@ class GroupCondition extends StatelessWidget {
 }
 
 Widget _buildUserTab(String tabData, String tabTitle) {
-  final tabDataStyle = TextStyle(
-    fontWeight: FontWeight.w700,
-    fontSize: 20.0,
-  );
-  final tabTitleStyle = TextStyle(
-    fontWeight: FontWeight.w400,
-    fontSize: 12.0,
-  );
-
   return Container(
     width: 120.0,
     child: Column(
       children: [
         Text(
           tabData,
-          style: tabDataStyle,
+          style: SettingStyle.TITLE_STYLE,
         ),
         Text(
           tabTitle,
-          style: tabTitleStyle,
+          style: SettingStyle.SMALL_TEXT_STYLE,
         ),
       ],
     ),

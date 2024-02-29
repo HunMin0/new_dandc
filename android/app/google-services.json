@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "795195275036",
+    "project_id": "dealnconnect",
+    "storage_bucket": "dealnconnect.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:795195275036:android:dd65c9bc7cd8edafdcacd9",
+        "android_client_info": {
+          "package_name": "com.flutter.new_dandc_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDLeoz-KgbKGom1MhD2-kC1GObpFAR18Ns"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

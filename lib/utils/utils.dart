@@ -37,7 +37,7 @@ class Utils {
     return resultStr;
   }
 
-  static String moneyGenerator(num) {
+  static String moneyGenerator(int num) {
     if (num > 999 && num < 99999) {
       return "${(num / 10000).toStringAsFixed(1)}만원";
     } else if (num > 999999 && num < 9999999) {

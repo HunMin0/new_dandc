@@ -16,7 +16,7 @@ class BoardFile {
   });
 
   factory BoardFile.fromJSON(Map<String, dynamic> json) {
-    var has_file = json['file_id'] != null ? File.fromJSON(json['has_file']) : null;
+    var has_file = json['has_file'] != null ? File.fromJSON(json['has_file']) : null;
 
     return BoardFile(
         id: json['id'],

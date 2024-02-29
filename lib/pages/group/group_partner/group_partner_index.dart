@@ -1,19 +1,14 @@
-import 'package:Deal_Connect/api/group.dart';
 import 'package:Deal_Connect/api/group_user.dart';
 import 'package:Deal_Connect/components/layout/default_logo_layout.dart';
-import 'package:Deal_Connect/components/list_business_card.dart';
 import 'package:Deal_Connect/components/list_card.dart';
-import 'package:Deal_Connect/components/list_partner_card.dart';
+import 'package:Deal_Connect/components/list_group_user_card.dart';
+import 'package:Deal_Connect/components/loading.dart';
 import 'package:Deal_Connect/components/no_items.dart';
-import 'package:Deal_Connect/db/company_data.dart';
 import 'package:Deal_Connect/db/vertical_data.dart';
 import 'package:Deal_Connect/model/group_user.dart';
-import 'package:Deal_Connect/model/user.dart';
-import 'package:Deal_Connect/pages/business/business_detail/business_detail_info.dart';
 import 'package:Deal_Connect/pages/profile/other_profile.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:hexcolor/hexcolor.dart';
 
 class GroupPartnerIndex extends StatefulWidget {
@@ -83,7 +78,10 @@ class _GroupPartnerIndexState extends State<GroupPartnerIndex>
 
   @override
   Widget build(BuildContext context) {
-
+    if (_isLoading) {
+      // 로딩 중 인디케이터 표시
+      return Loading();
+    }
     return DefaultLogoLayout(
         titleName: groupName,
         isNotInnerPadding: 'true',
@@ -174,7 +172,7 @@ class _GroupPartnerIndexState extends State<GroupPartnerIndex>
                                     CupertinoPageRoute(builder: (context) => OtherProfileIndex()),
                                   );
                                 },
-                                child: ListPartnerCard(
+                                child: ListGroupUserCard(
                                   item: item,
                                   onApprovePressed: () {},
                                   onDeclinePressed: () {},
@@ -202,16 +200,12 @@ class _GroupPartnerIndexState extends State<GroupPartnerIndex>
                                   itemBuilder: (context, index) {
                                     GroupUser item =
                                     groupPartnerList![index];
-                                    return GestureDetector(
-                                      child: Container(
-                                        child: ListPartnerCard(
-                                          item: item,
-                                          onOutPressed: () {},
-                                          onDeclinePressed: () {},
-                                          onApprovePressed: () {},
-                                          onManagerPressed: () {},
-                                        ),
-                                      ),
+                                    return ListGroupUserCard(
+                                      item: item,
+                                      onOutPressed: () {},
+                                      onDeclinePressed: () {},
+                                      onApprovePressed: () {},
+                                      onManagerPressed: () {},
                                     );
                                   },
                                 )
@@ -226,41 +220,6 @@ class _GroupPartnerIndexState extends State<GroupPartnerIndex>
   }
 }
 
-// 회원 세로 리스트
-class _VerticalList extends StatelessWidget {
-  _VerticalList({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Color(0xFFf5f6f8),
-      ),
-      child: ListView.builder(
-        itemCount: verticalDataList.length,
-        itemBuilder: (context, index) {
-          Map<String, dynamic> verticalData = verticalDataList[index];
-
-          return GestureDetector(
-            onTap: () {
-              Navigator.push(
-                context,
-                CupertinoPageRoute(builder: (context) => OtherProfileIndex()),
-              );
-            },
-            child: ListCard(
-              avaterImagePath: verticalData['avaterImagePath'],
-              bgImagePath: verticalData['bgImagePath'],
-              companyName: verticalData['companyName'],
-              userName: verticalData['userName'],
-              tagList: verticalData['tagList'],
-            ),
-          );
-        },
-      ),
-    );
-  }
-}
 
 class GroupPartnerTabHeaderDelegate extends SliverPersistentHeaderDelegate {
   final TabController tabController;

@@ -11,6 +11,7 @@ class SharedPrefUtils {
   static String prefKeyUserType = 'user_type';
   static String prefKeyFcmToken = 'fcm_token';
   static String prefKeySearchKeyword = 'search_keyword';
+  static String prefKeySearchPartner = 'search_partner';
   static String prefKeyDivider = '|xXx|';
 
   static String userTypeNormal = '일반회원';
@@ -158,6 +159,68 @@ class SharedPrefUtils {
     }
   }
 
+  static Future<bool> addSearchPartner(String partnerId) async {
+    try {
+      await removeSearchKeyword(partnerId);
+
+      final prefs = await SharedPreferences.getInstance();
+      final savedStr = prefs.getString(prefKeySearchPartner);
+      String saveStr = partnerId;
+      if (savedStr != null && savedStr.isNotEmpty) {
+        saveStr += prefKeyDivider + savedStr;
+      }
+      prefs.setString(prefKeySearchPartner, saveStr);
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  static Future<List<String>> getSearchPartner() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final savedStr = prefs.getString(prefKeySearchPartner);
+      List<String> resultList = [];
+      if (savedStr != null) {
+        resultList.addAll(savedStr.split(prefKeyDivider));
+      }
+      return resultList;
+    } catch (e) {
+      return [];
+    }
+  }
+
+  static Future<bool> removeSearchPartner(String keyword) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      List<String> savedPartners = await getSearchPartner();
+
+      String saveStr = '';
+      for (var value in savedPartners) {
+        if (value != keyword) {
+          if (saveStr.isNotEmpty) {
+            saveStr += prefKeyDivider;
+          }
+          saveStr += value;
+        }
+      }
+      prefs.setString(prefKeySearchPartner, saveStr);
+
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  static Future<bool> clearSearchPartner() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      prefs.remove(prefKeySearchPartner);
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
 
 
 }

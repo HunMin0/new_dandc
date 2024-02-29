@@ -14,7 +14,7 @@ class Category {
   });
 
   factory Category.fromJSON(Map<String, dynamic> json) {
-    var has_category_icon_image = json['category_icon_id'] != null ? File.fromJSON(json['has_category_icon_image']) : null;
+    var has_category_icon_image = json['has_category_icon_image'] != null ? File.fromJSON(json['has_category_icon_image']) : null;
 
     return Category(
       id: json['id'],

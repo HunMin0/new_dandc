@@ -1,21 +1,15 @@
-import 'package:Deal_Connect/components/layout/default_basic_layout.dart';
-import 'package:Deal_Connect/components/layout/default_layout.dart';
+import 'package:Deal_Connect/api/business.dart';
 import 'package:Deal_Connect/components/layout/default_search_layout.dart';
 import 'package:Deal_Connect/components/list_business_card.dart';
-import 'package:Deal_Connect/db/company_data.dart';
-import 'package:Deal_Connect/pages/business/components/business_tab_bar.dart';
-import 'package:Deal_Connect/pages/trade/trade_buy/trade_buy_create.dart';
+import 'package:Deal_Connect/components/loading.dart';
+import 'package:Deal_Connect/components/no_items.dart';
+import 'package:Deal_Connect/model/user_business.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:hexcolor/hexcolor.dart';
 
 // 사업장찾기
 class TradeBuyIndex extends StatefulWidget {
-  String? searchKeyword;
-
-  // super()를 사용하여 부모 클래스의 생성자 호출
-  TradeBuyIndex({
-    this.searchKeyword = '',
+  const TradeBuyIndex({
     Key? key,
   }) : super(key: key);
 
@@ -24,56 +18,82 @@ class TradeBuyIndex extends StatefulWidget {
 }
 
 class _TradeBuyIndexState extends State<TradeBuyIndex> {
+  String? searchKeyword = '';
+  List<UserBusiness>? userBusinessList = [];
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _initData();
+  }
+
+  void _initData() {
+    getUserBusinesses(
+        queryMap: {'do_not_include_mine': true, 'partner_has_store': true, 'keyword': searchKeyword})
+        .then((response) {
+      if (response.status == 'success') {
+        Iterable iterable = response.data;
+
+        List<UserBusiness>? userBusinessList = List<UserBusiness>.from(
+            iterable.map((e) => UserBusiness.fromJSON(e)));
+
+        setState(() {
+          if (userBusinessList != null) {
+            this.userBusinessList = userBusinessList;
+          }
+          this._isLoading = false;
+        });
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
+
   @override
   Widget build(BuildContext context) {
+    if (_isLoading) {
+      // 로딩 중 인디케이터 표시
+      return Loading();
+    }
+
+
     return DefaultSearchLayout(
         isNotInnerPadding: 'true',
         onSubmit: (keyword) {
           setState(() {
-            widget.searchKeyword = keyword;
+            searchKeyword = keyword;
+            _initData();
           });
         },
         child: Container(
-          color: HexColor('#F5F6FA'),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Padding(
-                padding: EdgeInsets.all(15.0),
-                child: Text('최근 검색', style: TextStyle(fontWeight: FontWeight.bold),),
-              ),
-              Expanded(
-                child: companyDataList.isNotEmpty
-                    ? GridView.builder(
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2, // 한 줄에 2개의 아이템
-                    crossAxisSpacing: 10.0, // 아이템 간의 가로 간격
-                    mainAxisSpacing: 10.0, // 아이템 간의 세로 간격
-                    childAspectRatio: 1 / 1.4,
-                  ),
-                  itemCount: companyDataList.length, // 아이템 개수
-                  itemBuilder: (context, index) {
-                    Map<String, dynamic> companyData = companyDataList[index];
-                    return GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          CupertinoPageRoute(
-                              builder: (context) => TradeBuyCreate()),
-                        );
-                      },
-                      child: ListBusinessCard(
-                        bgImagePath: companyData['bgImagePath'],
-                        avaterImagePath: companyData['avaterImagePath'],
-                        companyName: companyData['companyName'],
-                        tagList : companyData['tagList'],
-                      ),
-                    );
+          color: Color(0xFFf5f6f8),
+          padding: EdgeInsets.symmetric(horizontal: 14.0),
+          child: userBusinessList != null && userBusinessList!.isNotEmpty
+              ? GridView.builder(
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2, // 한 줄에 2개의 아이템
+              crossAxisSpacing: 10.0, // 아이템 간의 가로 간격
+              mainAxisSpacing: 10.0, // 아이템 간의 세로 간격
+              childAspectRatio: 1 / 1.4,
+            ),
+            itemCount: userBusinessList!.length, // 아이템 개수
+            itemBuilder: (context, index) {
+              UserBusiness item = userBusinessList![index];
+              return GestureDetector(
+                  onTap: () {
+                    Navigator.pushNamed(context, '/trade/buy/create',
+                        arguments: {"userBusinessId": item.id});
                   },
-                ) : const Text('등록된 데이터가 없습니다'),
-              ),
-            ],
-          ),
+                  child: ListBusinessCard(item: item)
+              );
+            },
+          )
+              : NoItems(),
         ),
     );
   }

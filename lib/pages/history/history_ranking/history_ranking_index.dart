@@ -1,8 +1,11 @@
+import 'package:Deal_Connect/api/partner.dart';
 import 'package:Deal_Connect/components/layout/default_logo_layout.dart';
 import 'package:Deal_Connect/components/list_ranking_card.dart';
+import 'package:Deal_Connect/components/loading.dart';
+import 'package:Deal_Connect/components/no_items.dart';
+import 'package:Deal_Connect/db/group_ranking_data.dart';
 import 'package:Deal_Connect/db/ranking_data.dart';
-import 'package:Deal_Connect/pages/group/group_index.dart';
-import 'package:Deal_Connect/pages/history/history_ranking/history_ranking_detail_list.dart';
+import 'package:Deal_Connect/model/partner.dart';
 import 'package:Deal_Connect/pages/profile/other_profile.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -16,120 +19,75 @@ class HistoryRankingIndex extends StatefulWidget {
 }
 
 class _HistoryRankingIndexState extends State<HistoryRankingIndex> {
+  bool _isLoading = true;
+  List<Partner> partnerRankingList = [];
+
+
+  @override
+  void initState() {
+    super.initState();
+    _initData();
+  }
+
+  void _initData() async {
+    getPartnersRanking()
+        .then((response) {
+      if (response.status == 'success') {
+        Iterable iterable = response.data;
+        List<Partner> dataList =
+            List<Partner>.from(iterable.map((e) => Partner.fromJSON(e)));
+        setState(() {
+          this.partnerRankingList = dataList;
+        });
+      }
+    });
+    setState(() {
+      _isLoading = false;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    TextStyle subTitle = TextStyle(fontSize: 16, fontWeight: FontWeight.bold);
-
+    if (_isLoading) {
+      // 로딩 중 인디케이터 표시
+      return Loading();
+    }
     return DefaultLogoLayout(
-        titleName: 'Deal & Connect 랭킹',
-        isNotInnerPadding: 'true',
-        child: SingleChildScrollView(
-          child: Container(
-            color: HexColor("f5f6fa"),
-            child: Column(
-              children: [
-                Divider(thickness: 10, height: 10, color: HexColor("f5f6fa")),
-                _buildTitle(
-                    "최대 판매금액(최근 30일 기준)", "더보기", HistoryRankingDetailList()),
-                Divider(thickness: 10, height: 10, color: HexColor("f5f6fa")),
-                Column(
-                  children: [
-                    for (final data in rankingData)
-                      GestureDetector(
+      titleName: 'Deal&Connect 랭킹',
+      isNotInnerPadding: 'true',
+      child: RefreshIndicator(
+        onRefresh: () async {
+          setState(() {
+            _isLoading = true;
+          });
+          _initData();
+        },
+        child: Container(
+          color: HexColor("#f5f6fa"),
+          padding: EdgeInsets.all(15.0),
+          child: partnerRankingList != null && partnerRankingList.isNotEmpty ? Column(
+            children: [
+              Expanded(
+                child: ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: partnerRankingList.length,
+                    itemBuilder: (context, index) {
+                      final item = partnerRankingList[index];
+                      return GestureDetector(
                         onTap: () {
                           Navigator.push(
                             context,
-                            CupertinoPageRoute(builder: (context) => OtherProfileIndex()
-                            ),
+                            CupertinoPageRoute(
+                                builder: (context) => OtherProfileIndex()),
                           );
                         },
-                        child: ListRankingCard(
-                          bgImagePath: data['bgImagePath'],
-                          avaterImagePath: data['avaterImagePath'],
-                          companyName: data['companyName'],
-                          userName: data['userName'],
-                          ranking: data['ranking'],
-                          tagList: List<String>.from(data['tagList']),
-                          money: data['money'],
-                        ),
-                      )
-                  ],
-                ),
-                _buildTitle(
-                    "최대 구매금액(최근 30일 기준)", "더보기", HistoryRankingDetailList()),
-                Divider(thickness: 10, height: 10, color: HexColor("f5f6fa")),
-                Column(
-                  children: [
-                    for (final data in rankingData)
-                    ListRankingCard(
-                      bgImagePath: data['bgImagePath'],
-                      avaterImagePath: data['avaterImagePath'],
-                      companyName: data['companyName'],
-                      userName: data['userName'],
-                      ranking: data['ranking'],
-                      tagList: List<String>.from(data['tagList']),
-                      money: data['money'],
-                    )
-                  ],
-                ),
-                _buildTitle(
-                    "최다 거래내역(최근 30일 기준)", "더보기", HistoryRankingDetailList()),
-                Divider(thickness: 10, height: 10, color: HexColor("f5f6fa")),
-                Column(
-                  children: [
-                    for (final data in rankingData)
-                      ListRankingCard(
-                        bgImagePath: data['bgImagePath'],
-                        avaterImagePath: data['avaterImagePath'],
-                        companyName: data['companyName'],
-                        userName: data['userName'],
-                        ranking: data['ranking'],
-                        tagList: List<String>.from(data['tagList']),
-                        money: data['money'],
-                      )
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ));
-  }
-
-  Container _buildTitle(String text, String buttonText, Widget goto) {
-    return Container(
-      color: HexColor("#ffffff"),
-      padding: const EdgeInsets.symmetric(horizontal: 15.0),
-      child: Column(
-        children: [
-          Row(
-            children: [
-              Text(
-                text,
-                style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.w500),
-              ),
-              Spacer(),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                      context, CupertinoPageRoute(builder: (context) => goto));
-                },
-                child: Text(
-                  buttonText,
-                  style: TextStyle(
-                    color: Color(0xff333333),
-                  ),
-                ),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Color(0xFFf5f6fa),
-                  foregroundColor: Color(0xFFf5f6fa),
-                  elevation: 0,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8.0)),
-                ),
+                        child: ListRankingCard(item: item, index: index),
+                      );
+                    }),
               ),
             ],
-          ),
-        ],
+          ) : NoItems(),
+        ),
       ),
     );
   }

@@ -4,13 +4,18 @@ import 'dart:io';
 import 'package:Deal_Connect/api/group.dart';
 import 'package:Deal_Connect/components/alert/show_complete_dialog.dart';
 import 'package:Deal_Connect/components/const/setting_colors.dart';
+import 'package:Deal_Connect/components/const/setting_style.dart';
 import 'package:Deal_Connect/components/custom/common_text_form_filed.dart';
 import 'package:Deal_Connect/components/custom/join_text_form_field.dart';
 import 'package:Deal_Connect/components/layout/default_logo_layout.dart';
 import 'package:Deal_Connect/components/layout/default_next_layout.dart';
+import 'package:Deal_Connect/components/loading.dart';
 import 'package:Deal_Connect/model/group.dart';
 import 'package:Deal_Connect/utils/custom_dialog.dart';
+import 'package:Deal_Connect/utils/utils.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -22,11 +27,72 @@ class GroupRegisterIndex extends StatefulWidget {
 }
 
 class _GroupRegisterIndexState extends State<GroupRegisterIndex> {
-  String name = '';
-  String description = '';
   File? _pickedImage;
-  final List<String> keywords = [];
+  late final List<String> keywords = [];
   final TextEditingController _controller = TextEditingController();
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _descriptionController = TextEditingController();
+
+  Group? groupData;
+  int? groupId;
+  String? groupName;
+  bool _isLoading = true;
+
+  var args;
+
+  @override
+  void initState() {
+    super.initState();
+    _initData();
+  }
+
+  void _initData() async {
+    final widgetsBinding = WidgetsBinding.instance;
+    widgetsBinding?.addPostFrameCallback((callback) async {
+      if (ModalRoute.of(context)?.settings.arguments != null) {
+        setState(() {
+          args = ModalRoute.of(context)?.settings.arguments;
+        });
+
+        if (args != null) {
+          setState(() {
+            groupId = args['groupId'];
+            groupName = args['groupName'];
+          });
+        }
+
+        if (groupId != null) {
+          await getGroup(groupId!).then((response) {
+            if (response.status == 'success') {
+              Group resultData = Group.fromJSON(response.data);
+              setState(() {
+                groupData = resultData;
+                _nameController.text = groupData!.name;
+                if (groupData!.description != null) {
+                  _descriptionController.text = groupData!.description ?? '';
+                }
+                if (groupData!.has_keywords != null) {
+                  if (groupData!.has_keywords != null) {
+                    for (var keywordItem in groupData!.has_keywords!) {
+                      keywords.add(keywordItem.keyword);
+                    }
+                  }
+                }
+              });
+            } else {
+              Fluttertoast.showToast(
+                  msg: '그룹 정보를 받아오는 도중 오류가 발생했습니다.\n오류코드: 463');
+            }
+          });
+        }
+
+      }
+    });
+
+    setState(() {
+      _isLoading = false;
+    });
+  }
 
   void _addKeyword() {
     final text = _controller.text;
@@ -45,12 +111,18 @@ class _GroupRegisterIndexState extends State<GroupRegisterIndex> {
   }
 
   @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
+
+    ImageProvider groupImage;
+
+    if (groupData != null && groupData!.has_group_image != null) {
+      groupImage = CachedNetworkImageProvider(
+        Utils.getImageFilePath(groupData!.has_group_image!),
+      );
+    } else {
+      groupImage = AssetImage('assets/images/no-image.png');
+    }
+
     final baseBorder = OutlineInputBorder(
       borderSide: BorderSide(
         color: INPUT_BORDER_COLOR,
@@ -64,6 +136,11 @@ class _GroupRegisterIndexState extends State<GroupRegisterIndex> {
       //fontWeight: FontWeight.w600
     );
 
+    if (_isLoading) {
+      // 로딩 중 인디케이터 표시
+      return Loading();
+    }
+
     return DefaultNextLayout(
         nextTitle: '저장하기',
         prevTitle: '취소',
@@ -73,7 +150,7 @@ class _GroupRegisterIndexState extends State<GroupRegisterIndex> {
         bottomBar: true,
         prevOnPressed: () {},
         nextOnPressed: () {
-          _submit();
+          groupId != null ? _modify() : _submit();
         },
         child: GestureDetector(
             onTap: () {
@@ -161,30 +238,41 @@ class _GroupRegisterIndexState extends State<GroupRegisterIndex> {
                             });
                       },
                       child: _pickedImage == null
-                          ? Container(
-                              width: double.infinity,
-                              height: 180.0,
-                              decoration: BoxDecoration(
-                                color: Color(0xFFF5F5F5),
-                                borderRadius: BorderRadius.all(
-                                  Radius.circular(10.0),
-                                ),
-                              ),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    Icons.camera_alt,
-                                    color: Color(0xFFD9D9D9),
-                                    size: 60.0,
+                          ? (groupData != null &&
+                                groupData!.has_group_image != null)
+                              ? Container(
+                                  width: double.infinity,
+                                  height: 240.0,
+                                  decoration: BoxDecoration(
+                                      image: DecorationImage(
+                                          image: groupImage,
+                                          fit: BoxFit.cover)),
+                                )
+                              : Container(
+                                  width: double.infinity,
+                                  height: 180.0,
+                                  decoration: const BoxDecoration(
+                                    color: Color(0xFFF5F5F5),
+                                    borderRadius: BorderRadius.all(
+                                      Radius.circular(10.0),
+                                    ),
                                   ),
-                                  Text(
-                                    '이미지 등록 해주세요',
-                                    style: TextStyle(color: Color(0xFFA2A2A2)),
+                                  child: const Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        Icons.camera_alt,
+                                        color: Color(0xFFD9D9D9),
+                                        size: 60.0,
+                                      ),
+                                      Text(
+                                        '이미지 등록 해주세요',
+                                        style:
+                                            TextStyle(color: Color(0xFFA2A2A2)),
+                                      ),
+                                    ],
                                   ),
-                                ],
-                              ),
-                            )
+                                )
                           : Container(
                               width: double.infinity,
                               height: 240.0,
@@ -194,25 +282,50 @@ class _GroupRegisterIndexState extends State<GroupRegisterIndex> {
                               ),
                             ),
                     ),
-                    JoinTextFormField(
-                        label: '그룹 이름',
-                        hintText: '그룹 이름을 입력해주세요.',
-                        onChanged: (String value) {
-                          setState(() {
-                            name = value;
-                          });
-                        }),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Padding(
+                          padding: EdgeInsets.symmetric(vertical: 10.0),
+                          child: Text(
+                            '그룹 이름',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w400,
+                              fontSize: 13.0,
+                            ),
+                          ),
+                        ),
+                        TextFormField(
+                            controller: _nameController,
+                            decoration: SettingStyle.INPUT_STYLE.copyWith(
+                              hintText: '그룹 이름을 입력해주세요.',
+                            )),
+                      ],
+                    ),
                     SizedBox(
                       height: 10,
                     ),
-                    JoinTextFormField(
-                        label: '그룹 간단 소개',
-                        hintText: '그룹 간단 소개 내용을 입력해주세요.',
-                        maxLines: 4,
-                        maxLength: null,
-                        onChanged: (String value) {
-                          description = value;
-                        }),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Padding(
+                          padding: EdgeInsets.symmetric(vertical: 10.0),
+                          child: Text(
+                            '그룹 간단 소개',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w400,
+                              fontSize: 13.0,
+                            ),
+                          ),
+                        ),
+                        TextFormField(
+                            controller: _descriptionController,
+                            maxLines: 4,
+                            decoration: SettingStyle.INPUT_STYLE.copyWith(
+                              hintText: '그룹 간단 소개 내용을 입력해주세요.',
+                            )),
+                      ],
+                    ),
                     SizedBox(
                       height: 10,
                     ),
@@ -234,19 +347,14 @@ class _GroupRegisterIndexState extends State<GroupRegisterIndex> {
                           decoration: InputDecoration(
                             fillColor: INPUT_BG_COLOR,
                             filled: true,
-                            // fillColor에 배경색이 있을 경우 색상반영, false 미적용
-                            // 기본보더
                             border: baseBorder,
-                            // 선택되지 않은상태에서 활성화 되어있는 필드
                             enabledBorder: baseBorder,
-                            // 포커스보더
                             focusedBorder: baseBorder.copyWith(
                               borderSide: baseBorder.borderSide.copyWith(
                                 color: PRIMARY_COLOR,
                               ),
                             ),
                             contentPadding: EdgeInsets.all(12.0),
-                            // 필드 패딩
                             labelText: '키워드 추가',
                             suffixIcon: IconButton(
                               icon: Icon(Icons.add),
@@ -277,10 +385,30 @@ class _GroupRegisterIndexState extends State<GroupRegisterIndex> {
     CustomDialog.showProgressDialog(context);
 
     storeGroup({
-      'name': name,
-      'description': description,
+      'name': _nameController.text,
+      'description': _descriptionController.text,
       'keywords': jsonEncode(keywords),
-    }, _pickedImage).then((response) async {
+    }, _pickedImage)
+        .then((response) async {
+      CustomDialog.dismissProgressDialog();
+
+      if (response.status == 'success') {
+        _showCompleteDialog(context);
+      } else {
+        CustomDialog.showServerValidatorErrorMsg(response);
+      }
+    });
+  }
+
+  _modify() async {
+    CustomDialog.showProgressDialog(context);
+
+    updateGroup(groupId!, {
+      'name': _nameController.text,
+      'description': _descriptionController.text,
+      'keywords': jsonEncode(keywords),
+    }, _pickedImage)
+        .then((response) async {
       CustomDialog.dismissProgressDialog();
 
       if (response.status == 'success') {
@@ -297,11 +425,12 @@ class _GroupRegisterIndexState extends State<GroupRegisterIndex> {
       barrierDismissible: false,
       builder: (BuildContext context) {
         return ShowCompleteDialog(
-          messageTitle: '그룹 등록 완료',
-          messageText: '등록이 완료되었습니다.',
+          messageTitle: '그룹 저장 완료',
+          messageText: '저장이 완료되었습니다.',
           buttonText: '확인',
           onConfirmed: () {
-            Navigator.pushNamedAndRemoveUntil(context, '/group', (route) => false);
+            Navigator.pop(context);
+            Navigator.pop(context);
           },
         );
       },
@@ -312,4 +441,6 @@ class _GroupRegisterIndexState extends State<GroupRegisterIndex> {
   void dispose() {
     super.dispose();
   }
+
+
 }

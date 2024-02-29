@@ -27,10 +27,11 @@ class _CompanyCreateStepThreeState extends State<CompanyCreateStepThree> {
   String address1 = '';
   String address2 = '';
   bool hasHoliday = false;
-  bool hasWeekend = true;
+  bool hasWeekend = false;
   String workTime = '';
   String holiday = '';
   String weekend = '';
+  String description = '';
 
   bool isProcessable = true;
   final GlobalKey<FormState> _companyFormKey = GlobalKey<FormState>();
@@ -77,9 +78,13 @@ class _CompanyCreateStepThreeState extends State<CompanyCreateStepThree> {
             address2 = args['address2'];
             hasHoliday = args['hasHoliday'];
             hasWeekend = args['hasWeekend'];
+            print('userBusinessCategoryId :' + userBusinessCategoryId.toString());
+            print('hasHoliday :' + hasHoliday.toString());
+            print('hasWeekend :' + hasWeekend.toString());
             workTime = args['workTime'];
             holiday = args['holiday'];
             weekend = args['weekend'];
+            description = args['description'];
           });
         }
       }
@@ -203,6 +208,8 @@ class _CompanyCreateStepThreeState extends State<CompanyCreateStepThree> {
                         ],
                       ),
                       _buildHomePage(),
+
+
                     ],
                   ),
                 ),
@@ -216,7 +223,7 @@ class _CompanyCreateStepThreeState extends State<CompanyCreateStepThree> {
 
   _submit() async {
     CustomDialog.showProgressDialog(context);
-
+    print('userBusinessCategoryId :' + userBusinessCategoryId.toString());
     storeUserBusiness({
       'user_business_category_id': userBusinessCategoryId,
       'name': name,
@@ -229,16 +236,17 @@ class _CompanyCreateStepThreeState extends State<CompanyCreateStepThree> {
       'holiday': holiday,
       'weekend': weekend,
       'website': website,
+      'description': description,
       'keywords': jsonEncode(keywords),
     }, imageFile).then((response) async {
       CustomDialog.dismissProgressDialog();
 
       if (response.status == 'success') {
-        UserBusiness userBusiness = UserBusiness.fromJSON(response.data);
-
-        if (userBusiness.has_owner != null) {
-          await SharedPrefUtils.setUser(userBusiness.has_owner!);
-        }
+        // UserBusiness userBusiness = UserBusiness.fromJSON(response.data);
+        //
+        // if (userBusiness.has_owner != null) {
+        //   await SharedPrefUtils.setUser(userBusiness.has_owner!);
+        // }
         _showCompleteDialog(context);
       } else {
         CustomDialog.showServerValidatorErrorMsg(response);

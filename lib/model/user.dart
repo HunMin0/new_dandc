@@ -8,6 +8,8 @@ class User {
   final String name;
   final String user_id;
   final bool is_active;
+  final int? is_partner;
+  final int? is_partner_of;
   final int level;
   final bool is_agree_service;
   final bool is_agree_personal;
@@ -27,6 +29,8 @@ class User {
     required this.name,
     required this.user_id,
     required this.level,
+    this.is_partner = 0,
+    this.is_partner_of = 0,
     required this.is_active,
     required this.is_agree_service,
     required this.is_agree_personal,
@@ -62,6 +66,8 @@ class User {
       email: json['email'],
       phone: json['phone'],
       level: json['level'],
+      is_partner: json['is_partner'],
+      is_partner_of: json['is_partner_of'],
       is_active: json['is_active'],
       sns_type: json['sns_type'],
       has_user_profile: has_user_profile,

@@ -2,7 +2,6 @@ import 'package:Deal_Connect/components/layout/default_logo_layout.dart';
 import 'package:Deal_Connect/components/list_card.dart';
 import 'package:Deal_Connect/components/grid_group_card.dart';
 import 'package:Deal_Connect/components/list_group_card.dart';
-import 'package:Deal_Connect/components/list_partner_manage_card.dart';
 import 'package:Deal_Connect/db/group_data.dart';
 import 'package:Deal_Connect/db/group_sample_data.dart';
 import 'package:Deal_Connect/db/vertical_data.dart';

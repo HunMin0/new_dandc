@@ -3,9 +3,14 @@ import 'package:Deal_Connect/pages/auth/join/join_index.dart';
 import 'package:Deal_Connect/pages/auth/login/login_index.dart';
 import 'package:Deal_Connect/pages/auth/login/user_id_login.dart';
 import 'package:Deal_Connect/pages/auth/terms/terms_index.dart';
+import 'package:Deal_Connect/pages/business/business_detail/business_detail_info.dart';
+import 'package:Deal_Connect/pages/business/business_index.dart';
+import 'package:Deal_Connect/pages/business/business_service/business_service_create.dart';
+import 'package:Deal_Connect/pages/business/business_service/business_service_info.dart';
 import 'package:Deal_Connect/pages/default_page.dart';
 import 'package:Deal_Connect/pages/group/group_board/group_board_create.dart';
 import 'package:Deal_Connect/pages/group/group_board/group_board_info.dart';
+import 'package:Deal_Connect/pages/group/group_detail/group_detail_info.dart';
 import 'package:Deal_Connect/pages/group/group_index.dart';
 import 'package:Deal_Connect/pages/group/group_manage/group_manage_index.dart';
 import 'package:Deal_Connect/pages/group/group_manage/group_manage_info.dart';
@@ -13,8 +18,13 @@ import 'package:Deal_Connect/pages/group/group_manage/group_manage_parnter.dart'
 import 'package:Deal_Connect/pages/group/group_partner/group_partner_index.dart';
 import 'package:Deal_Connect/pages/group/group_register/group_register_index.dart';
 import 'package:Deal_Connect/pages/group/group_search/group_search_index.dart';
+import 'package:Deal_Connect/pages/group/group_trade/group_trade_detail.dart';
 import 'package:Deal_Connect/pages/group/group_trade/group_trade_index.dart';
-import 'package:Deal_Connect/pages/group/group_view.dart';
+import 'package:Deal_Connect/pages/history/history_detail/history_detail_confirm.dart';
+import 'package:Deal_Connect/pages/history/history_detail/history_detail_index.dart';
+import 'package:Deal_Connect/pages/history/history_detail/history_detail_info.dart';
+import 'package:Deal_Connect/pages/history/history_detail/reciept_view.dart';
+import 'package:Deal_Connect/pages/history/history_ranking/history_ranking_index.dart';
 import 'package:Deal_Connect/pages/intro/intro_index.dart';
 import 'package:Deal_Connect/pages/profile/company_create/company_create_photo.dart';
 import 'package:Deal_Connect/pages/profile/company_create/company_create_index.dart';
@@ -22,20 +32,92 @@ import 'package:Deal_Connect/pages/profile/company_create/company_create_step_on
 import 'package:Deal_Connect/pages/profile/company_create/company_create_step_three.dart';
 import 'package:Deal_Connect/pages/profile/company_create/company_create_step_two.dart';
 import 'package:Deal_Connect/pages/profile/other_profile.dart';
+import 'package:Deal_Connect/pages/profile/partner_attend/partner_attend_index.dart';
 import 'package:Deal_Connect/pages/profile/profile_edit/profile_edit_index.dart';
 import 'package:Deal_Connect/pages/profile/profile_group/profile_group_index.dart';
 import 'package:Deal_Connect/pages/profile/profile_index.dart';
 import 'package:Deal_Connect/pages/profile/profile_partner/profile_partner_index.dart';
 import 'package:Deal_Connect/pages/root_page.dart';
+import 'package:Deal_Connect/pages/trade/trade_buy/trade_buy_create.dart';
+import 'package:Deal_Connect/pages/trade/trade_sell/trade_sell_create.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
 import 'components/address_search_viewer.dart';
 
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  await Firebase.initializeApp();
+  print('Handling a background message ${message.messageId}');
+  print('title: ${message.notification?.title}');
+}
 
-void main() {
+/// Create a [AndroidNotificationChannel] for heads up notifications
+late AndroidNotificationChannel channel;
+
+/// Initialize the [FlutterLocalNotificationsPlugin] package.
+late FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
+
+Future<void> main() async {
+
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+  channel = const AndroidNotificationChannel(
+    'high_importance_channel', // id
+    'High Importance Notifications', // title
+    importance: Importance.high,
+    description: 'This channel is used for important notifications.', // description
+  );
+  flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+
+  /// Create an Android Notification Channel.
+  ///
+  /// We use this channel in the `AndroidManifest.xml` file to override the
+  /// default FCM channel to enable heads up notifications.
+  await flutterLocalNotificationsPlugin
+      .resolvePlatformSpecificImplementation<
+      AndroidFlutterLocalNotificationsPlugin>()
+      ?.createNotificationChannel(channel);
+
+  /// Update the iOS foreground notification presentation options to allow
+  /// heads up notifications.
+  await FirebaseMessaging.instance
+      .setForegroundNotificationPresentationOptions(
+    alert: true,
+    badge: true,
+    sound: true,
+  );
+
+  FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+    print('Got a message whilst in the foreground!');
+    print('Message data: ${message.data}');
+
+    if (message.notification != null) {
+      print('Message also contained a notification: ${message.notification}');
+      flutterLocalNotificationsPlugin.show(
+          message.hashCode,
+          message.notification?.title,
+          message.notification?.body,
+          NotificationDetails(
+              android: AndroidNotificationDetails(
+                channel.id,
+                channel.name,
+                channelDescription: channel.description,
+                icon: '@mipmap/ic_launcher',
+              ),
+              iOS: const IOSNotificationDetails(
+                badgeNumber: 1,
+                subtitle: 'the subtitle',
+                sound: 'slow_spring_board.aiff',
+              )));
+    }
+  });
+
   SystemChrome.setPreferredOrientations([ // 선호하는 화면 방향 설정
     DeviceOrientation.portraitUp, // 세로 방향 고정
     DeviceOrientation.portraitDown,
@@ -50,9 +132,9 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    return MaterialApp(
+    return CupertinoApp(
         title: 'Deal&Connect', // 디바이스의 작업줄에 표시역할
-        theme: SettingThemes.lightTheme,
+        theme: SettingThemes.cupertinoTheme,
         debugShowCheckedModeBanner: false,
         localizationsDelegates: const [
           GlobalMaterialLocalizations.delegate,
@@ -79,19 +161,40 @@ class MyApp extends StatelessWidget {
           '/profile/company/create/step3': (context) => CompanyCreateStepThree(),
           '/profile/groups': (context) => ProfileGroupIndex(),
           '/profile/partners': (context) => ProfilePartnerIndex(),
+          '/profile/partner/attends': (context) => PartnerAttendIndex(),
+          '/profile/partner/info': (context) => OtherProfileIndex(),
           '/profile': (context) => OtherProfileIndex(),
           '/group': (context) => GroupIndex(),
           '/group/partner': (context) => GroupPartnerIndex(),
           '/group/trade': (context) => GroupTradeIndex(),
+          '/group/trade/detail': (context) => GroupTradeDetail(),
+
+
           '/group/search': (context) => GroupSearchIndex(),
-          '/group/info': (context) => GroupView(),
+          '/group/info': (context) => GroupDetailInfo(),
           '/group/create': (context) => GroupRegisterIndex(),
+          '/group/edit': (context) => GroupRegisterIndex(),
           '/group/manage': (context) => GroupManageIndex(),
           '/group/manage/info': (context) => GroupManageInfo(),
           '/group/manage/partner': (context) => GroupManagePartner(),
           '/group/board/create': (context) => GroupBoardCreate(),
           '/group/board/edit': (context) => GroupBoardCreate(),
           '/group/board/info': (context) => GroupBoardInfo(),
+
+
+          '/business': (context) => BusinessIndex(),
+          '/business/info': (context) => BusinessDetailInfo(),
+          '/business/edit': (context) => CompanyCreateIndex(),
+          '/business/edit/photo': (context) => CompanyCreatePhoto(),
+          '/business/service/edit': (context) => BusinessServiceCreate(),
+          '/business/service/create': (context) => BusinessServiceCreate(),
+          '/business/service/info': (context) => BusinessServiceInfo(),
+          '/trade/buy/create': (context) => TradeBuyCreate(),
+          '/trade/sell/create': (context) => TradeSellCreate(),
+          '/trade/history/approve': (context) => HistoryDetailIndex(),
+          '/trade/history/info': (context) => HistoryDetailInfo(),
+          '/trade/history/info/confirm': (context) => HistoryDetailConfirm(),
+          '/trade/history/ranking': (context) => HistoryRankingIndex(),
           '/address/search': (context) => AddressSearchViewer(),
         }
     );

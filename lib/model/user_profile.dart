@@ -14,7 +14,7 @@ class UserProfile {
   });
 
   factory UserProfile.fromJSON(Map<String, dynamic> json) {
-    var has_profile_image = json['profile_image_id'] != null ? File.fromJSON(json['has_profile_image']) : null;
+    var has_profile_image = json['has_profile_image'] != null ? File.fromJSON(json['has_profile_image']) : null;
 
     return UserProfile(
         id: json['id'],

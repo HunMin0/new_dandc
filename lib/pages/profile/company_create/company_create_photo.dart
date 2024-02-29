@@ -1,9 +1,18 @@
 import 'dart:io';
 
+import 'package:Deal_Connect/api/business.dart';
+import 'package:Deal_Connect/components/alert/show_complete_dialog.dart';
 import 'package:Deal_Connect/components/const/setting_colors.dart';
 import 'package:Deal_Connect/components/layout/default_next_layout.dart';
+import 'package:Deal_Connect/components/loading.dart';
+import 'package:Deal_Connect/model/user_business.dart';
 import 'package:Deal_Connect/pages/profile/company_create/company_create_step_one.dart';
+import 'package:Deal_Connect/utils/custom_dialog.dart';
+import 'package:Deal_Connect/utils/shared_pref_utils.dart';
+import 'package:Deal_Connect/utils/utils.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 
 class CompanyCreatePhoto extends StatefulWidget {
@@ -17,23 +26,55 @@ class _CompanyCreatePhotoState extends State<CompanyCreatePhoto> {
   File? _pickedImage;
   bool isProcessable = false;
   bool checkState = false;
-  int userBusinessCategoryId = 0;
+  bool _isLoading = true;
+  int? userBusinessCategoryId;
+
+  //수정시 사용
+  int? userBusinessId;
+  String? storeName;
+  UserBusiness? userBusiness;
 
   var args;
 
   @override
   void initState() {
     super.initState();
+    _initData();
+  }
 
+  void _initData() async {
     final widgetsBinding = WidgetsBinding.instance;
-    widgetsBinding?.addPostFrameCallback((callback) {
+    widgetsBinding?.addPostFrameCallback((callback) async {
       if (ModalRoute.of(context)?.settings.arguments != null) {
-        args = ModalRoute.of(context)?.settings.arguments;
+        setState(() {
+          args = ModalRoute.of(context)?.settings.arguments;
+        });
+
         if (args != null) {
           setState(() {
             userBusinessCategoryId = args['userBusinessCategoryId'];
+            userBusinessId = args['userBusinessId'];
+            storeName = args['storeName'];
           });
         }
+        if (userBusinessId != null) {
+          await getUserBusiness(userBusinessId!).then((response) {
+            if (response.status == 'success') {
+              UserBusiness resultData = UserBusiness.fromJSON(response.data);
+              if (resultData != null) {
+                setState(() {
+                  userBusiness = resultData;
+                });
+              }
+            } else {
+              Fluttertoast.showToast(
+                  msg: '업체 정보를 받아오는 도중 오류가 발생했습니다.\n오류코드: 463');
+            }
+          });
+        }
+        setState(() {
+          _isLoading = false;
+        });
       }
     });
   }
@@ -46,21 +87,42 @@ class _CompanyCreatePhotoState extends State<CompanyCreatePhoto> {
       //fontWeight: FontWeight.w600
     );
 
+    ImageProvider businessMainImage;
+    if (userBusiness != null && userBusiness!.has_business_image != null) {
+      businessMainImage = CachedNetworkImageProvider(
+        Utils.getImageFilePath(userBusiness!.has_business_image!),
+      );
+    } else {
+      businessMainImage = AssetImage('assets/images/no-image.png');
+    }
+
+    if (_isLoading) {
+      return Loading();
+    }
+
     return DefaultNextLayout(
-      titleName: '업체등록',
+      titleName: storeName ?? '업체등록',
       isProcessable: isProcessable,
       bottomBar: true,
       prevTitle: '취소',
-      nextTitle: '다음',
+      nextTitle: userBusinessId != null ? '저장' : '다음',
       prevOnPressed: () {
-        Navigator.of(context).popUntil((route) => route.isFirst);
+        if(userBusinessId != null) {
+          Navigator.of(context).pop();
+        } else {
+          Navigator.of(context).popUntil((route) => route.isFirst);
+        }
       },
       nextOnPressed: () {
-        Navigator.pushNamed(context, '/profile/company/create/step1',
-            arguments: {
-              'userBusinessCategoryId': userBusinessCategoryId,
-              'imageFile': _pickedImage,
-            });
+        if(userBusinessId != null) {
+          _submit();
+        } else {
+          Navigator.pushNamed(context, '/profile/company/create/step1',
+              arguments: {
+                'userBusinessCategoryId': userBusinessCategoryId,
+                'imageFile': _pickedImage,
+              });
+        }
       },
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -147,30 +209,39 @@ class _CompanyCreatePhotoState extends State<CompanyCreatePhoto> {
                   });
             },
             child: _pickedImage == null
-                ? Container(
-                    width: double.infinity,
-                    height: 240.0,
-                    decoration: BoxDecoration(
-                      color: Color(0xFFF5F5F5),
-                      borderRadius: BorderRadius.all(
-                        Radius.circular(10.0),
-                      ),
-                    ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.camera_alt,
-                          color: Color(0xFFD9D9D9),
-                          size: 60.0,
+                ? (userBusiness != null &&
+                        userBusiness!.has_business_image != null)
+                    ? Container(
+                        width: double.infinity,
+                        height: 240.0,
+                        decoration: BoxDecoration(
+                            image: DecorationImage(image: businessMainImage, fit: BoxFit.cover),
                         ),
-                        Text(
-                          '대표사진을 등록 해주세요',
-                          style: TextStyle(color: Color(0xFFA2A2A2)),
+                      )
+                    : Container(
+                        width: double.infinity,
+                        height: 240.0,
+                        decoration: BoxDecoration(
+                          color: Color(0xFFF5F5F5),
+                          borderRadius: BorderRadius.all(
+                            Radius.circular(10.0),
+                          ),
                         ),
-                      ],
-                    ),
-                  )
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.camera_alt,
+                              color: Color(0xFFD9D9D9),
+                              size: 60.0,
+                            ),
+                            Text(
+                              '대표사진을 등록 해주세요',
+                              style: TextStyle(color: Color(0xFFA2A2A2)),
+                            ),
+                          ],
+                        ),
+                      )
                 : Container(
                     width: double.infinity,
                     height: 240.0,
@@ -183,45 +254,84 @@ class _CompanyCreatePhotoState extends State<CompanyCreatePhoto> {
           SizedBox(
             height: 20.0,
           ),
-          Container(
-            child: Row(
-              children: [
-                InkWell(
-                  borderRadius: BorderRadius.circular(20.0),
-                  onTap: () {
-                    setState(() {
-                      checkState = !checkState;
-                      if (!checkState) {
-                        checkState = false;
-                      }
-                      isProcessable = checkState || (_pickedImage != null);
-                    });
-                  },
-                  child: _checkType(checkState: checkState),
+          if (_pickedImage == null)
+          Row(
+            children: [
+              InkWell(
+                borderRadius: BorderRadius.circular(20.0),
+                onTap: () {
+                  setState(() {
+                    checkState = !checkState;
+                    if (!checkState) {
+                      checkState = false;
+                    }
+                    isProcessable = checkState || (_pickedImage != null);
+                  });
+                },
+                child: _checkType(checkState: checkState),
+              ),
+              SizedBox(
+                width: 10.0,
+              ),
+              GestureDetector(
+                onTap: () {
+                  setState(() {
+                    checkState = !checkState;
+                    if (!checkState) {
+                      checkState = false;
+                    }
+                    isProcessable = checkState || (_pickedImage != null);
+                  });
+                },
+                child: _notImage(
+                  underText: '대표사진 다음에 등록하기',
+                  checkState: checkState,
                 ),
-                SizedBox(
-                  width: 10.0,
-                ),
-                GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      checkState = !checkState;
-                      if (!checkState) {
-                        checkState = false;
-                      }
-                      isProcessable = checkState || (_pickedImage != null);
-                    });
-                  },
-                  child: _notImage(
-                    underText: '대표사진 다음에 등록하기',
-                    checkState: checkState,
-                  ),
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
         ],
       ),
+    );
+  }
+
+  _submit() async {
+    CustomDialog.showProgressDialog(context);
+
+    updateUserBusiness(userBusiness!.id, {
+      'name': userBusiness!.name,
+      'phone': userBusiness!.phone,
+    }, _pickedImage).then((response) async {
+      CustomDialog.dismissProgressDialog();
+
+      if (response.status == 'success') {
+        UserBusiness userBusiness = UserBusiness.fromJSON(response.data);
+
+        if (userBusiness.has_owner != null) {
+          await SharedPrefUtils.setUser(userBusiness.has_owner!);
+        }
+        _showCompleteDialog(context);
+      } else {
+        CustomDialog.showServerValidatorErrorMsg(response);
+      }
+    });
+  }
+
+  void _showCompleteDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return ShowCompleteDialog(
+          messageTitle: '수정완료',
+          messageText: '수정이 완료되었습니다.',
+          buttonText: '확인',
+          onConfirmed: () {
+            Navigator.of(context).pop();
+            Navigator.of(context).pop();
+          },
+        );
+      },
     );
   }
 }

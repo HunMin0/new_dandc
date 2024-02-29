@@ -9,14 +9,22 @@ class SettingStyle {
   static const Color INPUT_BORDER_COLOR = Color(0xFFF3F2F2);
   static const Color GREY_COLOR = Color(0xFFf5f6fa);
 
+  static const TextStyle NORMAL_TEXT_STYLE = TextStyle(
+      color: Colors.black, fontSize: 15);
+
+  static const TextStyle SMALL_TEXT_STYLE = TextStyle(
+      color: Colors.black, fontSize: 12);
+
   static TextStyle SUB_GREY_TEXT = TextStyle(
-      color: HexColor("#aaaaaa"), fontSize: 12, fontWeight: FontWeight.w500);
+      color: HexColor("#aaaaaa"), fontSize: 11, fontWeight: FontWeight.w500);
 
   static const TextStyle SUB_TITLE_STYLE = TextStyle(
-      color: Colors.black, fontSize: 16, fontWeight: FontWeight.w500);
+      color: Colors.black, fontSize: 15, fontWeight: FontWeight.w500);
 
   static const TextStyle TITLE_STYLE = TextStyle(
       color: Colors.black, fontSize: 18, fontWeight: FontWeight.bold);
+
+
 
   static const InputDecoration INPUT_STYLE = InputDecoration(
     fillColor: INPUT_BG_COLOR,
@@ -44,5 +52,14 @@ class SettingStyle {
       ),
     ),
     contentPadding: EdgeInsets.all(12.0),
+  );
+
+  static final ButtonStyle BUTTON_STYLE = ElevatedButton.styleFrom(
+    backgroundColor: Color(0xFFf5f6fa),
+    foregroundColor: Color(0xFFf5f6fa),
+    elevation: 0,
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(8.0),
+    ),
   );
 }

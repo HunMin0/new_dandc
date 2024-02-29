@@ -64,7 +64,9 @@ class _GroupBoardInfoState extends State<GroupBoardInfo> {
                 boardWriteData = resultData;
                 if (boardWriteData != null && boardWriteData!.has_writer != null && myUser != null) {
                   if (boardWriteData!.has_writer!.id == myUser!.id) {
-                    _isMine = true;
+                    setState(() {
+                      _isMine = true;
+                    });
                   }
                 }
               });

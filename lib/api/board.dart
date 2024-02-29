@@ -114,7 +114,7 @@ Future<ResponseData> getBoardWriteLatestData(int groupId) async {
     headers: {"Content-Type": "application/json", "Authorization": token!},
   );
   var jsonBody = json.decode(utf8.decode(response.bodyBytes));
-  print(jsonBody.toString());
+  // print(jsonBody.toString());
   return ResponseData.fromJSON(jsonBody, response.statusCode);
 }
 

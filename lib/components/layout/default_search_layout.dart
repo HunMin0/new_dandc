@@ -8,8 +8,9 @@ class DefaultSearchLayout extends StatelessWidget {
   final Widget child;
   final Color? backgroundColor;
   final String? isNotInnerPadding;
+  final TextEditingController? textController = TextEditingController();
 
-  const DefaultSearchLayout(
+  DefaultSearchLayout(
       {required this.child,
       required this.onSubmit,
       this.backgroundColor,
@@ -31,6 +32,7 @@ class DefaultSearchLayout extends StatelessWidget {
             children: [
               Expanded(
                 child: TextField(
+                  controller: textController,
                   onSubmitted: (value) {
                     // 여기에 키패드 서브밋이 발생했을 때 수행할 작업을 추가합니다.
                     onSubmit(value);

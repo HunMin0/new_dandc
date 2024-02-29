@@ -1,5 +1,11 @@
+import 'package:Deal_Connect/api/group_trade.dart';
+import 'package:Deal_Connect/components/const/setting_style.dart';
 import 'package:Deal_Connect/components/layout/default_logo_layout.dart';
+import 'package:Deal_Connect/components/list_group_trade_card.dart';
+import 'package:Deal_Connect/components/loading.dart';
+import 'package:Deal_Connect/components/no_items.dart';
 import 'package:Deal_Connect/db/trade_data.dart';
+import 'package:Deal_Connect/model/group_trade.dart';
 import 'package:Deal_Connect/pages/group/group_trade/group_trade_mine_list.dart';
 import 'package:Deal_Connect/pages/history/history_detail/history_detail_info.dart';
 import 'package:flutter/cupertino.dart';
@@ -8,41 +14,75 @@ import 'package:flutter/material.dart';
 import '../../history/components/list_card.dart';
 
 class GroupTradeHistoryList extends StatefulWidget {
-  const GroupTradeHistoryList({super.key});
+  int? groupId;
+  String? groupName;
+
+  GroupTradeHistoryList({this.groupId, this.groupName, super.key});
 
   @override
   State<GroupTradeHistoryList> createState() => _GroupTradeHistoryListState();
 }
 
 class _GroupTradeHistoryListState extends State<GroupTradeHistoryList> {
+  List<GroupTrade> groupTradeList = [];
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _initData();
+  }
+
+  void _initData() {
+    getGroupTrades(queryMap: {'group_id': widget.groupId}).then((response) {
+      if (response.status == 'success') {
+        Iterable iterable = response.data;
+
+        List<GroupTrade>? resData =
+            List<GroupTrade>.from(iterable.map((e) => GroupTrade.fromJSON(e)));
+        setState(() {
+          this.groupTradeList = resData;
+        });
+      }
+    });
+    setState(() {
+      _isLoading = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Expanded(
+    if (_isLoading) {
+      // 로딩 중 인디케이터 표시
+      return Loading();
+    }
+    return groupTradeList != null && groupTradeList!.isNotEmpty ? Expanded(
       child: Container(
-        child: tradeDataList.isNotEmpty
-            ? ListView.builder(
-          itemCount: tradeDataList.length,
-          itemBuilder: (context, index) {
-            Map<String, dynamic> tradeData = tradeDataList[index];
-            return GestureDetector(
-              onTap: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) => HistoryDetailInfo()));
-              },
-              child: ListCard(
-                created_at: tradeData['created_at'],
-                companyCeo: tradeData['companyCeo'],
-                companyName: tradeData['companyName'],
-                trade_name: tradeData['trade_name'],
-                trade_price: tradeData['trade_price'],
-                buyer: tradeData['buyer'],
-              ),
-            );
+        padding: EdgeInsets.all(13.0),
+        color: SettingStyle.GREY_COLOR,
+        child: RefreshIndicator(
+          onRefresh: () async {
+            setState(() {
+              _isLoading = true;
+            });
+            _initData();
           },
-        )
-            : const Text('등록된 데이터가 없습니다'),
+          child: ListView.builder(
+                  itemCount: groupTradeList.length,
+                  itemBuilder: (context, index) {
+                    GroupTrade item = groupTradeList[index];
+                    return GestureDetector(
+                      onTap: () {
+                        Navigator.pushNamed(
+                            context, '/trade/history/info',
+                            arguments: {'tradeId': groupTradeList[index].has_trade!.id});
+                      },
+                      child: ListGroupTradeCard(item: item),
+                    );
+                  },
+                ),
+        ),
       ),
-    );
+    ) : NoItems();
   }
 }
-

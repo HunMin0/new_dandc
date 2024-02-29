@@ -2,12 +2,11 @@ import 'package:Deal_Connect/api/group.dart';
 import 'package:Deal_Connect/components/layout/default_search_layout.dart';
 import 'package:Deal_Connect/components/list_card.dart';
 import 'package:Deal_Connect/components/grid_group_card.dart';
+import 'package:Deal_Connect/components/loading.dart';
 import 'package:Deal_Connect/components/no_items.dart';
 import 'package:Deal_Connect/db/group_data.dart';
 import 'package:Deal_Connect/db/vertical_data.dart';
 import 'package:Deal_Connect/model/group.dart';
-import 'package:Deal_Connect/pages/group/group_view.dart';
-import 'package:Deal_Connect/pages/search/components/search_keyword_item.dart';
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
 
@@ -21,6 +20,7 @@ class GroupSearchIndex extends StatefulWidget {
 class _GroupSearchIndexState extends State<GroupSearchIndex> {
   List<Group>? groups;
   String? searchKeyword = '';
+  bool _isLoading = true;
 
   @override
   void initState() {
@@ -40,6 +40,7 @@ class _GroupSearchIndexState extends State<GroupSearchIndex> {
         setState(() {
           if (groups != null) {
             this.groups = groups;
+            _isLoading = false;
           }
         });
       }
@@ -48,6 +49,10 @@ class _GroupSearchIndexState extends State<GroupSearchIndex> {
 
   @override
   Widget build(BuildContext context) {
+    if (_isLoading) {
+      // 로딩 중 인디케이터 표시
+      return Loading();
+    }
     return DefaultSearchLayout(
       isNotInnerPadding: 'true',
       onSubmit: (keyword) {
@@ -56,12 +61,12 @@ class _GroupSearchIndexState extends State<GroupSearchIndex> {
         });
         _initGroupData();
       },
-      child: GestureDetector(
+      child: groups != null && groups!.isNotEmpty
+          ? GestureDetector(
           onTap: () {
             FocusScope.of(context).requestFocus(FocusNode());
           },
-          child: groups != null
-              ? Container(
+          child: Container(
               padding: EdgeInsets.all(10.0),
               height: double.infinity,
               color: Color(0xFFF5F6FA),
@@ -87,7 +92,7 @@ class _GroupSearchIndexState extends State<GroupSearchIndex> {
                 },
               ),
                               )
-              : NoItems()),
+      ) : NoItems(),
     );
   }
 }

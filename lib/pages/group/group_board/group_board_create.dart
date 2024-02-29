@@ -1,12 +1,8 @@
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:Deal_Connect/api/board.dart';
 import 'package:Deal_Connect/components/alert/show_complete_dialog.dart';
 import 'package:Deal_Connect/components/const/setting_style.dart';
-import 'package:Deal_Connect/components/custom/input_file_grid.dart';
-import 'package:Deal_Connect/components/custom/join_text_form_field.dart';
-import 'package:Deal_Connect/components/layout/default_logo_layout.dart';
 import 'package:Deal_Connect/components/layout/default_next_layout.dart';
 import 'package:Deal_Connect/components/loading.dart';
 import 'package:Deal_Connect/items/image_picker_item.dart';
@@ -30,7 +26,6 @@ class _GroupBoardCreateState extends State<GroupBoardCreate> {
   File? _pickedImage;
   List <ImagePickerItem> boardImageList = [];
 
-  TextEditingController _controller = TextEditingController();
   TextEditingController _titleController = TextEditingController();
   TextEditingController _contentController = TextEditingController();
   int? groupId;

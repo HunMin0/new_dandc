@@ -1,7 +1,21 @@
+import 'package:Deal_Connect/Utils/custom_dialog.dart';
+import 'package:Deal_Connect/api/trade.dart';
+import 'package:Deal_Connect/components/alert/show_complete_dialog.dart';
+import 'package:Deal_Connect/components/common_item/color_chip.dart';
+import 'package:Deal_Connect/components/common_item/expended_elevated_button.dart';
+import 'package:Deal_Connect/components/common_item/stack_thumbnail.dart';
+import 'package:Deal_Connect/components/const/setting_style.dart';
 import 'package:Deal_Connect/components/layout/default_logo_layout.dart';
+import 'package:Deal_Connect/components/loading.dart';
+import 'package:Deal_Connect/model/trade.dart';
+import 'package:Deal_Connect/model/user.dart';
 import 'package:Deal_Connect/pages/history/history_detail/reciept_view.dart';
+import 'package:Deal_Connect/utils/shared_pref_utils.dart';
+import 'package:Deal_Connect/utils/utils.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:hexcolor/hexcolor.dart';
 
 class HistoryDetailInfo extends StatefulWidget {
@@ -12,8 +26,145 @@ class HistoryDetailInfo extends StatefulWidget {
 }
 
 class _HistoryDetailInfoState extends State<HistoryDetailInfo> {
+  bool _isLoading = true;
+  int? tradeId;
+  Trade? tradeData;
+  User? myUser;
+
+  var args;
+
+  @override
+  void initState() {
+    _initMyUser();
+    _initData();
+    super.initState();
+  }
+
+  void _initMyUser() {
+    SharedPrefUtils.getUser().then((value) => myUser = value);
+  }
+
+  void _initData() async {
+    final widgetsBinding = WidgetsBinding.instance;
+    widgetsBinding?.addPostFrameCallback((callback) async {
+      if (ModalRoute.of(context)?.settings.arguments != null) {
+        setState(() {
+          args = ModalRoute.of(context)?.settings.arguments;
+        });
+
+        if (args != null) {
+          setState(() {
+            tradeId = args['tradeId'];
+          });
+        }
+        if (tradeId != null) {
+          await getTrade(tradeId!).then((response) {
+            if (response.status == 'success') {
+              Trade resultData = Trade.fromJSON(response.data);
+              setState(() {
+                tradeData = resultData;
+              });
+            } else {
+              Fluttertoast.showToast(
+                  msg: '파트너 정보를 받아오는 도중 오류가 발생했습니다.\n오류코드: 463');
+            }
+          });
+        }
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    if (_isLoading || tradeData == null) {
+      return Loading();
+    }
+
+    ImageProvider? receiptThumbnailImage =
+        AssetImage('assets/images/no-image.png');
+
+    ImageProvider? ownerProfileThumbnailImage =
+        AssetImage('assets/images/no-image.png');
+    ImageProvider? businessThumbnailImage =
+        AssetImage('assets/images/no-image.png');
+
+    String buttonStatus = 'approved';
+    //내가 응답해야 하고
+    if (tradeData!.response_user_id == myUser!.id) {
+      //상태가 대기이면
+      if (tradeData!.trade_status == 'pending') {
+        //내 승인대기로 >> 승인, 반려 버튼 노출
+        buttonStatus = 'approve_or_reject';
+      }
+    }
+
+    //내가 보낸 요청의 경우
+    if (tradeData!.request_user_id == myUser!.id) {
+      if (tradeData!.trade_status == 'pending') {
+        //대기중, 취소 버튼 노출
+        buttonStatus = 'pending_or_cancel';
+      }
+    }
+
+    if (tradeData != null) {
+      if (tradeData!.has_receipt_image != null) {
+        final receiptImage = tradeData!.has_receipt_image!;
+        receiptThumbnailImage = CachedNetworkImageProvider(
+          Utils.getImageFilePath(receiptImage),
+        );
+      }
+
+      if (tradeData!.has_business_owner != null &&
+          tradeData!.has_business_owner!.has_user_profile != null &&
+          tradeData!.has_business_owner!.has_user_profile!.has_profile_image !=
+              null) {
+        final ownerProfileImage =
+            tradeData!.has_business_owner!.has_user_profile!.has_profile_image!;
+        ownerProfileThumbnailImage = CachedNetworkImageProvider(
+          Utils.getImageFilePath(ownerProfileImage),
+        );
+      }
+
+      if (tradeData!.has_business != null &&
+          tradeData!.has_business!.has_business_image != null) {
+        final businessImage = tradeData!.has_business!.has_business_image!;
+        businessThumbnailImage = CachedNetworkImageProvider(
+          Utils.getImageFilePath(businessImage),
+        );
+      }
+    }
+
+    ImageProvider? userProfileThumbnailImage =
+        AssetImage('assets/images/no-image.png');
+    ImageProvider? userBusinessThumbnailImage =
+        AssetImage('assets/images/no-image.png');
+
+    if (tradeData != null) {
+      if (tradeData!.has_buy_user != null &&
+          tradeData!.has_buy_user!.has_user_profile != null &&
+          tradeData!.has_buy_user!.has_user_profile!.has_profile_image !=
+              null) {
+        final userProfileImage =
+            tradeData!.has_buy_user!.has_user_profile!.has_profile_image!;
+        userProfileThumbnailImage = CachedNetworkImageProvider(
+          Utils.getImageFilePath(userProfileImage),
+        );
+      }
+
+      if (tradeData!.has_buy_user != null &&
+          tradeData!.has_buy_user!.main_business != null &&
+          tradeData!.has_buy_user!.main_business!.has_business_image != null) {
+        final userBusinessImage =
+            tradeData!.has_buy_user!.main_business!.has_business_image!;
+        userBusinessThumbnailImage = CachedNetworkImageProvider(
+          Utils.getImageFilePath(userBusinessImage),
+        );
+      }
+    }
+
     return DefaultLogoLayout(
       titleName: '거래내역 상세',
       isNotInnerPadding: 'true',
@@ -22,27 +173,38 @@ class _HistoryDetailInfoState extends State<HistoryDetailInfo> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Padding(
-              padding: EdgeInsets.symmetric(vertical: 30),
+              padding: const EdgeInsets.symmetric(vertical: 30),
               child: Column(
                 children: [
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      Spacer(),
-                      Container(
+                      const Spacer(),
+                      SizedBox(
                         width: 100,
                         child: Column(
                           children: [
-                            _ListLeftBg(),
-                            SizedBox(
+                            StackThumbNail(
+                                profileThumbnailImage:
+                                    ownerProfileThumbnailImage,
+                                businessThumbnailImage: businessThumbnailImage),
+                            const SizedBox(
                               height: 7,
                             ),
                             Text(
-                              '(나)하남돼지집',
-                              style: TextStyle(fontWeight: FontWeight.bold),
+                              tradeData != null &&
+                                      tradeData!.has_business != null
+                                  ? tradeData!.has_business!.name
+                                  : '',
+                              style:
+                                  const TextStyle(fontWeight: FontWeight.bold),
+                              overflow: TextOverflow.ellipsis,
                             ),
                             Text(
-                              '홍길동',
+                              tradeData != null &&
+                                      tradeData!.has_business_owner != null
+                                  ? tradeData!.has_business_owner!.name
+                                  : '',
                               style: TextStyle(fontSize: 12),
                             ),
                           ],
@@ -51,56 +213,128 @@ class _HistoryDetailInfoState extends State<HistoryDetailInfo> {
                       Spacer(),
                       Column(
                         children: [
-                          Icon(Icons.compare_arrows_rounded, size: 50, color: HexColor("#aaaaaa"),),
-                          SizedBox(
+                          Icon(
+                            CupertinoIcons.right_chevron,
+                            size: 50,
+                            color: HexColor("#aaaaaa"),
+                          ),
+                          const SizedBox(
                             height: 10,
                           ),
-                          Text(
-                            '2,500,000원',
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 15),
-                          ),
-                          Text('판매')
+                          Text(tradeData!.trade_type == 'sell' ? '판매' : '구매')
                         ],
                       ),
-                      Spacer(),
-                      Container(
+                      const Spacer(),
+                      SizedBox(
                         width: 100,
                         child: Column(
                           children: [
-                            _ListLeftBg(),
-                            SizedBox(
+                            StackThumbNail(
+                                profileThumbnailImage:
+                                    userProfileThumbnailImage,
+                                businessThumbnailImage:
+                                    userBusinessThumbnailImage),
+                            const SizedBox(
                               height: 7,
                             ),
                             Text(
-                              '김철수',
-                              style: TextStyle(fontWeight: FontWeight.bold),
+                              tradeData != null &&
+                                      tradeData!.has_buy_user != null
+                                  ? tradeData!.has_buy_user!.name
+                                  : '',
+                              style:
+                                  const TextStyle(fontWeight: FontWeight.bold),
                             ),
                             Text(
-                              '다이소, 김밥천국, 틈새라면',
+                              tradeData != null &&
+                                      tradeData!.has_buy_user != null &&
+                                      tradeData!.has_buy_user!.main_business !=
+                                          null
+                                  ? tradeData!.has_buy_user!.main_business!.name
+                                  : '',
                               style: TextStyle(fontSize: 12),
                               overflow: TextOverflow.ellipsis,
                             ),
                           ],
                         ),
                       ),
-                      Spacer(),
+                      const Spacer(),
                     ],
                   ),
                 ],
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 15.0),
-              child: Row(
-                children: [
-                  _reanderButton(btnName: '승인', onPressed: (){},),
-                  SizedBox(
-                    width: 10.0,
-                  ),
-                  _reanderButton(btnName: '반려', onPressed: (){},),
-                ],
+            if (buttonStatus == 'approve_or_reject')
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                child: Row(
+                  children: [
+                    ExpendedElevatedButton(
+                      btnName: '승인',
+                      onPressed: () {
+                        Navigator.pushNamed(
+                            context, '/trade/history/info/confirm', arguments: {
+                          'tradeData': tradeData!,
+                          'division': 'approved'
+                        }).then((value) {
+                          _initData();
+                        });
+                      },
+                    ),
+                    const SizedBox(
+                      width: 10.0,
+                    ),
+                    ExpendedElevatedButton(
+                      btnName: '반려',
+                      textColor: HexColor("#ff4433"),
+                      onPressed: () {
+                        Navigator.pushNamed(
+                            context, '/trade/history/info/confirm', arguments: {
+                          'tradeData': tradeData!,
+                          'division': 'rejected'
+                        }).then((value) {
+                          _initData();
+                        });
+                      },
+                    ),
+                  ],
+                ),
               ),
+            if (buttonStatus == 'pending_or_cancel')
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                child: Column(
+                  children: [
+                    Row(
+                      children: [
+                        ExpendedElevatedButton(
+                          btnName: '대기중',
+                          onPressed: () {},
+                        ),
+                        const SizedBox(
+                          width: 10.0,
+                        ),
+                        ExpendedElevatedButton(
+                          btnName: '삭제',
+                          textColor: HexColor("#ff4433"),
+                          onPressed: () {
+                            _submitManage('delete');
+                          },
+                        ),
+                      ],
+                    ),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    Text(
+                      '[승인대기] 상태에서만 삭제가 가능합니다.',
+                      style: SettingStyle.SUB_GREY_TEXT,
+                    )
+                  ],
+                ),
+              ),
+            const SizedBox(
+              height: 30,
             ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20.0),
@@ -109,22 +343,30 @@ class _HistoryDetailInfoState extends State<HistoryDetailInfo> {
                 children: [
                   Row(
                     children: [
-                      Text(
+                      const Text(
                         "거래 정보",
-                        style:
-                            TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                        style: SettingStyle.SUB_TITLE_STYLE,
                       ),
                       Spacer(),
                       TextButton(
                         onPressed: () {
-                          Navigator.push(context, MaterialPageRoute(builder: (context) => RecieptView()));
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => ReceiptView(
+                                      receiptImage: receiptThumbnailImage!)));
                         },
-                        child: Text("영수증 확인", style: TextStyle( color: HexColor("#75A8E4"), fontWeight: FontWeight.bold ),),
+                        child: Text(
+                          "영수증 확인",
+                          style: TextStyle(
+                              color: HexColor("#75A8E4"),
+                              fontWeight: FontWeight.bold),
+                        ),
                       )
                     ],
                   ),
                   Container(
-                    padding: EdgeInsets.all(10.0),
+                    padding: const EdgeInsets.all(10.0),
                     decoration: BoxDecoration(
                       color: HexColor("#F5F6FA"),
                       borderRadius: BorderRadius.circular(10.0),
@@ -133,22 +375,57 @@ class _HistoryDetailInfoState extends State<HistoryDetailInfo> {
                       children: [
                         Row(
                           children: [
+                            const Text("상태"),
+                            const Spacer(),
+                            if (tradeData!.trade_status == 'rejected')
+                              ColorChip(
+                                color: HexColor("#aa5544"),
+                                textColor: HexColor("#ffffff"),
+                                chipText: '반려',
+                              ),
+                            if (tradeData!.trade_status == 'pending')
+                              ColorChip(
+                                color: HexColor("#44aa44"),
+                                textColor: HexColor("#ffffff"),
+                                chipText: '승인대기',
+                              ),
+                            if (tradeData!.trade_status == 'approved')
+                              ColorChip(
+                                color: HexColor("#4455aa"),
+                                textColor: HexColor("#ffffff"),
+                                chipText: '승인',
+                              ),
+                          ],
+                        ),
+                        SizedBox(
+                          height: 4,
+                        ),
+                        Row(
+                          children: [
                             Text("거래일자"),
                             Spacer(),
-                            Text("2023-01-01 15:23")
+                            Text(tradeData!.traded_at!.substring(0, 11) ?? '')
                           ],
                         ),
                         SizedBox(
                           height: 5,
                         ),
                         Row(
-                          children: [Text("거래항목"), Spacer(), Text("삼겹살, 목살")],
+                          children: [
+                            Text("거래항목"),
+                            Spacer(),
+                            Text(tradeData!.trade_services)
+                          ],
                         ),
                         SizedBox(
                           height: 5,
                         ),
                         Row(
-                          children: [Text("거래금액"), Spacer(), Text("320,000원")],
+                          children: [
+                            Text("거래금액"),
+                            Spacer(),
+                            Text(Utils.parsePrice(tradeData!.price))
+                          ],
                         ),
                       ],
                     ),
@@ -156,40 +433,57 @@ class _HistoryDetailInfoState extends State<HistoryDetailInfo> {
                   SizedBox(
                     height: 20,
                   ),
-                  Text(
-                    "[김철수]님 한마디",
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-                  ),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  Container(
-                      padding: EdgeInsets.all(10.0),
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        color: HexColor("#F5F6FA"),
-                        borderRadius: BorderRadius.circular(10.0),
-                      ),
-                      child: Text("맛깔나게 !맛깔나게 잘먹었습니다!맛깔나게 잘먹었습니다!맛깔나게 잘먹었습니다!맛깔나게 잘먹었습니다!맛깔나게 잘먹었습니다!맛깔나게 잘먹었습니다!맛깔나게 잘먹었습니다!맛깔나게 잘먹었습니다!맛깔나게 잘먹었습니다!맛깔나게 잘먹었습니다!맛깔나게 잘먹었습니다!맛깔나게 잘먹었습니다!맛깔나게 잘먹었습니다!맛깔나게 잘먹었습니다!맛깔나게 잘먹었습니다!맛깔나게 잘먹었습니다!맛깔나게 잘먹었습니다!맛깔나게 잘먹었습니다!맛깔나게 잘먹었습니다!")),
-                  SizedBox(
+                  if (tradeData!.user_description != null)
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "[${tradeData!.has_buy_user!.name}]님 한마디",
+                          style: SettingStyle.SUB_TITLE_STYLE,
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        Container(
+                          padding: EdgeInsets.all(10.0),
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            color: HexColor("#F5F6FA"),
+                            borderRadius: BorderRadius.circular(10.0),
+                          ),
+                          child: Text(tradeData?.user_description ?? ''),
+                        ),
+                      ],
+                    ),
+                  const SizedBox(
                     height: 20,
                   ),
-                  Text(
-                    "[하남돼지집]님 한마디",
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                  if (tradeData!.business_user_description != null)
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "[${tradeData!.has_business!.name}]님 한마디",
+                          style: SettingStyle.SUB_TITLE_STYLE,
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        Container(
+                          padding: EdgeInsets.all(10.0),
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            color: HexColor("#F5F6FA"),
+                            borderRadius: BorderRadius.circular(10.0),
+                          ),
+                          child:
+                              Text(tradeData?.business_user_description ?? ''),
+                        )
+                      ],
+                    ),
+                  const SizedBox(
+                    height: 40,
                   ),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  Container(
-                      padding: EdgeInsets.all(10.0),
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        color: HexColor("#F5F6FA"),
-                        borderRadius: BorderRadius.circular(10.0),
-                      ),
-                      child: Text("와주셔서 감사합니다!")),
-                  SizedBox(height: 40,),
                 ],
               ),
             )
@@ -199,78 +493,90 @@ class _HistoryDetailInfoState extends State<HistoryDetailInfo> {
     );
   }
 
-  Stack _ListLeftBg() {
-    return Stack(
-      //overflow: Overflow.visible,
-      clipBehavior: Clip.none,
-      children: [
-        Container(
-          width: 100,
-          height: 70,
-          decoration: BoxDecoration(
-            image: DecorationImage(
-              image: AssetImage('assets/images/sample/main_sample01.jpg'),
-              fit: BoxFit.cover,
-            ),
-            borderRadius: BorderRadius.circular(10.0),
-          ),
-        ),
-        Positioned(
-          left: -8.0,
-          bottom: -8.0,
-          child: Container(
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(
-                color: Colors.white,
-                width: 2.0,
-              ),
-            ),
-            child: CircleAvatar(
-              radius: 18.0,
-              backgroundImage:
-                  AssetImage('assets/images/sample/main_sample_avater.jpg'),
-            ),
-          ),
-        ),
-      ],
-    );
+  void _submitManage(String mode) {
+    if (mode == 'delete') {
+      CustomDialog.showDoubleBtnDialog(
+          context: context,
+          msg: '정말 삭제하시겠습니까?',
+          rightBtnText: '삭제',
+          onLeftBtnClick: () {},
+          onRightBtnClick: () {
+            _deleteSubmit();
+          });
+    }
+    if (mode == 'approved') {
+      CustomDialog.showDoubleBtnDialog(
+          context: context,
+          msg: '정말 승인 하시겠습니까?',
+          rightBtnText: '승인',
+          onLeftBtnClick: () {},
+          onRightBtnClick: () {
+            _manageSubmit('approved');
+          });
+    }
+    if (mode == 'rejected') {
+      CustomDialog.showDoubleBtnDialog(
+          context: context,
+          msg: '정말 반려 하시겠습니까?',
+          rightBtnText: '반려',
+          onLeftBtnClick: () {},
+          onRightBtnClick: () {});
+    }
+  }
+
+  void _deleteSubmit() {
+    CustomDialog.showProgressDialog(context);
+
+    deleteTrade(tradeData!.id).then((response) async {
+      CustomDialog.dismissProgressDialog();
+
+      if (response.status == 'success') {
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (BuildContext context) {
+            return ShowCompleteDialog(
+              messageTitle: '삭제 완료',
+              messageText: '삭제가 완료 되었습니다.',
+              buttonText: '확인',
+              onConfirmed: () {
+                Navigator.of(context).pop();
+                Navigator.of(context).pop();
+                Navigator.of(context).pop();
+              },
+            );
+          },
+        );
+      } else {
+        CustomDialog.showServerValidatorErrorMsg(response);
+      }
+    });
+  }
+
+  void _manageSubmit(String tradeStatus) {
+    CustomDialog.showProgressDialog(context);
+    manageTrade(tradeData!.id, {'trade_status': tradeStatus})
+        .then((response) async {
+      CustomDialog.dismissProgressDialog();
+      if (response.status == 'success') {
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (BuildContext context) {
+            return ShowCompleteDialog(
+              messageTitle: '승인 완료',
+              messageText: '승인이 완료 되었습니다.',
+              buttonText: '확인',
+              onConfirmed: () {
+                Navigator.of(context).pop();
+                Navigator.of(context).pop();
+              },
+            );
+          },
+        );
+      } else {
+        CustomDialog.showServerValidatorErrorMsg(response);
+      }
+    });
   }
 }
-
-
-class _reanderButton extends StatelessWidget {
-  final String btnName;
-  final VoidCallback onPressed;
-
-  const _reanderButton({
-    required this.btnName,
-    required this.onPressed,
-    super.key,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Expanded(
-      child: ElevatedButton(
-        onPressed: onPressed,
-        child: Text(
-          btnName,
-          style: TextStyle(
-              color: Colors.black,
-              fontSize: 14.0,
-              fontWeight: FontWeight.w500),
-        ),
-        style: ElevatedButton.styleFrom(
-          minimumSize: Size(double.infinity, 50),
-          backgroundColor: Color(0xFFF5F6FA),
-          foregroundColor: Color(0xFFF5F6FA),
-          elevation: 0,
-          shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8.0)),
-        ),
-      ),
-    );
-  }
-}
-

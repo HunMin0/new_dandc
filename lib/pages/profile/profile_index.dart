@@ -1,5 +1,6 @@
 import 'package:Deal_Connect/api/auth.dart';
 import 'package:Deal_Connect/api/business.dart';
+import 'package:Deal_Connect/components/common_item/grey_chip.dart';
 import 'package:Deal_Connect/components/layout/default_basic_layout.dart';
 import 'package:Deal_Connect/components/list_row_business_card.dart';
 import 'package:Deal_Connect/components/loading.dart';
@@ -40,7 +41,7 @@ class _ProfileIndexState extends State<ProfileIndex>
   bool _isLoading = true;
   User? myUser; // 저장 된 내 정보
   User? ProfileUserData;
-  List<UserBusiness>? userBusiness; //사업장
+  List<UserBusiness>? userBusinessList; //사업장
   var myPageData;
 
   @override
@@ -104,7 +105,7 @@ class _ProfileIndexState extends State<ProfileIndex>
   }
 
   void _initUserBusinessData() {
-    getUserBusinessData().then((response) {
+    getUserBusinesses(queryMap: {'is_mine': true}).then((response) {
       if (response.status == 'success') {
         Iterable iterable = response.data;
 
@@ -113,7 +114,7 @@ class _ProfileIndexState extends State<ProfileIndex>
 
         setState(() {
           if (userBusiness != null) {
-            this.userBusiness = userBusiness;
+            this.userBusinessList = userBusiness;
           }
         });
       }
@@ -133,10 +134,17 @@ class _ProfileIndexState extends State<ProfileIndex>
     } else {
       backgroundImage = AssetImage('assets/images/no-image.png');
     }
+
+    int tradeAmount = 0;
+    if (myPageData?['trade_amount'] != null && myPageData!['trade_amount'] is String) {
+      tradeAmount = int.tryParse(myPageData!['trade_amount']) ?? 0; // tryParse 사용하여 안전하게 변환
+    }
+
     if (_isLoading) {
       // 로딩 중 인디케이터 표시
       return Loading();
     }
+
     return DefaultBasicLayout(
       child: NestedScrollView(
         headerSliverBuilder: (context, innerBoxIsScrolled) {
@@ -146,7 +154,7 @@ class _ProfileIndexState extends State<ProfileIndex>
               expandedHeight: 270.0,
               flexibleSpace: FlexibleSpaceBar(
                 background: Padding(
-                  padding: EdgeInsets.all(12.0),
+                  padding: const EdgeInsets.all(12.0),
                   child: Column(
                     children: [
                       Row(
@@ -171,7 +179,7 @@ class _ProfileIndexState extends State<ProfileIndex>
                                     fontSize: 18.0,
                                   ),
                                 ),
-                                SizedBox(
+                                const SizedBox(
                                   height: 5.0,
                                 ),
                                 if (ProfileUserData != null)
@@ -184,6 +192,7 @@ class _ProfileIndexState extends State<ProfileIndex>
                               ],
                             ),
                           ),
+                          SizedBox(width: 20,),
                           GestureDetector(
                             onTap: () {
                               Navigator.pushNamed(context, '/profile/edit')
@@ -192,17 +201,17 @@ class _ProfileIndexState extends State<ProfileIndex>
                               });
                             },
                             child: Icon(
-                              Icons.edit_note,
+                              CupertinoIcons.person_crop_square,
                               color: HexColor("#dddddd"),
                               size: 30,
                             ),
                           ),
-                          SizedBox(
+                          const SizedBox(
                             width: 10,
                           )
                         ],
                       ),
-                      SizedBox(
+                      const SizedBox(
                         height: 24.0,
                       ),
                       IntrinsicHeight(
@@ -236,7 +245,7 @@ class _ProfileIndexState extends State<ProfileIndex>
                                 widget.onTab(1);
                               },
                               child: _buildUserTab(
-                                myPageData?['trade_amount'].toString() ?? '0',
+                                Utils.parsePrice(tradeAmount),
                                 '거래내역',
                               ),
                             ),
@@ -246,7 +255,110 @@ class _ProfileIndexState extends State<ProfileIndex>
                       SizedBox(
                         height: 24.0,
                       ),
-                      ProfileUserButton(),
+                      Row(
+                        children: [
+                          _reanderButton(
+                            btnName: '프로필 공유하기',
+                            onPressed: () {
+                              showModalBottomSheet(
+                                  backgroundColor: Colors.white,
+                                  showDragHandle: false,
+                                  context: context,
+                                  builder: (_) {
+                                    return Container(
+                                      width: double.infinity,
+                                      height: 150,
+                                      padding: EdgeInsets.only(top: 20.0),
+                                      color: HexColor("FFFFFF"),
+                                      child: const Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        children: [
+                                          Text("공유 방법을 선택해주세요."),
+                                          SizedBox(
+                                            height: 20,
+                                          ),
+                                          Expanded(
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.center,
+                                              children: [
+                                                Spacer(),
+                                                Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.center,
+                                                  children: [
+                                                    Icon(Icons.messenger),
+                                                    SizedBox(
+                                                      height: 5,
+                                                    ),
+                                                    Text("문자")
+                                                  ],
+                                                ),
+                                                Spacer(),
+                                                Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.center,
+                                                  children: [
+                                                    Icon(Icons.messenger),
+                                                    SizedBox(
+                                                      height: 5,
+                                                    ),
+                                                    Text("카카오")
+                                                  ],
+                                                ),
+                                                Spacer(),
+                                                Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.center,
+                                                  children: [
+                                                    Icon(Icons.messenger),
+                                                    SizedBox(
+                                                      height: 5,
+                                                    ),
+                                                    Text("뭐시기")
+                                                  ],
+                                                ),
+                                                Spacer(),
+                                                Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.center,
+                                                  children: [
+                                                    Icon(Icons.messenger),
+                                                    SizedBox(
+                                                      height: 5,
+                                                    ),
+                                                    Text("문자")
+                                                  ],
+                                                ),
+                                                Spacer(),
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  });
+                            },
+                          ),
+                          SizedBox(
+                            width: 10.0,
+                          ),
+                          _reanderButton(
+                            alertCount: (myPageData != null ? myPageData['partner_want_approved_count'] : 0) ?? 0,
+                            btnName: '파트너 신청 확인하기',
+                            onPressed: () {
+                              Navigator.pushNamed(
+                                  context, '/profile/partner/attends',
+                                  ).then((value) {
+                                _initMyUserData();
+                              });
+                            },
+                          ),
+                        ],
+                      ),
                       SizedBox(
                         height: 24.0,
                       ),
@@ -279,48 +391,59 @@ class _ProfileIndexState extends State<ProfileIndex>
           child: TabBarView(
             controller: tabController,
             children: [
-              SizedBox(
-                child: (userBusiness != null && userBusiness!.isNotEmpty)
-                    ? CustomScrollView(
-                        slivers: [
-                          SliverList(
-                            delegate: SliverChildBuilderDelegate(
-                                (BuildContext context, int index) {
-                              UserBusiness item = userBusiness![index];
-                              return GestureDetector(
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    CupertinoPageRoute(
-                                        builder: (context) =>
-                                            BusinessDetailInfo()),
-                                  );
-                                },
-                                child: ListRowBusinessCard(item: item),
-                              );
-                            }, childCount: userBusiness!.length),
-                          ),
-                          SliverToBoxAdapter(
-                            child: Padding(
-                              padding: const EdgeInsets.only(
-                                  top: 10.0, bottom: 40.0),
-                              child: Row(
-                                children: [
-                                  Expanded(
-                                    child: TabBarButton(
-                                        btnTitle: '내 업체 추가하기',
-                                        onPressed: () {
-                                          Navigator.pushNamed(context,
-                                              '/profile/company/create');
-                                        }),
-                                  ),
-                                ],
+              RefreshIndicator(
+                onRefresh: () async {
+                  setState(() {
+                    _isLoading = true;
+                  });
+                  _initMyUserData();
+                },
+                child: SizedBox(
+                  child: (userBusinessList != null &&
+                          userBusinessList!.isNotEmpty)
+                      ? CustomScrollView(
+                          slivers: [
+                            SliverList(
+                              delegate: SliverChildBuilderDelegate(
+                                  (BuildContext context, int index) {
+                                UserBusiness item = userBusinessList![index];
+                                return GestureDetector(
+                                    onTap: () {
+                                      Navigator.pushNamed(
+                                          context, '/business/info', arguments: {
+                                        "userBusinessId": item.id
+                                      }).then((value) {
+                                        _initMyUserData();
+                                      });
+                                    },
+                                    child: ListRowBusinessCard(item: item));
+                              }, childCount: userBusinessList!.length),
+                            ),
+                            SliverToBoxAdapter(
+                              child: Padding(
+                                padding: const EdgeInsets.only(
+                                    top: 10.0, bottom: 40.0),
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      child: TabBarButton(
+                                          btnTitle: '내 업체 추가하기',
+                                          onPressed: () {
+                                            Navigator.pushNamed(context,
+                                                    '/profile/company/create')
+                                                .then((value) {
+                                              _initMyUserData();
+                                            });
+                                          }),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
-                          ),
-                        ],
-                      )
-                    : NotUserRegistered(isTabType: true),
+                          ],
+                        )
+                      : NotUserRegistered(isTabType: true),
+                ),
               ),
               SizedBox(
                 child: postDataList.isNotEmpty
@@ -337,8 +460,7 @@ class _ProfileIndexState extends State<ProfileIndex>
                                   Navigator.push(
                                     context,
                                     CupertinoPageRoute(
-                                        builder: (context) =>
-                                            GroupBoardInfo()),
+                                        builder: (context) => GroupBoardInfo()),
                                   );
                                 },
                                 child: PostListCard(
@@ -372,39 +494,13 @@ class _ProfileIndexState extends State<ProfileIndex>
   Widget _buildTags(List<UserKeyword> tagList) {
     List<Widget> tagWidgets = [];
     for (int i = 0; i < tagList.length; i++) {
-      if (i < 3) {
-        // 최대 3개 태그만 표시
         tagWidgets.add(Padding(
           padding: const EdgeInsets.only(right: 5.0),
-          child: _cardTag(
-              tagList[i] as UserKeyword), // tagList[i]는 Map<String, dynamic> 타입
+          child: GreyChip(chipText: '#' + tagList[i].keyword),
         ));
-      } else {
-        break;
-      }
     }
 
     return Row(children: tagWidgets);
-  }
-
-  // 태그 공통
-  Container _cardTag(UserKeyword text) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Color(0xFFf5f6fa),
-        borderRadius: BorderRadius.circular(10.0),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 7.0),
-        child: Text(
-          '#' + text.keyword,
-          style: TextStyle(
-              color: Color(0xFF5f5f66),
-              fontSize: 11.0,
-              fontWeight: FontWeight.w500),
-        ),
-      ),
-    );
   }
 }
 
@@ -495,4 +591,55 @@ Widget _buildTabLine() {
     height: double.infinity,
     color: const Color(0xFFD9D9D9),
   );
+}
+class _reanderButton extends StatelessWidget {
+  final String btnName;
+  final VoidCallback onPressed;
+  final int? alertCount;
+
+  const _reanderButton({
+    required this.btnName,
+    required this.onPressed,
+    this.alertCount = 0,
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: Stack(
+        alignment: Alignment.centerRight, // 버튼 내 우측 정렬
+        children: [
+          ElevatedButton(
+            onPressed: onPressed,
+            child: Text(
+              btnName,
+              style: TextStyle(
+                  color: Colors.black, fontSize: 14.0, fontWeight: FontWeight.w500),
+            ),
+            style: ElevatedButton.styleFrom(
+              minimumSize: Size(double.infinity, 50),
+              backgroundColor: Color(0xFFF5F6FA),
+              foregroundColor: Color(0xFFF5F6FA),
+              elevation: 0,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
+            ),
+          ),
+          if (alertCount != null && alertCount! > 0) // 알림 숫자가 0보다 클 때만 뱃지 표시
+            Positioned(
+              left: 5, // 우측 여백
+              top: 5, // 상단 여백
+              child: Container(
+                width: 10,
+                height: 10,
+                decoration: BoxDecoration(
+                  color: Colors.red, // 뱃지 배경색
+                  shape: BoxShape.circle, // 원형 뱃지
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
 }

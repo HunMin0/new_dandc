@@ -1,3 +1,4 @@
+import 'package:Deal_Connect/model/user.dart';
 import 'package:flutter/material.dart';
 
 class ListCard extends StatelessWidget {

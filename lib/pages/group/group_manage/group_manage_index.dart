@@ -25,15 +25,9 @@ class _GroupManageIndexState extends State<GroupManageIndex> {
 
     final widgetsBinding = WidgetsBinding.instance;
     widgetsBinding?.addPostFrameCallback((callback) async {
-      if (ModalRoute
-          .of(context)
-          ?.settings
-          .arguments != null) {
+      if (ModalRoute.of(context)?.settings.arguments != null) {
         setState(() {
-          args = ModalRoute
-              .of(context)
-              ?.settings
-              .arguments;
+          args = ModalRoute.of(context)?.settings.arguments;
         });
 
         if (args != null) {
@@ -53,9 +47,9 @@ class _GroupManageIndexState extends State<GroupManageIndex> {
         color: Colors.black, fontSize: 20, fontWeight: FontWeight.bold);
 
     return DefaultLogoLayout(
-        titleName: groupName,
-        isNotInnerPadding: 'true',
-        child: Padding(
+      titleName: groupName,
+      isNotInnerPadding: 'true',
+      child: Padding(
         padding: const EdgeInsets.all(15.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
@@ -74,10 +68,13 @@ class _GroupManageIndexState extends State<GroupManageIndex> {
                 children: [
                   InkWell(
                     onTap: () {
-                      Navigator.pushNamed(context, '/group/manage/info', arguments: { "groupId": groupId, "groupName": groupName });
+                      Navigator.pushNamed(context, '/group/edit',
+                          arguments: {
+                            "groupId": groupId,
+                            "groupName": groupName
+                          });
                     },
-                    child:
-                    Stack(
+                    child: Stack(
                       clipBehavior: Clip.none,
                       children: [
                         Container(
@@ -109,8 +106,7 @@ class _GroupManageIndexState extends State<GroupManageIndex> {
                               image: AssetImage(
                                   'assets/images/icons/trade_button_icon_buy.png'),
                               height: 90,
-                            )
-                        ),
+                            )),
                       ],
                     ),
                   ),
@@ -119,10 +115,13 @@ class _GroupManageIndexState extends State<GroupManageIndex> {
                   ),
                   InkWell(
                     onTap: () {
-                      Navigator.pushNamed(context, '/group/manage/partner', arguments: { "groupId": groupId, "groupName": groupName });
+                      Navigator.pushNamed(context, '/group/manage/partner',
+                          arguments: {
+                            "groupId": groupId,
+                            "groupName": groupName
+                          });
                     },
-                    child:
-                    Stack(
+                    child: Stack(
                       clipBehavior: Clip.none,
                       children: [
                         Container(
@@ -154,28 +153,40 @@ class _GroupManageIndexState extends State<GroupManageIndex> {
                               image: AssetImage(
                                   'assets/images/icons/trade_button_icon_sell.png'),
                               height: 90,
-                            )
-                        ),
+                            )),
                       ],
                     ),
                   ),
-                ]
+                ]),
+            SizedBox(
+              height: 60,
             ),
-            SizedBox(height: 60,),
             Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Icon(Icons.check_circle, color: HexColor("#75A8E4"), size: 18,),
-                SizedBox(width: 5,),
-                Text("그룹관리 Tip", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),),
+                Icon(
+                  Icons.check_circle,
+                  color: HexColor("#75A8E4"),
+                  size: 18,
+                ),
+                SizedBox(
+                  width: 5,
+                ),
+                Text(
+                  "그룹관리 Tip",
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
               ],
             ),
-            SizedBox(height: 20,),
+            SizedBox(
+              height: 20,
+            ),
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text("· "),
-                Expanded(child: Text("그룹 이미지가 정책과 맞지 않는 경우 통보 없이 삭제 될 수 있습니다.")),
+                Expanded(
+                    child: Text("그룹 이미지가 정책과 맞지 않는 경우 통보 없이 삭제 될 수 있습니다.")),
               ],
             ),
             Row(

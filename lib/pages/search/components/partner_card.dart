@@ -1,3 +1,4 @@
+import 'package:Deal_Connect/components/const/setting_style.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:hexcolor/hexcolor.dart';
 
@@ -41,10 +42,11 @@ class PartnerCard extends StatelessWidget {
                   ),
                 ),
               ),
-              SizedBox(height: 8,),
-              Text(name, style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold), overflow: TextOverflow.ellipsis,),
-              Text(markets, style: TextStyle(color:HexColor("#666666")), overflow: TextOverflow.ellipsis),
-              Spacer(),
+              const SizedBox(height: 8,),
+              Text(name, style: SettingStyle.SUB_TITLE_STYLE, overflow: TextOverflow.ellipsis,),
+              const SizedBox(height: 1,),
+              Text(markets, style: SettingStyle.SUB_GREY_TEXT, overflow: TextOverflow.ellipsis),
+              const Spacer(),
             ],
           ),
         ),

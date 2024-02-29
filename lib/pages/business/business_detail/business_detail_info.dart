@@ -1,14 +1,26 @@
-import 'package:Deal_Connect/components/layout/default_logo_layout.dart';
+import 'package:Deal_Connect/api/business.dart';
+import 'package:Deal_Connect/api/partner.dart';
+import 'package:Deal_Connect/api/user_business_service.dart';
+import 'package:Deal_Connect/components/alert/show_complete_dialog.dart';
+import 'package:Deal_Connect/components/common_item/grey_chip.dart';
+import 'package:Deal_Connect/components/const/setting_style.dart';
+import 'package:Deal_Connect/components/image_viewer.dart';
+import 'package:Deal_Connect/components/layout/sliver_layout.dart';
 import 'package:Deal_Connect/components/list_service_card.dart';
-import 'package:Deal_Connect/db/service_data.dart';
-import 'package:Deal_Connect/pages/business/business_history/business_history_index.dart';
-import 'package:Deal_Connect/pages/business/business_service/business_service_create.dart';
-import 'package:Deal_Connect/pages/business/business_service/business_service_info.dart';
-import 'package:Deal_Connect/pages/history/history_detail/history_detail_index.dart';
-import 'package:Deal_Connect/pages/history/history_index.dart';
-import 'package:Deal_Connect/pages/profile/other_profile.dart';
+import 'package:Deal_Connect/components/loading.dart';
+import 'package:Deal_Connect/components/no_items.dart';
+import 'package:Deal_Connect/model/partnership.dart';
+import 'package:Deal_Connect/model/user.dart';
+import 'package:Deal_Connect/model/user_business.dart';
+import 'package:Deal_Connect/model/user_business_keyword.dart';
+import 'package:Deal_Connect/model/user_business_service.dart';
+import 'package:Deal_Connect/utils/custom_dialog.dart';
+import 'package:Deal_Connect/utils/shared_pref_utils.dart';
+import 'package:Deal_Connect/utils/utils.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:hexcolor/hexcolor.dart';
 
 class BusinessDetailInfo extends StatefulWidget {
@@ -19,269 +31,542 @@ class BusinessDetailInfo extends StatefulWidget {
 }
 
 class _BusinessDetailInfoState extends State<BusinessDetailInfo> {
-  final List<String> tagList = ['#테스트', '#테스트2', '#테스트3'];
+  int? userBusinessId;
+  UserBusiness? userBusiness;
+  List<UserBusinessService>? userBusinessServiceList;
+  bool _isLoading = true;
+  bool _isManageable = false;
+  String _isPartner = 'N'; // 'N' 아님, 'R' 승인대기, 'Y' 파트너
+  User? myUser;
+  Partnership? myPartnership;
+
+  var args;
+
+  @override
+  void initState() {
+    _initMyUser();
+    _initData();
+    super.initState();
+  }
+
+  void _initMyUser() {
+    SharedPrefUtils.getUser().then((value) => myUser = value);
+  }
+
+  void _initData() async {
+    final widgetsBinding = WidgetsBinding.instance;
+    widgetsBinding?.addPostFrameCallback((callback) async {
+      if (ModalRoute.of(context)?.settings.arguments != null) {
+        setState(() {
+          args = ModalRoute.of(context)?.settings.arguments;
+        });
+
+        if (args != null) {
+          setState(() {
+            userBusinessId = args['userBusinessId'];
+          });
+        }
+        if (userBusinessId != null) {
+          await getUserBusiness(userBusinessId!).then((response) {
+            if (response.status == 'success') {
+              UserBusiness resultData = UserBusiness.fromJSON(response.data);
+              setState(() {
+                if (resultData != null) {
+                  userBusiness = resultData;
+                  if (myUser != null) {
+                    if (myUser!.id == userBusiness!.user_id) {
+                      _isManageable = true;
+                    }
+                  }
+                }
+              });
+
+              if (userBusiness?.user_id != null) {
+                _initPartnerShip(userBusiness!.user_id);
+              }
+            } else {
+              Fluttertoast.showToast(
+                  msg: '업체 정보를 받아오는 도중 오류가 발생했습니다.\n오류코드: 463');
+            }
+          });
+
+          _initUserBusinessServices(userBusinessId);
+        }
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    });
+  }
+
+  void _initUserBusinessServices(userBusinessId) async {
+    await getUserBusinessServices(queryMap: {
+      'user_business_id': userBusinessId,
+    }).then((response) {
+      if (response.status == 'success') {
+        Iterable iterable = response.data;
+
+        List<UserBusinessService>? userBusinessServiceList =
+            List<UserBusinessService>.from(
+                iterable.map((e) => UserBusinessService.fromJSON(e)));
+
+        setState(() {
+          this.userBusinessServiceList = userBusinessServiceList;
+        });
+      }
+    });
+  }
+
+  void _initPartnerShip(userId) async {
+    await getPartnership(userId).then((response) {
+      if (response.status == 'success') {
+        Partnership myPartnershipData = Partnership.fromJSON(response.data);
+        setState(() {
+          this.myPartnership = myPartnershipData;
+          if (myPartnership != null && myPartnership!.is_partner) {
+            //승인
+            if (myPartnership!.partnership_status == true) {
+              _isPartner = 'Y';
+            } else {
+              //승인대기
+              _isPartner = 'R';
+            }
+          } else {
+            _isPartner = 'N';
+          }
+        });
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    return DefaultLogoLayout(
-        titleName: '청년 한다발 서초점',
+    ImageProvider businessMainImage;
+    ImageProvider ownerAvatarImage;
+
+    if (userBusiness != null && userBusiness!.has_business_image != null) {
+      businessMainImage = CachedNetworkImageProvider(
+        Utils.getImageFilePath(userBusiness!.has_business_image!),
+      );
+    } else {
+      businessMainImage = AssetImage('assets/images/no-image.png');
+    }
+
+    if (userBusiness != null &&
+        userBusiness!.has_owner != null &&
+        userBusiness!.has_owner!.has_user_profile != null &&
+        userBusiness!.has_owner!.has_user_profile!.has_profile_image != null) {
+      ownerAvatarImage = CachedNetworkImageProvider(
+        Utils.getImageFilePath(
+            userBusiness!.has_owner!.has_user_profile!.has_profile_image!),
+      );
+    } else {
+      ownerAvatarImage = AssetImage('assets/images/no-image.png');
+    }
+
+    if (_isLoading && userBusiness == null) {
+      // 로딩 중 인디케이터 표시
+      return Loading();
+    }
+    return SliverLayout(
         isNotInnerPadding: 'true',
-        child: NestedScrollView(
-          headerSliverBuilder: (context, innerBoxIsScrolled) {
-            return [
-              SliverAppBar(
-                  automaticallyImplyLeading: false,
-                  pinned: false,
-                  expandedHeight: 640.0,
-                  flexibleSpace: FlexibleSpaceBar(
-                      collapseMode: CollapseMode.pin,
-                      background: Column(
-                        children: [
-                          AspectRatio(
-                            aspectRatio: 1.8 / 1,
-                            child: Container(
-                              decoration: BoxDecoration(
-                                image: DecorationImage(
-                                  image: AssetImage(
-                                      'assets/images/sample/main_sample01.jpg'),
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
+        child: CustomScrollView(
+          slivers: <Widget>[
+            SliverAppBar(
+              leading: IconButton(
+                padding: EdgeInsets.all(10.0),
+                icon: const Icon(CupertinoIcons.back),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+              actions: [
+                IconButton(onPressed: () {}, icon: const Icon(CupertinoIcons.share)),
+                if (_isManageable)
+                  IconButton(
+                      onPressed: () {
+                        showModalBottomSheet(
+                          context: context,
+                          shape: const RoundedRectangleBorder(
+                            borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(0),
+                              topRight:
+                                  Radius.circular(0),
                             ),
                           ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 15.0, vertical: 5),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  children: [
-                                    Text(
-                                      "청년한다발 서초점",
-                                      style: TextStyle(
-                                          fontSize: 20,
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                    Spacer(),
-                                    IconButton(
-                                      onPressed: () {},
-                                      splashRadius: 25.0,
-                                      icon: Icon(
-                                        Icons.share,
-                                        size: 20,
+                          builder: (BuildContext bc) {
+                            return Container(
+                              margin: EdgeInsets.only(bottom: 40.0),
+                              child: SafeArea(
+                                child: Wrap(
+                                  children: <Widget>[
+                                    if (userBusiness!.is_main == false)
+                                      ListTile(
+                                        title: Text(
+                                          '대표업체등록',
+                                          style: SettingStyle.SUB_TITLE_STYLE
+                                              .copyWith(
+                                                  color:
+                                                      SettingStyle.MAIN_COLOR),
+                                          textAlign: TextAlign.center,
+                                        ),
+                                        onTap: () {
+                                          Navigator.pop(context);
+                                          _mainItem();
+                                        },
                                       ),
-                                      color: HexColor("#6d6d6d"),
+                                    Divider(
+                                      height: 1,
+                                      thickness: 1,
+                                      color: HexColor('#dddddd'),
                                     ),
-                                  ],
-                                ),
-                                Text(
-                                  "이쁜 꽃을 파는 집입니다.",
-                                  style: TextStyle(
-                                      fontSize: 16, color: HexColor("#5D5D5D")),
-                                ),
-                                SizedBox(height: 15),
-                                Row(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    GestureDetector(
+                                    ListTile(
+                                      title: Text(
+                                        '수정하기',
+                                        style: SettingStyle.SUB_TITLE_STYLE,
+                                        textAlign: TextAlign.center,
+                                      ),
                                       onTap: () {
-                                        Navigator.push(
-                                          context,
-                                          CupertinoPageRoute(builder: (context) => OtherProfileIndex()
-                                          ),
-                                        );
+                                        Navigator.pop(context);
+                                        Navigator.pushNamed(
+                                            context, '/business/edit',
+                                            arguments: {
+                                              'userBusinessId':
+                                                  userBusiness!.id,
+                                              'storeName': userBusiness!.name
+                                            }).then((value) {
+                                          _initData();
+                                        });
                                       },
-                                      child: Row(
-                                        children: [
-                                          CircleAvatar(
-                                            radius: 15.0,
-                                            backgroundImage: AssetImage(
-                                                'assets/images/sample/main_sample_avater2.jpg'),
-                                          ),
-                                          SizedBox(
-                                            width: 5,
-                                          ),
-                                          Text(
-                                            "한동엽 대표",
-                                            style: TextStyle(fontSize: 16),
-                                          )
-                                        ],
+                                    ),
+                                    Divider(
+                                      height: 1,
+                                      thickness: 1,
+                                      color: HexColor('#dddddd'),
+                                    ),
+                                    ListTile(
+                                      title: Text(
+                                        '삭제하기',
+                                        style: SettingStyle.SUB_TITLE_STYLE
+                                            .copyWith(color: Colors.red),
+                                        textAlign: TextAlign.center,
                                       ),
-                                    ),
-                                    SizedBox(
-                                      width: 10,
-                                    ),
-                                    Container(
-                                      width: 1,
-                                      height: 20,
-                                      color: HexColor("#222222"),
-                                    ),
-                                    SizedBox(
-                                      width: 10,
-                                    ),
-                                    Row(
-                                      children: [
-                                        Container(
-                                          width: 25,
-                                          child: Image(
-                                            image: AssetImage(
-                                                'assets/images/icons/partner_icon.png'),
-                                            fit: BoxFit.contain,
-                                          ),
-                                        ),
-                                        SizedBox(
-                                          width: 5,
-                                        ),
-                                        Text(
-                                          "파트너 132명",
-                                          style: TextStyle(fontSize: 16),
-                                        )
-                                      ],
+                                      onTap: () {
+                                        // 삭제 로직 처리
+                                        Navigator.pop(context); // 하단 시트 닫기
+                                        _deleteItem();
+                                      },
                                     ),
                                   ],
                                 ),
-                                SizedBox(
-                                  height: 15,
+                              ),
+                            );
+                          },
+                        );
+                      },
+                      icon: Icon(CupertinoIcons.ellipsis_vertical)),
+              ],
+              pinned: true,
+              expandedHeight: 350.0,
+              flexibleSpace: FlexibleSpaceBar(
+                background: GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                ImageViewer(imageProvider: businessMainImage)));
+                  },
+                  child: Stack(
+                    children: [
+                      Container(
+                        decoration: BoxDecoration(
+                          image: DecorationImage(
+                            image: businessMainImage,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      ),
+                      Container(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              Colors.white.withOpacity(0.5),
+                              Colors.transparent,
+                              Colors.transparent
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            SliverToBoxAdapter(
+              child: Column(
+                children: [
+                  Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 15.0, vertical: 5),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Padding(
+                              padding: EdgeInsets.symmetric(vertical: 10),
+                              child: Text(
+                                userBusiness != null ? userBusiness!.name : '',
+                                style: SettingStyle.TITLE_STYLE,
+                              ),
+                            ),
+                            Text(
+                              userBusiness?.description ?? '',
+                              style: TextStyle(
+                                  fontSize: 16, color: HexColor("#5D5D5D")),
+                            ),
+                            SizedBox(height: 15),
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                GestureDetector(
+                                  onTap: () {
+                                    Navigator.pushNamed(context, '/profile',
+                                        arguments: {
+                                          'user_id': userBusiness!.has_owner!.id
+                                        });
+                                  },
+                                  child: Row(
+                                    children: [
+                                      CircleAvatar(
+                                        radius: 15.0,
+                                        backgroundImage: ownerAvatarImage,
+                                      ),
+                                      SizedBox(
+                                        width: 5,
+                                      ),
+                                      Text(
+                                        userBusiness != null
+                                            ? userBusiness!.has_owner?.name ??
+                                                ''
+                                            : '',
+                                        style: TextStyle(fontSize: 16),
+                                      )
+                                    ],
+                                  ),
                                 ),
-                                _buildTags(tagList),
                                 SizedBox(
-                                  height: 15,
+                                  width: 10,
+                                ),
+                                Container(
+                                  width: 1,
+                                  height: 20,
+                                  color: HexColor("#222222"),
+                                ),
+                                SizedBox(
+                                  width: 10,
                                 ),
                                 Row(
                                   children: [
-                                    _reanderButton(
-                                      btnName: '전화',
-                                      onPressed: () {},
+                                    Container(
+                                      width: 25,
+                                      child: Image(
+                                        image: AssetImage(
+                                            'assets/images/icons/partner_icon.png'),
+                                        fit: BoxFit.contain,
+                                      ),
                                     ),
                                     SizedBox(
                                       width: 5,
                                     ),
-                                    _reanderButton(
-                                      btnName: '거래내역',
-                                      onPressed: () {
-                                        Navigator.push(context, CupertinoPageRoute(builder: (context) => BusinessHistoryIndex()));
-                                      },
-                                    ),
+                                    Text(
+                                      "파트너 " +
+                                          (myPartnership != null
+                                              ? myPartnership!.partners_count
+                                                  .toString()
+                                              : "0") +
+                                          "명",
+                                      style: TextStyle(fontSize: 16),
+                                    )
                                   ],
                                 ),
                               ],
                             ),
-                          ),
-                          Divider(
-                            thickness: 10,
-                            color: HexColor("#f5f6fa"),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 15.0, vertical: 10.0),
-                            child: Column(
-                              children: [
-                                _iconText(Icons.place, "서울특별시 서초구 반포동 19-1"),
-                                SizedBox(
-                                  height: 10,
-                                ),
-                                _iconText(Icons.desktop_windows_rounded,
-                                    "https://www.test.com"),
-                                SizedBox(
-                                  height: 10,
-                                ),
-                                _iconText(
-                                    Icons.watch_later, "평일 09:00 ~ 20:00"),
-                                SizedBox(
-                                  height: 10,
-                                ),
-                                _iconText(Icons.phone, "010-1234-6565"),
-                              ],
+                            SizedBox(
+                              height: 15,
                             ),
-                          ),
-                          Divider(
-                            thickness: 10,
-                            color: HexColor("#f5f6fa"),
-                          ),
-                        ],
-                      ))),
-            ];
-          },
-          body: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 15.0),
-                child: Row(
-                  children: [
-                    Text(
-                      "주요 서비스",
-                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                    ),
-                    Spacer(),
-                    ElevatedButton(
-                      onPressed: () {
-                        Navigator.push(context, CupertinoPageRoute(builder: (context) => BusinessServiceCreate()));
-                      },
-                      child: Text(
-                        '추가하기',
-                        style: TextStyle(
-                          color: Color(0xff333333),
+                            if (userBusiness != null &&
+                                userBusiness!.has_keywords != null)
+                              _buildTags(userBusiness!.has_keywords!),
+                            SizedBox(
+                              height: 15,
+                            ),
+                            Row(children: [
+                              if (_isPartner == 'Y' || _isManageable == true)
+                                _reanderButton(
+                                  btnName: '전화',
+                                  onPressed: () {},
+                                )
+                              else if (_isPartner == 'N')
+                                _reanderButton(
+                                  btnName: '파트너 신청',
+                                  onPressed: () {
+                                    _attendPartner();
+                                  },
+                                )
+                              else if (_isPartner == 'R')
+                                _reanderButton(
+                                  btnName: '승인 대기중',
+                                  onPressed: () {},
+                                )
+                            ]),
+                          ],
                         ),
                       ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Color(0xFFf5f6fa),
-                        foregroundColor: Color(0xFFf5f6fa),
-                        elevation: 0,
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8.0)),
+                      Divider(
+                        thickness: 10,
+                        color: HexColor("#f5f6fa"),
+                      ),
+                      if (userBusiness != null)
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 15.0, vertical: 10.0),
+                          child: Column(
+                            children: [
+                              _iconText(
+                                  Icons.place,
+                                  (userBusiness!.address1 ?? '') +
+                                      ' ' +
+                                      (userBusiness!.address2 ?? '')),
+                              if (userBusiness!.website != null)
+                                _iconText(Icons.desktop_windows_rounded,
+                                    userBusiness!.website ?? ''),
+                              _iconText(Icons.watch_later,
+                                  userBusiness!.work_time ?? ''),
+                              if (userBusiness != null &&
+                                  userBusiness!.has_weekend != null &&
+                                  userBusiness!.has_weekend)
+                                _iconText(Icons.next_week_outlined,
+                                    userBusiness!.weekend ?? ''),
+                              if (userBusiness != null &&
+                                  userBusiness!.has_holiday != null &&
+                                  userBusiness!.has_holiday)
+                                _iconText(
+                                    Icons.restore, userBusiness!.holiday ?? ''),
+                              _iconText(Icons.phone, userBusiness!.phone ?? ''),
+                            ],
+                          ),
+                        ),
+                      Divider(
+                        thickness: 10,
+                        color: HexColor("#f5f6fa"),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                        child: Row(
+                          children: [
+                            Text(
+                              "주요 서비스",
+                              style: TextStyle(
+                                  fontSize: 20, fontWeight: FontWeight.bold),
+                            ),
+                            Spacer(),
+                            if (_isManageable)
+                              ElevatedButton(
+                                onPressed: () {
+                                  Navigator.pushNamed(
+                                      context, '/business/service/create',
+                                      arguments: {
+                                        'userBusinessId': userBusinessId
+                                      }).then((value) {
+                                    _initData();
+                                  });
+                                },
+                                child: Text(
+                                  '추가하기',
+                                  style: TextStyle(
+                                    color: Color(0xff333333),
+                                  ),
+                                ),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Color(0xFFf5f6fa),
+                                  foregroundColor: Color(0xFFf5f6fa),
+                                  elevation: 0,
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8.0)),
+                                ),
+                              ),
+                          ],
+                        ),
+                      ),
+                      Divider(
+                        thickness: 10,
+                        color: HexColor("#f5f6fa"),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            (userBusinessServiceList?.isEmpty ?? true)
+                ? SliverToBoxAdapter(
+                    child: NoItems(), // 데이터가 없을 때 적절한 위젯을 반환합니다.
+                  )
+                : SliverPadding(
+                    padding: EdgeInsets.symmetric(horizontal: 10.0),
+                    sliver: SliverGrid(
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2, // 한 줄에 2개의 아이템
+                        crossAxisSpacing: 10.0, // 아이템 간의 가로 간격
+                        mainAxisSpacing: 10.0, // 아이템 간의 세로 간격
+                        childAspectRatio: 1.2 / 1, // 아이템의 가로세로 비율
+                      ),
+                      delegate: SliverChildBuilderDelegate(
+                        (BuildContext context, int index) {
+                          // 여기에 각 그리드 항목을 빌드하는 로직을 추가합니다.
+                          UserBusinessService item =
+                              userBusinessServiceList![index];
+                          return GestureDetector(
+                            onTap: () {
+                              Navigator.pushNamed(
+                                  context, '/business/service/info',
+                                  arguments: {
+                                    'businessServiceId': item.id,
+                                    'storeName': userBusiness!.name,
+                                  }).then((value) {
+                                _initData();
+                              });
+                            },
+                            child: ListServiceCard(
+                                item: item, storeName: userBusiness!.name),
+                          );
+                        },
+                        childCount: userBusinessServiceList?.length ??
+                            0, // 그리드 항목의 수를 설정합니다.
                       ),
                     ),
-                  ],
-                ),
+                  ),
+            SliverToBoxAdapter(
+              child: Container(
+                height: 350, // SliverAppBar와 같은 높이의 공간을 추가
+                color: Colors.transparent, // 필요에 따라 색상 지정
               ),
-              Divider(
-                thickness: 10,
-                color: HexColor("#f5f6fa"),
-              ),
-              Expanded(
-                child: Container(
-                  padding: EdgeInsets.all(15.0),
-                  child: serviceDataList.isNotEmpty
-                      ? GridView.builder(
-                          gridDelegate:
-                              const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2, // 한 줄에 2개의 아이템
-                            crossAxisSpacing: 10.0, // 아이템 간의 가로 간격
-                            mainAxisSpacing: 5.0, // 아이템 간의 세로 간격
-                            childAspectRatio: 1.1 / 1,
-                          ),
-                          itemCount: serviceDataList.length, // 아이템 개수
-                          itemBuilder: (context, index) {
-                            Map<String, dynamic> serviceData =
-                                serviceDataList[index];
-                            return GestureDetector(
-                              onTap: () {
-                                Navigator.push(context, CupertinoPageRoute(builder: (context) => BusinessServiceInfo()));
-                              },
-                              child: Container(
-                                child: ListServiceCard(),
-                              ),
-                            );
-                          },
-                        )
-                      : const Text('등록된 데이터가 없습니다'),
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ));
   }
 
 // 반복태그
-  Widget _buildTags(List<String> tagList) {
+  Widget _buildTags(List<UserBusinessKeyword> tagList) {
     List<Widget> tagWidgets = [];
     for (int i = 0; i < tagList.length; i++) {
       if (i < 3) {
         tagWidgets.add(Padding(
           padding: const EdgeInsets.only(right: 5.0),
-          child: _cardTag(tagList[i]),
+          child: GreyChip(chipText: '#' + tagList[i].keyword,),
         ));
       } else {
         break;
@@ -290,40 +575,140 @@ class _BusinessDetailInfoState extends State<BusinessDetailInfo> {
     return Row(children: tagWidgets);
   }
 
-// 태그 공통
-  Container _cardTag(String text) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Color(0xFFf5f6fa),
-        borderRadius: BorderRadius.circular(10.0),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 7.0),
-        child: Text(
-          text,
-          style: TextStyle(
-              color: Color(0xFF5f5f66),
-              fontSize: 11.0,
-              fontWeight: FontWeight.w500),
+  Column _iconText(IconData prefixIcon, String text) {
+    return Column(
+      children: [
+        Row(
+          children: [
+            Icon(
+              prefixIcon,
+              color: HexColor("#ABABAB"),
+              size: 18,
+            ),
+            SizedBox(
+              width: 10,
+            ),
+            Text(text)
+          ],
         ),
-      ),
+        SizedBox(
+          height: 10,
+        )
+      ],
     );
   }
 
-  Row _iconText(IconData prefixIcon, String text) {
-    return Row(
-      children: [
-        Icon(
-          prefixIcon,
-          color: HexColor("#ABABAB"),
-          size: 18,
-        ),
-        SizedBox(
-          width: 10,
-        ),
-        Text(text)
-      ],
+  void _attendPartner() {
+    CustomDialog.showDoubleBtnDialog(
+        context: context,
+        msg: '${userBusiness!.has_owner!.name}님에게 파트너 신청을 하시겠습니까?',
+        rightBtnText: '신청하기',
+        onLeftBtnClick: () {},
+        onRightBtnClick: () {
+          _attendSubmit();
+        });
+  }
+
+  void _attendSubmit() {
+    CustomDialog.showProgressDialog(context);
+
+    attendPartner({'partner_user_id': userBusiness!.has_owner!.id})
+        .then((response) async {
+      CustomDialog.dismissProgressDialog();
+
+      if (response.status == 'success') {
+        _showCompleteDialog(context, '파트너 신청', '파트너 신청이 완료되었습니다.');
+      } else {
+        CustomDialog.showServerValidatorErrorMsg(response);
+      }
+    });
+  }
+
+  void _showCompleteDialog(BuildContext context, title, text) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return ShowCompleteDialog(
+          messageTitle: title,
+          messageText: text,
+          buttonText: '확인',
+          onConfirmed: () {
+            _initData();
+            Navigator.of(context).pop();
+          },
+        );
+      },
     );
+  }
+
+  void _deleteItem() {
+    CustomDialog.showDoubleBtnDialog(
+        context: context,
+        msg: '정말 삭제하시겠습니까?',
+        rightBtnText: '삭제',
+        onLeftBtnClick: () {},
+        onRightBtnClick: () {
+          _deleteSubmit();
+        });
+  }
+
+  void _deleteSubmit() {
+    CustomDialog.showProgressDialog(context);
+
+    deleteUserBusiness(userBusiness!.id).then((response) async {
+      CustomDialog.dismissProgressDialog();
+
+      if (response.status == 'success') {
+        _showDeleteCompleteDialog(context, '업체 삭제', '삭제되었습니다.');
+      } else {
+        CustomDialog.showServerValidatorErrorMsg(response);
+      }
+    });
+  }
+
+  void _showDeleteCompleteDialog(BuildContext context, title, text) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return ShowCompleteDialog(
+          messageTitle: title,
+          messageText: text,
+          buttonText: '확인',
+          onConfirmed: () {
+            Navigator.of(context).pop();
+            Navigator.of(context).pop();
+          },
+        );
+      },
+    );
+  }
+
+  void _mainItem() {
+    CustomDialog.showDoubleBtnDialog(
+        context: context,
+        msg: '대표 업체로 등록하시겠습니까?',
+        rightBtnText: '등록',
+        onLeftBtnClick: () {},
+        onRightBtnClick: () {
+          _mainSubmit();
+        });
+  }
+
+  void _mainSubmit() {
+    CustomDialog.showProgressDialog(context);
+
+    updateMainUserBusiness(userBusiness!.id, {'is_main': true})
+        .then((response) async {
+      CustomDialog.dismissProgressDialog();
+
+      if (response.status == 'success') {
+        _showCompleteDialog(context, '대표 업체 등록', '등록되었습니다.');
+      } else {
+        CustomDialog.showServerValidatorErrorMsg(response);
+      }
+    });
   }
 }
 

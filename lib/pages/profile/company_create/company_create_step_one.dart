@@ -26,6 +26,7 @@ class _CompanyCreateStepOneState extends State<CompanyCreateStepOne> {
   double? longitude;
   String address1 = '';
   String address2 = '';
+  String description = '';
 
   bool isProcessable = false;
   bool isPhoneFilled = false;
@@ -96,29 +97,30 @@ class _CompanyCreateStepOneState extends State<CompanyCreateStepOne> {
                 'phone': phone,
                 'address1': address1,
                 'address2': address2,
+                'description': description,
               });
         },
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                isCompanyNameFilled
-                    ? (isAddressFilled
-                        ? (isDetailedAddressFilled
-                            ? '다음을 눌러 업체등록을 완성해주세요'
-                            : '상세주소를 입력 해주세요')
-                        : '주소를 입력 해주세요')
-                    : '업체명을 입력 해주세요',
-                style: TextStyle(
-                  fontSize: 17.0,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.black,
-                ),
-              ),
-              SizedBox(
-                height: 40.0,
-              ),
+              // Text(
+              //   isCompanyNameFilled
+              //       ? (isAddressFilled
+              //           ? (isDetailedAddressFilled
+              //               ? '다음을 눌러 업체등록을 완성해주세요'
+              //               : '상세주소를 입력 해주세요')
+              //           : '주소를 입력 해주세요')
+              //       : '업체명을 입력 해주세요',
+              //   style: TextStyle(
+              //     fontSize: 17.0,
+              //     fontWeight: FontWeight.w600,
+              //     color: Colors.black,
+              //   ),
+              // ),
+              // SizedBox(
+              //   height: 40.0,
+              // ),
               Column(
                 children: [
                   JoinTextFormField(
@@ -136,6 +138,15 @@ class _CompanyCreateStepOneState extends State<CompanyCreateStepOne> {
                   ),
                   SizedBox(
                     height: 10.0,
+                  ),
+                  JoinTextFormField(
+                    label: '한줄소개',
+                    hintText: '한 줄 소개를 입력해주세요',
+                    onChanged: (String value) {
+                      setState(() {
+                        description = value;
+                      });
+                    },
                   ),
                   _buildAddressSearchBtn(context),
                   SizedBox(

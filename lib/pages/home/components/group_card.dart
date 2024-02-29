@@ -23,24 +23,18 @@ class _GroupCardState extends State<GroupCard> {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        Navigator.pushNamed(context, '/group/info',
-            arguments: {'groupId': widget.item.id});
-      },
-      child: Row(
-        children: [
-          Stack(
-            children: [
-              _CardBackground(),
-              _CardData(),
-            ],
-          ),
-          SizedBox(
-            width: 10.0,
-          ),
-        ],
-      ),
+    return Row(
+      children: [
+        Stack(
+          children: [
+            _CardBackground(),
+            _CardData(),
+          ],
+        ),
+        SizedBox(
+          width: 10.0,
+        ),
+      ],
     );
   }
 
@@ -100,7 +94,7 @@ class _GroupCardState extends State<GroupCard> {
               ),
             ),
             Text(
-              widget.item.users_count.toString() + '명',
+              widget.item.approved_users_count.toString() + '명',
               style: textStyle.copyWith(
                 fontSize: 12.0,
               ),

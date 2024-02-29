@@ -30,19 +30,14 @@ class _BusinessTabListState extends State<BusinessTabList> {
         ),
         itemCount: companyDataList.length, // 아이템 개수
         itemBuilder: (context, index) {
-          Map<String, dynamic> companyData = companyDataList[index];
+          Map<String, dynamic> item = companyDataList[index];
           return GestureDetector(
             onTap: () {
               print('클릭했다~ ');
               Navigator.push(context, MaterialPageRoute(builder: (context) => BusinessDetailInfo()));
             },
             child: Container(
-              child: ListBusinessCard(
-                bgImagePath: companyData['bgImagePath'],
-                avaterImagePath: companyData['avaterImagePath'],
-                companyName: companyData['companyName'],
-                tagList : companyData['tagList'],
-              ),
+              child: Text('test'), //ListBusinessCard(item: item,),
             ),
           );
         },
