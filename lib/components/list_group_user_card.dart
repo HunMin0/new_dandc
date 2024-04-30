@@ -16,6 +16,7 @@ class ListGroupUserCard extends StatefulWidget {
   final VoidCallback onDeclinePressed;
   final VoidCallback onOutPressed;
   final VoidCallback onManagerPressed;
+  final VoidCallback onManagerDownPressed;
 
   const ListGroupUserCard(
       {required this.item,
@@ -23,6 +24,7 @@ class ListGroupUserCard extends StatefulWidget {
       required this.onDeclinePressed,
       required this.onOutPressed,
       required this.onManagerPressed,
+      required this.onManagerDownPressed,
       this.isManager = false,
       this.isMine = false,
       Key? key})
@@ -47,8 +49,8 @@ class _ListGroupUserCardState extends State<ListGroupUserCard> {
     ImageProvider? businessThumbnailImage =
         AssetImage('assets/images/no-image.png');
 
-    if (widget.item.has_user?.has_user_profile?.has_profile_image != null) {
-      final profileImage = widget.item.has_user!.has_user_profile!.has_profile_image!;
+    if (widget.item.has_user?.profile?.has_profile_image != null) {
+      final profileImage = widget.item.has_user!.profile!.has_profile_image!;
       profileThumbnailImage = CachedNetworkImageProvider(
         Utils.getImageFilePath(profileImage),
       );
@@ -123,6 +125,18 @@ class _ListGroupUserCardState extends State<ListGroupUserCard> {
                     : Container(
                         child: Column(
                           children: [
+                            widget.item.is_leader == true ? ElevatedButton(
+                              onPressed: () {
+                                widget.onManagerDownPressed();
+                              },
+                              child: Text(
+                                '강등',
+                                style: TextStyle(
+                                  color: Color(0xff333333),
+                                ),
+                              ),
+                              style: SettingStyle.BUTTON_STYLE,
+                            ) :
                             ElevatedButton(
                               onPressed: () {
                                 widget.onManagerPressed();
@@ -168,10 +182,24 @@ class _ListGroupUserCardState extends State<ListGroupUserCard> {
         children: [
           Row(
             children: [
-              Text(widget.item.is_leader ? '\u{1F451}' : ''),
-              SizedBox(
-                width: 2,
+              if (widget.item.is_leader)
+              Container(
+                  decoration: BoxDecoration(
+                    color: Color(0xFFf5f6fa),
+                    borderRadius: BorderRadius.circular(5.0),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 7.0),
+                    child: Text(
+                      "관리자",
+                      style: TextStyle(
+                          color: Color(0xFF5f5f66),
+                          fontSize: 11.0,
+                          fontWeight: FontWeight.w500),
+                    ),
+                  )
               ),
+              SizedBox(width: 3,),
               Text(
                 widget.item.has_user!.name,
                 style: TextStyle(fontWeight: FontWeight.w500, fontSize: 16.0),

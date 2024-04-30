@@ -23,4 +23,13 @@ class UserProfile {
         has_profile_image: has_profile_image
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'user_id': user_id,
+      'profile_image_id': profile_image_id,
+      'has_profile_image': has_profile_image?.toJson(),
+    };
+  }
 }

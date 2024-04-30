@@ -118,11 +118,11 @@ class _HistoryDetailInfoState extends State<HistoryDetailInfo> {
       }
 
       if (tradeData!.has_business_owner != null &&
-          tradeData!.has_business_owner!.has_user_profile != null &&
-          tradeData!.has_business_owner!.has_user_profile!.has_profile_image !=
+          tradeData!.has_business_owner!.profile != null &&
+          tradeData!.has_business_owner!.profile!.has_profile_image !=
               null) {
         final ownerProfileImage =
-            tradeData!.has_business_owner!.has_user_profile!.has_profile_image!;
+            tradeData!.has_business_owner!.profile!.has_profile_image!;
         ownerProfileThumbnailImage = CachedNetworkImageProvider(
           Utils.getImageFilePath(ownerProfileImage),
         );
@@ -144,11 +144,11 @@ class _HistoryDetailInfoState extends State<HistoryDetailInfo> {
 
     if (tradeData != null) {
       if (tradeData!.has_buy_user != null &&
-          tradeData!.has_buy_user!.has_user_profile != null &&
-          tradeData!.has_buy_user!.has_user_profile!.has_profile_image !=
+          tradeData!.has_buy_user!.profile != null &&
+          tradeData!.has_buy_user!.profile!.has_profile_image !=
               null) {
         final userProfileImage =
-            tradeData!.has_buy_user!.has_user_profile!.has_profile_image!;
+            tradeData!.has_buy_user!.profile!.has_profile_image!;
         userProfileThumbnailImage = CachedNetworkImageProvider(
           Utils.getImageFilePath(userProfileImage),
         );
@@ -453,11 +453,11 @@ class _HistoryDetailInfoState extends State<HistoryDetailInfo> {
                           ),
                           child: Text(tradeData?.user_description ?? ''),
                         ),
+                        const SizedBox(
+                          height: 20,
+                        ),
                       ],
                     ),
-                  const SizedBox(
-                    height: 20,
-                  ),
                   if (tradeData!.business_user_description != null)
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -478,12 +478,35 @@ class _HistoryDetailInfoState extends State<HistoryDetailInfo> {
                           ),
                           child:
                               Text(tradeData?.business_user_description ?? ''),
+                        ),
+                        const SizedBox(
+                          height: 40,
+                        ),
+                      ],
+                    ),
+                  if (tradeData!.partner_return_reason != null)
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "반려사유",
+                          style: SettingStyle.SUB_TITLE_STYLE,
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        Container(
+                          padding: EdgeInsets.all(10.0),
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            color: HexColor("#F5F6FA"),
+                            borderRadius: BorderRadius.circular(10.0),
+                          ),
+                          child:
+                          Text(tradeData?.partner_return_reason ?? ''),
                         )
                       ],
                     ),
-                  const SizedBox(
-                    height: 40,
-                  ),
                 ],
               ),
             )

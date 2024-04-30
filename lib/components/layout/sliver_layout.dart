@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:flutter/material.dart';
 import 'package:Deal_Connect/components/const/setting_colors.dart';
 
@@ -36,25 +34,28 @@ class SliverLayout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: backgroundColor ?? SettingColors.primaryMeterialColor,
-      body: SafeArea(
-        child: Padding(
-          padding: isNotInnerPadding == 'true' ? const EdgeInsets.all(0.0) : const EdgeInsets.all(20.0),
-          child: child,
+    return MediaQuery(
+      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+      child: Scaffold(
+        backgroundColor: backgroundColor ?? SettingColors.primaryMeterialColor,
+        body: SafeArea(
+          child: Padding(
+            padding: isNotInnerPadding == 'true' ? const EdgeInsets.all(0.0) : const EdgeInsets.all(20.0),
+            child: child,
+          ),
         ),
+        bottomNavigationBar: bottomBar
+            ? BottomButtons(
+          isNext: isNext,
+          isCancel: isCancel,
+          isProcessable: isProcessable!,
+          nextOnPressed: nextOnPressed!,
+          prevOnPressed: prevOnPressed!,
+          nextTitle: nextTitle!,
+          prevTitle: prevTitle!,
+        )
+            : null,
       ),
-      bottomNavigationBar: bottomBar
-          ? BottomButtons(
-        isNext: isNext,
-        isCancel: isCancel,
-        isProcessable: isProcessable!,
-        nextOnPressed: nextOnPressed!,
-        prevOnPressed: prevOnPressed!,
-        nextTitle: nextTitle!,
-        prevTitle: prevTitle!,
-      )
-          : null,
     );
   }
 }

@@ -17,52 +17,55 @@ class ShowCompleteDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12.0),
-      ),
-      backgroundColor: Colors.white,
-      actionsPadding: EdgeInsets.all(14.0),
-      contentPadding: EdgeInsets.all(14.0),
-      title: Text(
-        messageTitle,
-        style: TextStyle(
-          fontSize: 16.0,
-          fontWeight: FontWeight.w700,
+    return MediaQuery(
+      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+      child: AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12.0),
         ),
-        textAlign: TextAlign.center,
-      ),
-      content: Text(
-      messageText,
-        textAlign: TextAlign.center,
-        style: TextStyle(fontSize: 13.0),
-      ),
-      actions: [
-        Row(
-          children: [
-            Expanded(
-              child: ElevatedButton(
-                onPressed: onConfirmed,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: SettingStyle.MAIN_COLOR,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8.0)),
-                  elevation: 0,
-                  padding: EdgeInsets.symmetric(vertical: 12.0),
-                ),
-                child: Text(
-                  buttonText,
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 13.0,
-                    fontWeight: FontWeight.w600,
+        backgroundColor: Colors.white,
+        actionsPadding: EdgeInsets.all(14.0),
+        contentPadding: EdgeInsets.all(14.0),
+        title: Text(
+          messageTitle,
+          style: TextStyle(
+            fontSize: 16.0,
+            fontWeight: FontWeight.w700,
+          ),
+          textAlign: TextAlign.center,
+        ),
+        content: Text(
+        messageText,
+          textAlign: TextAlign.center,
+          style: TextStyle(fontSize: 13.0),
+        ),
+        actions: [
+          Row(
+            children: [
+              Expanded(
+                child: ElevatedButton(
+                  onPressed: onConfirmed,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: SettingStyle.MAIN_COLOR,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8.0)),
+                    elevation: 0,
+                    padding: EdgeInsets.symmetric(vertical: 12.0),
+                  ),
+                  child: Text(
+                    buttonText,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 13.0,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
               ),
-            ),
-          ],
-        )
-      ],
+            ],
+          )
+        ],
+      ),
     );
   }
 }

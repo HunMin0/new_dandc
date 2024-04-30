@@ -1,6 +1,4 @@
 import 'package:Deal_Connect/components/const/setting_style.dart';
-import 'package:Deal_Connect/pages/group/group_partner/group_partner_index.dart';
-import 'package:Deal_Connect/pages/group/group_trade/group_trade_index.dart';
 import 'package:Deal_Connect/utils/utils.dart';
 import 'package:flutter/material.dart';
 

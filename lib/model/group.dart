@@ -11,7 +11,7 @@ class Group {
   final int? group_image_id;
   final int? approved_users_count;
   final int? un_approved_users_count;
-  final int? price_sum;
+  final int price_sum;
   final String? description;
   final String? created_at;
   final String? updated_at;
@@ -27,7 +27,7 @@ class Group {
     this.description,
     this.approved_users_count,
     this.un_approved_users_count,
-    this.price_sum,
+    required this.price_sum,
     this.has_group_image,
     this.has_keywords,
     required this.created_at,
@@ -59,5 +59,23 @@ class Group {
         has_keywords: has_keywords,
         has_group_image: has_group_image
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'description': description,
+      'group_image_id': group_image_id,
+      'created_at': created_at,
+      'updated_at': updated_at,
+      'approved_users_count': approved_users_count,
+      'un_approved_users_count': un_approved_users_count,
+      'price_sum': price_sum,
+      'is_leader': is_leader,
+      'is_member': is_member,
+      'has_keywords': has_keywords,
+      'has_group_image': has_group_image?.toJson()
+    };
   }
 }

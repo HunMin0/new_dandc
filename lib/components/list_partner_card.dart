@@ -1,8 +1,6 @@
 import 'package:Deal_Connect/components/common_item/grey_chip.dart';
 import 'package:Deal_Connect/components/common_item/stack_thumbnail.dart';
 import 'package:Deal_Connect/components/const/setting_style.dart';
-import 'package:Deal_Connect/model/group_user.dart';
-import 'package:Deal_Connect/model/partner.dart';
 import 'package:Deal_Connect/model/user.dart';
 import 'package:Deal_Connect/model/user_keyword.dart';
 import 'package:Deal_Connect/utils/utils.dart';
@@ -28,12 +26,12 @@ class ListPartnerCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     ImageProvider? profileThumbnailImage =
-        AssetImage('assets/images/no-image.png');
+        const AssetImage('assets/images/no-image.png');
     ImageProvider? businessThumbnailImage =
-        AssetImage('assets/images/no-image.png');
+        const AssetImage('assets/images/no-image.png');
 
-    if (item != null && item!.has_user_profile?.has_profile_image != null) {
-      final profileImage = item!.has_user_profile!.has_profile_image!;
+    if (item != null && item!.profile?.has_profile_image != null) {
+      final profileImage = item!.profile!.has_profile_image!;
       profileThumbnailImage = CachedNetworkImageProvider(
         Utils.getImageFilePath(profileImage),
       );
@@ -70,7 +68,7 @@ class ListPartnerCard extends StatelessWidget {
                 children: [
                   Text(
                     item != null ? item!.name : '',
-                    style: TextStyle(
+                    style: const TextStyle(
                         fontWeight: FontWeight.w500, fontSize: 16.0),
                   ),
                   if (item != null && item!.main_business != null)
@@ -78,7 +76,7 @@ class ListPartnerCard extends StatelessWidget {
                       item!.main_business!.name ?? '',
                       style: SettingStyle.SUB_GREY_TEXT,
                     ),
-                  SizedBox(
+                  const SizedBox(
                     height: 10,
                   ),
                   if (item != null &&
@@ -99,7 +97,7 @@ class ListPartnerCard extends StatelessWidget {
                     onPressed: () {
                       onApprovePressed();
                     },
-                    child: Text(
+                    child: const Text(
                       '승인',
                       style: TextStyle(
                         color: Color(0xff333333),
@@ -111,7 +109,7 @@ class ListPartnerCard extends StatelessWidget {
                     onPressed: () {
                       onDeletePressed();
                     },
-                    child: Text(
+                    child: const Text(
                       '삭제',
                       style: TextStyle(
                         color: Color(0xffffffff),

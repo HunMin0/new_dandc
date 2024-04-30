@@ -1,8 +1,6 @@
 import 'dart:convert';
 
 import 'package:Deal_Connect/model/user.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SharedPrefUtils {
@@ -48,9 +46,11 @@ class SharedPrefUtils {
   static Future<bool> setUser(User user) async {
     try {
       final prefs = await SharedPreferences.getInstance();
+      // print("setUser @@@@@@@@@@@ " + jsonEncode(user));
       prefs.setString(prefKeyUser, jsonEncode(user));
       return true;
     } catch (e) {
+      print('setUserError@@@' + e.toString());
       return false;
     }
   }
@@ -69,8 +69,10 @@ class SharedPrefUtils {
     try {
       final prefs = await SharedPreferences.getInstance();
       String? userStr = prefs.getString(prefKeyUser);
+      // print("getUser@@@@@@@@@@@@@@" + jsonDecode(userStr!));
       return userStr != null ? User.fromJSON(jsonDecode(userStr)) : null;
     } catch (e) {
+      print('getUserError@@@' + e.toString());
       return null;
     }
   }
@@ -161,15 +163,16 @@ class SharedPrefUtils {
 
   static Future<bool> addSearchPartner(String partnerId) async {
     try {
-      await removeSearchKeyword(partnerId);
-
       final prefs = await SharedPreferences.getInstance();
       final savedStr = prefs.getString(prefKeySearchPartner);
-      String saveStr = partnerId;
-      if (savedStr != null && savedStr.isNotEmpty) {
-        saveStr += prefKeyDivider + savedStr;
+      List<String> partnerIds = savedStr != null ? savedStr.split(prefKeyDivider) : [];
+      partnerIds.remove(partnerId);
+      partnerIds.insert(0, partnerId);
+      if (partnerIds.length > 10) {
+        partnerIds = partnerIds.take(10).toList();
       }
-      prefs.setString(prefKeySearchPartner, saveStr);
+      // 저장
+      prefs.setString(prefKeySearchPartner, partnerIds.join(prefKeyDivider));
       return true;
     } catch (e) {
       return false;
@@ -221,6 +224,5 @@ class SharedPrefUtils {
       return false;
     }
   }
-
 
 }

@@ -102,8 +102,10 @@ class _HistoryDetailConfirmState extends State<HistoryDetailConfirm> {
                   children: [
                     SizedBox(
                       width: double.infinity,
-                      child: Text(tradeData!.has_request_user != null
+                      child: division == 'approved' ? Text(tradeData!.has_request_user != null
                           ? tradeData!.has_request_user!.name + ' 회원과의\n거래내역을 승인합니다.\n한마디 남겨보세요!'
+                          : '', style: SettingStyle.TITLE_STYLE,) : Text(tradeData!.has_request_user != null
+                          ? tradeData!.has_request_user!.name + ' 회원과의\n거래내역을 반려합니다.\n반려이유를 남겨주세요'
                           : '', style: SettingStyle.TITLE_STYLE,),
                     ),
                     const SizedBox(height: 20,),
@@ -264,7 +266,9 @@ class _HistoryDetailConfirmState extends State<HistoryDetailConfirm> {
           msg: '정말 반려 하시겠습니까?',
           rightBtnText: '반려',
           onLeftBtnClick: () {},
-          onRightBtnClick: () {});
+          onRightBtnClick: () {
+            _manageSubmit('rejected');
+          });
     }
   }
 
@@ -279,8 +283,8 @@ class _HistoryDetailConfirmState extends State<HistoryDetailConfirm> {
           barrierDismissible: false,
           builder: (BuildContext context) {
             return ShowCompleteDialog(
-              messageTitle: '승인 완료',
-              messageText: '승인이 완료 되었습니다.',
+              messageTitle: tradeStatus == 'rejected' ? '반려 완료' : '승인 완료',
+              messageText: '처리되었습니다.',
               buttonText: '확인',
               onConfirmed: () {
                 Navigator.of(context).pop();

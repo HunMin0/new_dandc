@@ -5,9 +5,6 @@ import 'package:Deal_Connect/api/group.dart';
 import 'package:Deal_Connect/components/alert/show_complete_dialog.dart';
 import 'package:Deal_Connect/components/const/setting_colors.dart';
 import 'package:Deal_Connect/components/const/setting_style.dart';
-import 'package:Deal_Connect/components/custom/common_text_form_filed.dart';
-import 'package:Deal_Connect/components/custom/join_text_form_field.dart';
-import 'package:Deal_Connect/components/layout/default_logo_layout.dart';
 import 'package:Deal_Connect/components/layout/default_next_layout.dart';
 import 'package:Deal_Connect/components/loading.dart';
 import 'package:Deal_Connect/model/group.dart';
@@ -16,7 +13,6 @@ import 'package:Deal_Connect/utils/utils.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:hexcolor/hexcolor.dart';
 import 'package:image_picker/image_picker.dart';
 
 class GroupRegisterIndex extends StatefulWidget {
@@ -120,17 +116,17 @@ class _GroupRegisterIndexState extends State<GroupRegisterIndex> {
         Utils.getImageFilePath(groupData!.has_group_image!),
       );
     } else {
-      groupImage = AssetImage('assets/images/no-image.png');
+      groupImage = const AssetImage('assets/images/no-image.png');
     }
 
-    final baseBorder = OutlineInputBorder(
+    final baseBorder = const OutlineInputBorder(
       borderSide: BorderSide(
         color: INPUT_BORDER_COLOR,
         width: 1.0,
       ),
     );
 
-    final bottomTextStyle = TextStyle(
+    final bottomTextStyle = const TextStyle(
       color: Color(0xFF232323),
       fontSize: 14.0,
       //fontWeight: FontWeight.w600
@@ -138,13 +134,13 @@ class _GroupRegisterIndexState extends State<GroupRegisterIndex> {
 
     if (_isLoading) {
       // 로딩 중 인디케이터 표시
-      return Loading();
+      return const Loading();
     }
 
     return DefaultNextLayout(
         nextTitle: '저장하기',
         prevTitle: '취소',
-        titleName: '그룹 만들기',
+        titleName: '그룹정보',
         isCancel: false,
         isProcessable: true,
         bottomBar: true,
@@ -202,7 +198,7 @@ class _GroupRegisterIndexState extends State<GroupRegisterIndex> {
                                             });
                                           },
                                         ),
-                                        Divider(
+                                        const Divider(
                                           height: 1.0,
                                           color: Color(0xFFdddddd),
                                         ),
@@ -302,7 +298,7 @@ class _GroupRegisterIndexState extends State<GroupRegisterIndex> {
                             )),
                       ],
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 10,
                     ),
                     Column(
@@ -326,14 +322,14 @@ class _GroupRegisterIndexState extends State<GroupRegisterIndex> {
                             )),
                       ],
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 10,
                     ),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 10.0),
+                        const Padding(
+                          padding: EdgeInsets.symmetric(vertical: 10.0),
                           child: Text(
                             '검색 키워드',
                             style: TextStyle(
@@ -354,16 +350,16 @@ class _GroupRegisterIndexState extends State<GroupRegisterIndex> {
                                 color: PRIMARY_COLOR,
                               ),
                             ),
-                            contentPadding: EdgeInsets.all(12.0),
+                            contentPadding: const EdgeInsets.all(12.0),
                             labelText: '키워드 추가',
                             suffixIcon: IconButton(
-                              icon: Icon(Icons.add),
+                              icon: const Icon(Icons.add),
                               onPressed: _addKeyword,
                             ),
                           ),
                           onSubmitted: (value) => _addKeyword(),
                         ),
-                        SizedBox(height: 10),
+                        const SizedBox(height: 10),
                         Wrap(
                           spacing: 8.0, // 각 Chip의 간격
                           children: keywords
@@ -393,6 +389,10 @@ class _GroupRegisterIndexState extends State<GroupRegisterIndex> {
       CustomDialog.dismissProgressDialog();
 
       if (response.status == 'success') {
+        Group resultData = Group.fromJSON(response.data);
+        setState(() {
+          groupData = resultData;
+        });
         _showCompleteDialog(context);
       } else {
         CustomDialog.showServerValidatorErrorMsg(response);
@@ -431,6 +431,8 @@ class _GroupRegisterIndexState extends State<GroupRegisterIndex> {
           onConfirmed: () {
             Navigator.pop(context);
             Navigator.pop(context);
+            Navigator.popAndPushNamed(context, '/group/info',
+                arguments: {'groupId': groupData!.id});
           },
         );
       },
@@ -441,6 +443,7 @@ class _GroupRegisterIndexState extends State<GroupRegisterIndex> {
   void dispose() {
     super.dispose();
   }
+
 
 
 }

@@ -1,8 +1,6 @@
 import 'package:Deal_Connect/components/const/setting_colors.dart';
+import 'package:Deal_Connect/components/const/setting_style.dart';
 import 'package:Deal_Connect/components/layout/default_logo_layout.dart';
-import 'package:Deal_Connect/pages/auth/join/join_index.dart';
-import 'package:Deal_Connect/pages/auth/terms/privacy_terms.dart';
-import 'package:Deal_Connect/pages/auth/terms/terms_of_use.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
@@ -37,15 +35,12 @@ class _TermsIndexState extends State<TermsIndex> {
                   color: Colors.black),
               children: [
                 TextSpan(
-                  text: '서비스가 처음이시군요\n',
-                ),
+                    text: '서비스가 처음이시군요\n', style: SettingStyle.TITLE_STYLE),
                 TextSpan(
-                  text: '약관내용에 동의',
-                  style: TextStyle(color: PRIMARY_COLOR), // 파란색으로 처리
-                ),
-                TextSpan(
-                  text: '해주세요',
-                ),
+                    text: '약관내용에 동의',
+                    style: SettingStyle.TITLE_STYLE
+                        .copyWith(color: PRIMARY_COLOR)),
+                TextSpan(text: '해주세요', style: SettingStyle.TITLE_STYLE),
               ],
             ),
           ),
@@ -70,7 +65,7 @@ class _TermsIndexState extends State<TermsIndex> {
                   },
                   child: Container(
                     padding:
-                        EdgeInsets.symmetric(horizontal: 30.0, vertical: 18.0),
+                        EdgeInsets.symmetric(horizontal: 10.0, vertical: 18.0),
                     decoration: BoxDecoration(
                         color: Color(0xFFf8f9fb),
                         borderRadius: BorderRadius.circular(8.0)),
@@ -79,11 +74,8 @@ class _TermsIndexState extends State<TermsIndex> {
                       children: [
                         Text(
                           '전체동의',
-                          style: TextStyle(
-                            fontSize: 16.0,
-                            fontWeight: FontWeight.w700,
-                            color: PRIMARY_COLOR,
-                          ),
+                          style: SettingStyle.NORMAL_TEXT_STYLE
+                              .copyWith(color: PRIMARY_COLOR, fontWeight: FontWeight.bold),
                         ),
                         Container(
                           width: 26,
@@ -116,16 +108,17 @@ class _TermsIndexState extends State<TermsIndex> {
                 ),
                 Container(
                   padding:
-                      EdgeInsets.symmetric(horizontal: 30.0, vertical: 14.0),
+                      EdgeInsets.symmetric(horizontal: 10.0, vertical: 14.0),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       GestureDetector(
                         onTap: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => TermsOfUse()));
+                          Navigator.pushNamed(context, '/webviewer',
+                              arguments: {
+                                'url':
+                                    'https://elastic-wolverine-c46.notion.site/206e03ed63634093a147baa93be78887'
+                              });
                         },
                         child: _termsText(
                           underText: '서비스 이용 약관',
@@ -150,16 +143,17 @@ class _TermsIndexState extends State<TermsIndex> {
                 ),
                 Container(
                   padding:
-                      EdgeInsets.symmetric(horizontal: 30.0, vertical: 14.0),
+                      EdgeInsets.symmetric(horizontal: 10.0, vertical: 14.0),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       GestureDetector(
                         onTap: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => PrivacyTerms()));
+                          Navigator.pushNamed(context, '/webviewer',
+                              arguments: {
+                                'url':
+                                    'https://elastic-wolverine-c46.notion.site/39205eef13dc49b0a3dd0d8f9bf4b35e'
+                              });
                         },
                         child: _termsText(
                           underText: '개인정보 처리 방침',
@@ -188,37 +182,23 @@ class _TermsIndexState extends State<TermsIndex> {
                 ),
                 Container(
                   padding:
-                      EdgeInsets.symmetric(horizontal: 30.0, vertical: 14.0),
+                      EdgeInsets.symmetric(horizontal: 10.0, vertical: 14.0),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      _termsText(
-                        underText: '이벤트 및 마케팅 활용 동의',
-                        subText: ' (선택)',
-                        showUnderline: false,
-                      ),
-                      InkWell(
-                        borderRadius: BorderRadius.circular(20.0),
+                      GestureDetector(
                         onTap: () {
-                          setState(() {
-                            isAgreeMarketing = !isAgreeMarketing;
-                          });
+                          Navigator.pushNamed(context, '/webviewer',
+                              arguments: {
+                                'url':
+                                    'https://elastic-wolverine-c46.notion.site/dad9fd935eae4ac3ab3d2f5946529548'
+                              });
                         },
-                        child: _checkType(termAgreed: isAgreeMarketing),
-                      ),
-                    ],
-                  ),
-                ),
-                Container(
-                  padding:
-                      EdgeInsets.symmetric(horizontal: 30.0, vertical: 14.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      _termsText(
-                        underText: '푸시 알림 동의',
-                        subText: ' (선택)',
-                        showUnderline: false,
+                        child: _termsText(
+                          underText: '푸시 알림 동의',
+                          subText: ' (선택)',
+                          showUnderline: true,
+                        ),
                       ),
                       InkWell(
                         borderRadius: BorderRadius.circular(20.0),
@@ -234,27 +214,60 @@ class _TermsIndexState extends State<TermsIndex> {
                 ),
                 Container(
                   padding:
-                      EdgeInsets.symmetric(horizontal: 30.0, vertical: 14.0),
+                      EdgeInsets.symmetric(horizontal: 10.0, vertical: 14.0),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      _termsText(
-                        underText: '마케팅 푸시 알림 동의',
-                        subText: ' (선택)',
-                        showUnderline: false,
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.pushNamed(context, '/webviewer',
+                              arguments: {
+                                'url':
+                                    'https://elastic-wolverine-c46.notion.site/1f4c9c56d1ed45e6b19c2796d1872657'
+                              });
+                        },
+                        child: _termsText(
+                          underText: '이벤트 및 마케팅 활용 알림 동의',
+                          subText: ' (선택)',
+                          showUnderline: true,
+                        ),
                       ),
                       InkWell(
                         borderRadius: BorderRadius.circular(20.0),
                         onTap: () {
                           setState(() {
-                            isAgreeAppMarketing = !isAgreeAppMarketing;
+                            isAgreeMarketing = !isAgreeMarketing;
                           });
                         },
-                        child: _checkType(termAgreed: isAgreeAppMarketing),
+                        child: _checkType(termAgreed: isAgreeMarketing),
                       ),
                     ],
                   ),
-                )
+                ),
+
+                // Container(
+                //   padding:
+                //       EdgeInsets.symmetric(horizontal: 10.0, vertical: 14.0),
+                //   child: Row(
+                //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                //     children: [
+                //       _termsText(
+                //         underText: '마케팅 푸시 알림 동의',
+                //         subText: ' (선택)',
+                //         showUnderline: false,
+                //       ),
+                //       InkWell(
+                //         borderRadius: BorderRadius.circular(20.0),
+                //         onTap: () {
+                //           setState(() {
+                //             isAgreeAppMarketing = !isAgreeAppMarketing;
+                //           });
+                //         },
+                //         child: _checkType(termAgreed: isAgreeAppMarketing),
+                //       ),
+                //     ],
+                //   ),
+                // )
               ],
             ),
           ),
@@ -286,10 +299,8 @@ class _TermsIndexState extends State<TermsIndex> {
               child: Center(
                 child: Text(
                   '다음',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 14.0,
-                    fontWeight: FontWeight.w500,
+                  style: SettingStyle.SUB_TITLE_STYLE.copyWith(
+                    color: Colors.white
                   ),
                 ),
               ),
@@ -324,10 +335,8 @@ class _termsText extends StatelessWidget {
   Widget build(BuildContext context) {
     return RichText(
       text: TextSpan(
-          style: TextStyle(
-            fontSize: 14.0,
-            fontWeight: FontWeight.w500,
-            color: Colors.grey,
+          style: SettingStyle.NORMAL_TEXT_STYLE.copyWith(
+            color: Colors.grey
           ),
           children: [
             TextSpan(

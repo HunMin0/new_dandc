@@ -1,8 +1,11 @@
 import 'package:Deal_Connect/api/auth.dart';
 import 'package:Deal_Connect/components/const/setting_colors.dart';
+import 'package:Deal_Connect/components/const/setting_style.dart';
 import 'package:Deal_Connect/components/custom/join_text_form_field.dart';
 import 'package:Deal_Connect/components/layout/default_logo_layout.dart';
+import 'package:Deal_Connect/model/login_response_data.dart';
 import 'package:Deal_Connect/utils/custom_dialog.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 
 class JoinIndex extends StatefulWidget {
@@ -31,6 +34,7 @@ class _JoinIndexState extends State<JoinIndex> {
 
   bool? _isIDValid; // 아이디 유효성 검사 결과 저장
   bool? _isRecommendCodeValid; // 추천인코드 유효성 검사 결과 저장
+  bool _isButtonDisabled = true; // 중복검사 버튼 활성화여부
 
   //중복체크
   Future<bool> checkDuplicate() async {
@@ -126,7 +130,7 @@ class _JoinIndexState extends State<JoinIndex> {
           children: [
             Text(
               '회원가입을 위해\n아래 정보를 입력해주세요.',
-              style: TextStyle(fontSize: 22.0, fontWeight: FontWeight.w400),
+              style: SettingStyle.TITLE_STYLE,
             ),
             SizedBox(
               height: 15.0,
@@ -152,7 +156,7 @@ class _JoinIndexState extends State<JoinIndex> {
                           maxHeight: double.infinity,
                         ),
                         child: TextButton(
-                          onPressed: () async {
+                          onPressed: _isButtonDisabled ? null : () async {
                             Future<bool> isDuplicate = checkDuplicate();
                             if (await isDuplicate) {
                               print('중복된 아이디입니다.');
@@ -254,9 +258,47 @@ class _JoinIndexState extends State<JoinIndex> {
                       _formKey.currentState!.validate();
                       postRegister(userMapData).then((value) {
                         if (value.status == 'success') {
-                          Navigator.pushNamedAndRemoveUntil(context, '/login', (r) => false);
+
+
+                          postLogin({
+                            'user_id': userId,
+                            'password': password
+                          }).then((value) {
+                            CustomDialog.dismissProgressDialog();
+
+                            if (value.status == 'success') {
+                              LoginResponseData loginResponseData = LoginResponseData.fromJSON(value.data);
+
+                              initLoginUserData(
+                                  loginResponseData.user,
+                                  loginResponseData.tokenType,
+                                  loginResponseData.accessToken
+                              ).then((result) {
+                                if (!(loginResponseData.user.is_active)) {
+                                  Navigator.pushNamedAndRemoveUntil(context, '/auth/withdraw', (r) => false);
+                                } else {
+                                  refreshFcmToken().then((value) {});
+                                  if (loginResponseData.user.is_agree_app_notification) {
+                                    FirebaseMessaging.instance.subscribeToTopic('all')
+                                        .then((_) {
+                                      print('사용자가 all 토픽을 구독하였습니다.');
+                                    });
+                                  }
+                                  if (loginResponseData.user.is_agree_marketing) {
+                                    FirebaseMessaging.instance.subscribeToTopic('marketing')
+                                        .then((_) {
+                                      print('사용자가 marketing 토픽을 구독하였습니다.');
+                                    });
+                                  }
+                                  Navigator.pushNamedAndRemoveUntil(
+                                      context, '/home', (r) => false);
+                                }
+                              });
+                            } else {
+                              CustomDialog.showServerValidatorErrorMsg(value);
+                            }
+                          });
                         } else {
-                          print(value.message);
                           CustomDialog.showServerValidatorErrorMsg(value);
                         }
                       });
@@ -310,6 +352,9 @@ class _JoinIndexState extends State<JoinIndex> {
         setState(() {
           userId = value;
           _isIDValid = null;
+          if (value.length >= 4) {
+            _isButtonDisabled = false;
+          }
         });
       },
     );

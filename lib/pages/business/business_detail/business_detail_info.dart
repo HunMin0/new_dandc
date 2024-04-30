@@ -1,5 +1,6 @@
 import 'package:Deal_Connect/api/business.dart';
 import 'package:Deal_Connect/api/partner.dart';
+import 'package:Deal_Connect/api/server_config.dart';
 import 'package:Deal_Connect/api/user_business_service.dart';
 import 'package:Deal_Connect/components/alert/show_complete_dialog.dart';
 import 'package:Deal_Connect/components/common_item/grey_chip.dart';
@@ -22,6 +23,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:hexcolor/hexcolor.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class BusinessDetailInfo extends StatefulWidget {
   const BusinessDetailInfo({super.key});
@@ -39,6 +41,7 @@ class _BusinessDetailInfoState extends State<BusinessDetailInfo> {
   String _isPartner = 'N'; // 'N' 아님, 'R' 승인대기, 'Y' 파트너
   User? myUser;
   Partnership? myPartnership;
+  String? shareUrl;
 
   var args;
 
@@ -48,6 +51,13 @@ class _BusinessDetailInfoState extends State<BusinessDetailInfo> {
     _initData();
     super.initState();
   }
+
+  Future<void> generateAndSetUrl(id) async {
+    setState(() {
+      shareUrl = ServerConfig.SERVER_URL + '?uri=business/info&userBusinessId=' + id.toString();
+    });
+  }
+
 
   void _initMyUser() {
     SharedPrefUtils.getUser().then((value) => myUser = value);
@@ -67,7 +77,8 @@ class _BusinessDetailInfoState extends State<BusinessDetailInfo> {
           });
         }
         if (userBusinessId != null) {
-          await getUserBusiness(userBusinessId!).then((response) {
+          generateAndSetUrl(userBusinessId);
+          await getUserBusiness(userBusinessId!).then((response) async {
             if (response.status == 'success') {
               UserBusiness resultData = UserBusiness.fromJSON(response.data);
               setState(() {
@@ -82,7 +93,7 @@ class _BusinessDetailInfoState extends State<BusinessDetailInfo> {
               });
 
               if (userBusiness?.user_id != null) {
-                _initPartnerShip(userBusiness!.user_id);
+                await _initPartnerShip(userBusiness!.user_id);
               }
             } else {
               Fluttertoast.showToast(
@@ -90,7 +101,7 @@ class _BusinessDetailInfoState extends State<BusinessDetailInfo> {
             }
           });
 
-          _initUserBusinessServices(userBusinessId);
+          await _initUserBusinessServices(userBusinessId);
         }
         setState(() {
           _isLoading = false;
@@ -99,44 +110,38 @@ class _BusinessDetailInfoState extends State<BusinessDetailInfo> {
     });
   }
 
-  void _initUserBusinessServices(userBusinessId) async {
-    await getUserBusinessServices(queryMap: {
-      'user_business_id': userBusinessId,
-    }).then((response) {
-      if (response.status == 'success') {
-        Iterable iterable = response.data;
-
-        List<UserBusinessService>? userBusinessServiceList =
-            List<UserBusinessService>.from(
-                iterable.map((e) => UserBusinessService.fromJSON(e)));
-
-        setState(() {
-          this.userBusinessServiceList = userBusinessServiceList;
-        });
-      }
-    });
+  Future<void> _initUserBusinessServices(userBusinessId) async {
+    var response = await getUserBusinessServices(queryMap: {'user_business_id': userBusinessId,});
+    if (response.status == 'success' && mounted) {
+      Iterable iterable = response.data;
+      List<UserBusinessService>? userBusinessServiceList =
+          List<UserBusinessService>.from(
+              iterable.map((e) => UserBusinessService.fromJSON(e)));
+      setState(() {
+        this.userBusinessServiceList = userBusinessServiceList;
+      });
+    }
   }
 
-  void _initPartnerShip(userId) async {
-    await getPartnership(userId).then((response) {
-      if (response.status == 'success') {
-        Partnership myPartnershipData = Partnership.fromJSON(response.data);
-        setState(() {
-          this.myPartnership = myPartnershipData;
-          if (myPartnership != null && myPartnership!.is_partner) {
-            //승인
-            if (myPartnership!.partnership_status == true) {
-              _isPartner = 'Y';
-            } else {
-              //승인대기
-              _isPartner = 'R';
-            }
+  Future<void> _initPartnerShip(userId) async {
+    var response = await getPartnership(userId);
+    if (response.status == 'success' && mounted) {
+      Partnership myPartnershipData = Partnership.fromJSON(response.data);
+      setState(() {
+        this.myPartnership = myPartnershipData;
+        if (myPartnership != null && myPartnership!.is_partner) {
+          //승인
+          if (myPartnership!.partnership_status == true) {
+            _isPartner = 'Y';
           } else {
-            _isPartner = 'N';
+            //승인대기
+            _isPartner = 'R';
           }
-        });
-      }
-    });
+        } else {
+          _isPartner = 'N';
+        }
+      });
+    }
   }
 
   @override
@@ -149,39 +154,53 @@ class _BusinessDetailInfoState extends State<BusinessDetailInfo> {
         Utils.getImageFilePath(userBusiness!.has_business_image!),
       );
     } else {
-      businessMainImage = AssetImage('assets/images/no-image.png');
+      businessMainImage = const AssetImage('assets/images/no-image.png');
     }
 
     if (userBusiness != null &&
         userBusiness!.has_owner != null &&
-        userBusiness!.has_owner!.has_user_profile != null &&
-        userBusiness!.has_owner!.has_user_profile!.has_profile_image != null) {
+        userBusiness!.has_owner!.profile != null &&
+        userBusiness!.has_owner!.profile!.has_profile_image != null) {
       ownerAvatarImage = CachedNetworkImageProvider(
         Utils.getImageFilePath(
-            userBusiness!.has_owner!.has_user_profile!.has_profile_image!),
+            userBusiness!.has_owner!.profile!.has_profile_image!),
       );
     } else {
-      ownerAvatarImage = AssetImage('assets/images/no-image.png');
+      ownerAvatarImage = const AssetImage('assets/images/no-image.png');
     }
 
-    if (_isLoading && userBusiness == null) {
+    if (_isLoading) {
       // 로딩 중 인디케이터 표시
-      return Loading();
+      return const Loading();
     }
     return SliverLayout(
         isNotInnerPadding: 'true',
         child: CustomScrollView(
           slivers: <Widget>[
+            CupertinoSliverRefreshControl(
+              onRefresh: () async {
+                setState(() {
+                  _isLoading = true;
+                });
+                _initData();
+              },
+            ),
             SliverAppBar(
+              surfaceTintColor: Colors.white,
               leading: IconButton(
-                padding: EdgeInsets.all(10.0),
+                padding: const EdgeInsets.all(10.0),
                 icon: const Icon(CupertinoIcons.back),
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
               ),
               actions: [
-                IconButton(onPressed: () {}, icon: const Icon(CupertinoIcons.share)),
+                if (shareUrl != null)
+                IconButton(
+                    onPressed: () {
+                      CustomDialog.showShareDialog(context, '공유하기', shareUrl!);
+                    },
+                    icon: const Icon(CupertinoIcons.share)),
                 if (_isManageable)
                   IconButton(
                       onPressed: () {
@@ -190,13 +209,12 @@ class _BusinessDetailInfoState extends State<BusinessDetailInfo> {
                           shape: const RoundedRectangleBorder(
                             borderRadius: BorderRadius.only(
                               topLeft: Radius.circular(0),
-                              topRight:
-                                  Radius.circular(0),
+                              topRight: Radius.circular(0),
                             ),
                           ),
                           builder: (BuildContext bc) {
                             return Container(
-                              margin: EdgeInsets.only(bottom: 40.0),
+                              margin: const EdgeInsets.only(bottom: 40.0),
                               child: SafeArea(
                                 child: Wrap(
                                   children: <Widget>[
@@ -206,8 +224,8 @@ class _BusinessDetailInfoState extends State<BusinessDetailInfo> {
                                           '대표업체등록',
                                           style: SettingStyle.SUB_TITLE_STYLE
                                               .copyWith(
-                                                  color:
-                                                      SettingStyle.MAIN_COLOR),
+                                              color:
+                                              SettingStyle.MAIN_COLOR),
                                           textAlign: TextAlign.center,
                                         ),
                                         onTap: () {
@@ -221,7 +239,7 @@ class _BusinessDetailInfoState extends State<BusinessDetailInfo> {
                                       color: HexColor('#dddddd'),
                                     ),
                                     ListTile(
-                                      title: Text(
+                                      title: const Text(
                                         '수정하기',
                                         style: SettingStyle.SUB_TITLE_STYLE,
                                         textAlign: TextAlign.center,
@@ -232,7 +250,7 @@ class _BusinessDetailInfoState extends State<BusinessDetailInfo> {
                                             context, '/business/edit',
                                             arguments: {
                                               'userBusinessId':
-                                                  userBusiness!.id,
+                                              userBusiness!.id,
                                               'storeName': userBusiness!.name
                                             }).then((value) {
                                           _initData();
@@ -264,7 +282,7 @@ class _BusinessDetailInfoState extends State<BusinessDetailInfo> {
                           },
                         );
                       },
-                      icon: Icon(CupertinoIcons.ellipsis_vertical)),
+                      icon: const Icon(CupertinoIcons.ellipsis_vertical)),
               ],
               pinned: true,
               expandedHeight: 350.0,
@@ -317,7 +335,7 @@ class _BusinessDetailInfoState extends State<BusinessDetailInfo> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Padding(
-                              padding: EdgeInsets.symmetric(vertical: 10),
+                              padding: const EdgeInsets.symmetric(vertical: 10),
                               child: Text(
                                 userBusiness != null ? userBusiness!.name : '',
                                 style: SettingStyle.TITLE_STYLE,
@@ -328,15 +346,16 @@ class _BusinessDetailInfoState extends State<BusinessDetailInfo> {
                               style: TextStyle(
                                   fontSize: 16, color: HexColor("#5D5D5D")),
                             ),
-                            SizedBox(height: 15),
+                            const SizedBox(height: 15),
                             Row(
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
                                 GestureDetector(
                                   onTap: () {
-                                    Navigator.pushNamed(context, '/profile',
+                                    Navigator.pushNamed(
+                                        context, '/profile/partner/info',
                                         arguments: {
-                                          'user_id': userBusiness!.has_owner!.id
+                                          'userId': userBusiness!.has_owner!.id
                                         });
                                   },
                                   child: Row(
@@ -345,7 +364,7 @@ class _BusinessDetailInfoState extends State<BusinessDetailInfo> {
                                         radius: 15.0,
                                         backgroundImage: ownerAvatarImage,
                                       ),
-                                      SizedBox(
+                                      const SizedBox(
                                         width: 5,
                                       ),
                                       Text(
@@ -353,12 +372,12 @@ class _BusinessDetailInfoState extends State<BusinessDetailInfo> {
                                             ? userBusiness!.has_owner?.name ??
                                                 ''
                                             : '',
-                                        style: TextStyle(fontSize: 16),
+                                        style: const TextStyle(fontSize: 16),
                                       )
                                     ],
                                   ),
                                 ),
-                                SizedBox(
+                                const SizedBox(
                                   width: 10,
                                 ),
                                 Container(
@@ -366,20 +385,20 @@ class _BusinessDetailInfoState extends State<BusinessDetailInfo> {
                                   height: 20,
                                   color: HexColor("#222222"),
                                 ),
-                                SizedBox(
+                                const SizedBox(
                                   width: 10,
                                 ),
                                 Row(
                                   children: [
                                     Container(
                                       width: 25,
-                                      child: Image(
+                                      child: const Image(
                                         image: AssetImage(
                                             'assets/images/icons/partner_icon.png'),
                                         fit: BoxFit.contain,
                                       ),
                                     ),
-                                    SizedBox(
+                                    const SizedBox(
                                       width: 5,
                                     ),
                                     Text(
@@ -389,37 +408,67 @@ class _BusinessDetailInfoState extends State<BusinessDetailInfo> {
                                                   .toString()
                                               : "0") +
                                           "명",
-                                      style: TextStyle(fontSize: 16),
+                                      style: const TextStyle(fontSize: 16),
                                     )
                                   ],
                                 ),
                               ],
                             ),
-                            SizedBox(
+                            const SizedBox(
                               height: 15,
                             ),
                             if (userBusiness != null &&
                                 userBusiness!.has_keywords != null)
                               _buildTags(userBusiness!.has_keywords!),
-                            SizedBox(
+                            const SizedBox(
                               height: 15,
                             ),
                             Row(children: [
-                              if (_isPartner == 'Y' || _isManageable == true)
+                              if (_isPartner == 'Y' ||
+                                  _isManageable == true) ...[
                                 _reanderButton(
-                                  btnName: '전화',
-                                  onPressed: () {},
-                                )
-                              else if (_isPartner == 'N')
+                                  btnName: '\u{1F4DE} 전화',
+                                  onPressed: () {
+                                    launchUrl(Uri.parse(
+                                        "tel:${userBusiness!.phone}"));
+                                  },
+                                ),
+                                const SizedBox(
+                                  width: 10,
+                                ),
+                                if (_isManageable == false)
+                                  _reanderButton(
+                                    btnName: '\u{1F4B3} 구매등록',
+                                    onPressed: () {
+                                      Navigator.pushNamed(
+                                          context, '/trade/buy/create',
+                                          arguments: {
+                                            'userBusinessId': userBusiness!.id
+                                          });
+                                    },
+                                  ),
+                                if (_isManageable == true)
+                                  _reanderButton(
+                                    btnName: '\u{1F4CB} 판매내역',
+                                    onPressed: () {
+                                      Navigator.pushNamed(
+                                          context, '/business/history',
+                                          arguments: {
+                                            'userBusinessId': userBusiness!.id
+                                          });
+                                    },
+                                  ),
+
+                              ] else if (_isPartner == 'N')
                                 _reanderButton(
-                                  btnName: '파트너 신청',
+                                  btnName: '\u{1F44B} 파트너 신청',
                                   onPressed: () {
                                     _attendPartner();
                                   },
                                 )
                               else if (_isPartner == 'R')
                                 _reanderButton(
-                                  btnName: '승인 대기중',
+                                  btnName: '\u{231B} 승인 대기중',
                                   onPressed: () {},
                                 )
                             ]),
@@ -468,12 +517,12 @@ class _BusinessDetailInfoState extends State<BusinessDetailInfo> {
                         padding: const EdgeInsets.symmetric(horizontal: 15.0),
                         child: Row(
                           children: [
-                            Text(
+                            const Text(
                               "주요 서비스",
                               style: TextStyle(
                                   fontSize: 20, fontWeight: FontWeight.bold),
                             ),
-                            Spacer(),
+                            const Spacer(),
                             if (_isManageable)
                               ElevatedButton(
                                 onPressed: () {
@@ -485,15 +534,15 @@ class _BusinessDetailInfoState extends State<BusinessDetailInfo> {
                                     _initData();
                                   });
                                 },
-                                child: Text(
+                                child: const Text(
                                   '추가하기',
                                   style: TextStyle(
                                     color: Color(0xff333333),
                                   ),
                                 ),
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: Color(0xFFf5f6fa),
-                                  foregroundColor: Color(0xFFf5f6fa),
+                                  backgroundColor: const Color(0xFFf5f6fa),
+                                  foregroundColor: const Color(0xFFf5f6fa),
                                   elevation: 0,
                                   shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(8.0)),
@@ -512,13 +561,14 @@ class _BusinessDetailInfoState extends State<BusinessDetailInfo> {
               ),
             ),
             (userBusinessServiceList?.isEmpty ?? true)
-                ? SliverToBoxAdapter(
+                ? const SliverToBoxAdapter(
                     child: NoItems(), // 데이터가 없을 때 적절한 위젯을 반환합니다.
                   )
                 : SliverPadding(
-                    padding: EdgeInsets.symmetric(horizontal: 10.0),
+                    padding: const EdgeInsets.symmetric(horizontal: 10.0),
                     sliver: SliverGrid(
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 2, // 한 줄에 2개의 아이템
                         crossAxisSpacing: 10.0, // 아이템 간의 가로 간격
                         mainAxisSpacing: 10.0, // 아이템 간의 세로 간격
@@ -566,7 +616,9 @@ class _BusinessDetailInfoState extends State<BusinessDetailInfo> {
       if (i < 3) {
         tagWidgets.add(Padding(
           padding: const EdgeInsets.only(right: 5.0),
-          child: GreyChip(chipText: '#' + tagList[i].keyword,),
+          child: GreyChip(
+            chipText: '#' + tagList[i].keyword,
+          ),
         ));
       } else {
         break;
@@ -585,13 +637,13 @@ class _BusinessDetailInfoState extends State<BusinessDetailInfo> {
               color: HexColor("#ABABAB"),
               size: 18,
             ),
-            SizedBox(
+            const SizedBox(
               width: 10,
             ),
-            Text(text)
+            Expanded(child: Text(text, overflow: TextOverflow.ellipsis,))
           ],
         ),
-        SizedBox(
+        const SizedBox(
           height: 10,
         )
       ],
@@ -729,13 +781,12 @@ class _reanderButton extends StatelessWidget {
         onPressed: onPressed,
         child: Text(
           btnName,
-          style: TextStyle(
-              color: Colors.black, fontSize: 14.0, fontWeight: FontWeight.w500),
+          style: SettingStyle.NORMAL_TEXT_STYLE,
         ),
         style: ElevatedButton.styleFrom(
-          minimumSize: Size(double.infinity, 50),
-          backgroundColor: Color(0xFFF5F6FA),
-          foregroundColor: Color(0xFFF5F6FA),
+          minimumSize: const Size(double.infinity, 50),
+          backgroundColor: const Color(0xFFF5F6FA),
+          foregroundColor: const Color(0xFFF5F6FA),
           elevation: 0,
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),

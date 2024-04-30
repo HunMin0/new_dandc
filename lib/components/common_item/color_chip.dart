@@ -20,7 +20,7 @@ class ColorChip extends StatelessWidget {
           borderRadius: BorderRadius.circular(5.0),
         ),
         child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 7.0),
+          padding: const EdgeInsets.symmetric(vertical: 2.0, horizontal: 7.0),
           child: Text(
             chipText,
             style: TextStyle(

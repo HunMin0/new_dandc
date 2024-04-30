@@ -1,3 +1,5 @@
+import 'package:Deal_Connect/components/common_item/grey_chip.dart';
+import 'package:Deal_Connect/components/const/setting_style.dart';
 import 'package:Deal_Connect/model/group.dart';
 import 'package:Deal_Connect/model/group_keyword.dart';
 import 'package:Deal_Connect/utils/utils.dart';
@@ -54,7 +56,7 @@ class GridGroupCard extends StatelessWidget {
               ),
             ),
             SizedBox(height: 5,),
-            Text(item.name, style: TextStyle(fontWeight: FontWeight.bold), overflow: TextOverflow.ellipsis,),
+            Text(item.name, style: SettingStyle.NORMAL_TEXT_STYLE.copyWith(fontWeight: FontWeight.bold), overflow: TextOverflow.ellipsis,),
             SizedBox(height: 10,),
             if (item.has_keywords != null)
               SingleChildScrollView(
@@ -73,7 +75,7 @@ class GridGroupCard extends StatelessWidget {
       if (i < 3) {
         tagWidgets.add(Padding(
           padding: const EdgeInsets.only(right: 5.0),
-          child: _cardTag(tagList[i].keyword),
+          child: GreyChip(chipText: '#' + tagList[i].keyword),
         ));
       } else {
         break;
@@ -81,26 +83,6 @@ class GridGroupCard extends StatelessWidget {
     }
 
     return Row(children: tagWidgets);
-  }
-
-// 태그 공통
-  Container _cardTag(String text) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Color(0xFFf5f6fa),
-        borderRadius: BorderRadius.circular(10.0),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 7.0),
-        child: Text(
-          text,
-          style: TextStyle(
-              color: Color(0xFF5f5f66),
-              fontSize: 11.0,
-              fontWeight: FontWeight.w500),
-        ),
-      ),
-    );
   }
 
 }

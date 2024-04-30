@@ -1,12 +1,9 @@
 import 'package:Deal_Connect/api/partner.dart';
 import 'package:Deal_Connect/components/alert/show_complete_dialog.dart';
 import 'package:Deal_Connect/components/layout/default_logo_layout.dart';
-import 'package:Deal_Connect/components/list_card.dart';
-import 'package:Deal_Connect/components/list_group_user_card.dart';
 import 'package:Deal_Connect/components/list_partner_card.dart';
 import 'package:Deal_Connect/components/loading.dart';
 import 'package:Deal_Connect/components/no_items.dart';
-import 'package:Deal_Connect/db/vertical_data.dart';
 import 'package:Deal_Connect/model/partner.dart';
 import 'package:Deal_Connect/model/user.dart';
 import 'package:Deal_Connect/utils/custom_dialog.dart';

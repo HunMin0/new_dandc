@@ -16,14 +16,14 @@ class ListBusinessCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     ImageProvider? profileThumbnailImage =
-        AssetImage('assets/images/no-image.png');
+        const AssetImage('assets/images/no-image.png');
     ImageProvider? businessThumbnailImage =
-        AssetImage('assets/images/no-image.png');
+        const AssetImage('assets/images/no-image.png');
 
     if (item.has_owner != null &&
-        item.has_owner!.has_user_profile != null &&
-        item.has_owner!.has_user_profile!.has_profile_image != null) {
-      final profileImage = item.has_owner!.has_user_profile!.has_profile_image!;
+        item.has_owner!.profile != null &&
+        item.has_owner!.profile!.has_profile_image != null) {
+      final profileImage = item.has_owner!.profile!.has_profile_image!;
       profileThumbnailImage = CachedNetworkImageProvider(
         Utils.getImageFilePath(profileImage),
       );
@@ -92,8 +92,8 @@ class ListBusinessCard extends StatelessWidget {
                         right: -10, // 우측 여백
                         top: -15, // 상단 여백
                         child: Container(
-                          padding: EdgeInsets.all(5.0),
-                          decoration: BoxDecoration(
+                          padding: const EdgeInsets.all(5.0),
+                          decoration: const BoxDecoration(
                             color: SettingStyle.MAIN_COLOR, // 뱃지 배경색
                             shape: BoxShape.circle, // 원형 뱃지
                           ),
@@ -107,22 +107,24 @@ class ListBusinessCard extends StatelessWidget {
                   ],
                 ),
               ),
-              SizedBox(
+              const SizedBox(
                 height: 5,
               ),
-              Text(
-                item.name,
-                style: TextStyle(fontWeight: FontWeight.bold),
-                overflow: TextOverflow.ellipsis,
+              Container(
+                child: Text(
+                  item.name,
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
-              SizedBox(
+              const SizedBox(
                 height: 5,
               ),
               Text(
                 item.has_owner!.name,
                 style: TextStyle(color: HexColor("#75A8E4"), fontSize: 12),
               ),
-              SizedBox(
+              const SizedBox(
                 height: 10,
               ),
               if (item.has_keywords != null)

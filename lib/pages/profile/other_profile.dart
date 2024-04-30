@@ -1,20 +1,17 @@
 import 'package:Deal_Connect/api/business.dart';
 import 'package:Deal_Connect/api/partner.dart';
+import 'package:Deal_Connect/api/server_config.dart';
 import 'package:Deal_Connect/components/alert/show_complete_dialog.dart';
 import 'package:Deal_Connect/components/common_item/grey_chip.dart';
+import 'package:Deal_Connect/components/const/setting_style.dart';
 import 'package:Deal_Connect/components/layout/default_logo_layout.dart';
-import 'package:Deal_Connect/components/list_line_business_card.dart';
 import 'package:Deal_Connect/components/list_row_business_card.dart';
 import 'package:Deal_Connect/components/loading.dart';
 import 'package:Deal_Connect/components/no_items.dart';
-import 'package:Deal_Connect/db/company_data.dart';
-import 'package:Deal_Connect/model/partner.dart';
 import 'package:Deal_Connect/model/partnership.dart';
 import 'package:Deal_Connect/model/user.dart';
 import 'package:Deal_Connect/model/user_business.dart';
 import 'package:Deal_Connect/model/user_keyword.dart';
-import 'package:Deal_Connect/pages/business/business_detail/business_detail_info.dart';
-import 'package:Deal_Connect/pages/profile/components/tab_list/not_user_registered.dart';
 import 'package:Deal_Connect/utils/custom_dialog.dart';
 import 'package:Deal_Connect/utils/shared_pref_utils.dart';
 import 'package:Deal_Connect/utils/utils.dart';
@@ -22,7 +19,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:hexcolor/hexcolor.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 // 프로필
 class OtherProfileIndex extends StatefulWidget {
@@ -42,15 +39,21 @@ class _OtherProfileIndexState extends State<OtherProfileIndex> {
   List<UserBusiness> userBusinessList = [];
   var profileData;
   Partnership? myPartnership;
+  String? shareUrl;
 
   var args;
 
   @override
   void initState() {
+    super.initState();
     _initMyUser();
     _initData();
-    super.initState();
-    // tab컨트롤러 초기화
+  }
+
+  Future<void> generateAndSetUrl(id) async {
+    setState(() {
+      shareUrl = ServerConfig.SERVER_URL + '?uri=profile&userId=' + id.toString();
+    });
   }
 
   void _initMyUser() {
@@ -71,7 +74,8 @@ class _OtherProfileIndexState extends State<OtherProfileIndex> {
           });
         }
         if (userId != null) {
-          await getPartnerUser(userId!).then((response) {
+          generateAndSetUrl(userId);
+          await getPartnerUser(userId!).then((response) async {
             if (response.status == 'success') {
               User resultData = User.fromJSON(response.data);
               setState(() {
@@ -81,104 +85,115 @@ class _OtherProfileIndexState extends State<OtherProfileIndex> {
                 }
               });
 
-              _initUserProfileData(partnerUser!.id);
-              _initUserBusinessData(partnerUser!.id);
-              _initPartnerShip(partnerUser!.id);
+              await _initUserProfileData(partnerUser!.id);
+              await _initUserBusinessData(partnerUser!.id);
+              await _initPartnerShip(partnerUser!.id);
+
+              setState(() {
+                _isLoading = false;
+              });
             } else {
               Fluttertoast.showToast(
                   msg: '파트너 정보를 받아오는 도중 오류가 발생했습니다.\n오류코드: 463');
             }
           });
         }
-        setState(() {
-          _isLoading = false;
-        });
       }
     });
   }
 
-  void _initUserProfileData(int id) {
-    getPartnerProfileData(id).then((response) {
-      if (response.status == 'success') {
-        var responseMyPageData = response.data;
+  Future<void> _initUserProfileData(int id) async {
+    var response = await getPartnerProfileData(id);
+    if (response.status == 'success' && mounted) {
+      var responseMyPageData = response.data;
 
-        setState(() {
-          if (responseMyPageData != null) {
-            profileData = responseMyPageData;
-          }
-        });
-      }
-    });
+      setState(() {
+        if (responseMyPageData != null) {
+          profileData = responseMyPageData;
+        }
+      });
+    }
   }
 
-  void _initUserBusinessData(int id) {
-    getUserBusinesses(queryMap: {'user_id': id}).then((response) {
-      if (response.status == 'success') {
-        Iterable iterable = response.data;
+  Future<void> _initUserBusinessData(int id) async {
+    var response = await getUserBusinesses(queryMap: {'user_id': id});
+    if (response.status == 'success') {
+      Iterable iterable = response.data;
 
-        List<UserBusiness>? userBusiness = List<UserBusiness>.from(
-            iterable.map((e) => UserBusiness.fromJSON(e)));
+      List<UserBusiness>? userBusiness = List<UserBusiness>.from(
+          iterable.map((e) => UserBusiness.fromJSON(e)));
 
-        setState(() {
-          this.userBusinessList = userBusiness;
-        });
-      }
-    });
+      setState(() {
+        this.userBusinessList = userBusiness;
+      });
+    }
   }
 
-  void _initPartnerShip(userId) async {
-    await getPartnership(userId).then((response) {
-      if (response.status == 'success') {
-        Partnership myPartnershipData = Partnership.fromJSON(response.data);
-        setState(() {
-          this.myPartnership = myPartnershipData;
-          if (myPartnership != null && myPartnership!.is_partner) {
-            //승인
-            if (myPartnership!.partnership_status == true) {
-              _isPartner = 'Y';
-            } else {
-              //승인대기
-              _isPartner = 'R';
-            }
+  Future<void> _initPartnerShip(userId) async {
+    var response = await getPartnership(userId);
+    if (response.status == 'success') {
+      Partnership myPartnershipData = Partnership.fromJSON(response.data);
+      setState(() {
+        this.myPartnership = myPartnershipData;
+        if (myPartnership != null && myPartnership!.is_partner) {
+          //승인
+          if (myPartnership!.partnership_status == true) {
+            _isPartner = 'Y';
           } else {
-            _isPartner = 'N';
+            //승인대기
+            _isPartner = 'R';
           }
-        });
-      }
-    });
+        } else {
+          _isPartner = 'N';
+        }
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     ImageProvider? backgroundImage;
     if (partnerUser != null &&
-        partnerUser?.has_user_profile != null &&
-        partnerUser?.has_user_profile?.has_profile_image != null) {
+        partnerUser?.profile != null &&
+        partnerUser?.profile?.has_profile_image != null) {
       backgroundImage = CachedNetworkImageProvider(
         Utils.getImageFilePath(
-            partnerUser!.has_user_profile!.has_profile_image!),
+            partnerUser!.profile!.has_profile_image!),
       );
     } else {
-      backgroundImage = AssetImage('assets/images/no-image.png');
+      backgroundImage = const AssetImage('assets/images/no-image.png');
     }
 
     if (_isLoading) {
-      return Loading();
+      return const Loading();
     }
     return DefaultLogoLayout(
       titleName: "프로필 상세",
       isNotInnerPadding: "true",
       rightShareBtn: true,
-      child: NestedScrollView(
-        headerSliverBuilder: (context, innerBoxIsScrolled) {
-          return [
+      rightShareAction: () {
+        if (shareUrl != null)
+          CustomDialog.showShareDialog(context, '공유하기', shareUrl!);
+      },
+      child: Container(
+        color: SettingStyle.GREY_COLOR,
+        child: CustomScrollView(
+          slivers: [
+            CupertinoSliverRefreshControl(
+              onRefresh: () async {
+                setState(() {
+                  _isLoading = true;
+                });
+                _initData();
+              },
+            ),
             SliverAppBar(
               pinned: false,
               automaticallyImplyLeading: false,
               expandedHeight: 240.0,
               flexibleSpace: FlexibleSpaceBar(
                 background: Padding(
-                  padding: EdgeInsets.all(12.0),
+                  padding: const EdgeInsets.all(12.0),
                   child: Column(
                     children: [
                       Row(
@@ -187,7 +202,7 @@ class _OtherProfileIndexState extends State<OtherProfileIndex> {
                             radius: 34.0,
                             backgroundImage: backgroundImage,
                           ),
-                          SizedBox(
+                          const SizedBox(
                             width: 18.0,
                           ),
                           Expanded(
@@ -196,30 +211,30 @@ class _OtherProfileIndexState extends State<OtherProfileIndex> {
                               children: [
                                 Text(
                                   partnerUser?.name ?? '',
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                     fontWeight: FontWeight.w600,
                                     fontSize: 18.0,
                                   ),
                                 ),
-                                SizedBox(
+                                const SizedBox(
                                   height: 5.0,
                                 ),
                                 if (partnerUser != null)
                                   if (partnerUser!.has_keywords != null)
                                     SingleChildScrollView(
                                       scrollDirection: Axis.horizontal,
-                                      child: _buildTags(
-                                          partnerUser!.has_keywords!),
+                                      child:
+                                          _buildTags(partnerUser!.has_keywords!),
                                     )
                               ],
                             ),
                           ),
-                          SizedBox(
+                          const SizedBox(
                             width: 10,
                           )
                         ],
                       ),
-                      SizedBox(
+                      const SizedBox(
                         height: 24.0,
                       ),
                       IntrinsicHeight(
@@ -229,8 +244,8 @@ class _OtherProfileIndexState extends State<OtherProfileIndex> {
                           children: [
                             GestureDetector(
                               onTap: () {
-                                Navigator.pushNamed(
-                                    context, '/profile/partners');
+                                Navigator.pushNamed(context, '/profile/partners',
+                                    arguments: {'userId': partnerUser!.id});
                               },
                               child: _buildUserTab(
                                 profileData?['partner_count'].toString() ?? '0',
@@ -240,7 +255,8 @@ class _OtherProfileIndexState extends State<OtherProfileIndex> {
                             _buildTabLine(),
                             GestureDetector(
                               onTap: () {
-                                Navigator.pushNamed(context, '/profile/groups');
+                                Navigator.pushNamed(context, '/profile/groups',
+                                    arguments: {'userId': partnerUser!.id});
                               },
                               child: _buildUserTab(
                                 profileData?['group_count'].toString() ?? '0',
@@ -250,18 +266,32 @@ class _OtherProfileIndexState extends State<OtherProfileIndex> {
                           ],
                         ),
                       ),
-                      SizedBox(
+                      const SizedBox(
                         height: 24.0,
                       ),
                       Row(
                         children: [
                           if (_isMine == false)
-                            if (_isPartner == 'Y')
+                            if (_isPartner == 'Y') ...[
                               _reanderButton(
-                                btnName: '전화',
-                                onPressed: () {},
-                              )
-                            else if (_isPartner == 'N')
+                                btnName: '\u{1F4DE} 전화',
+                                onPressed: () {
+                                  launchUrl(
+                                      Uri.parse("tel:${partnerUser!.phone}"));
+                                },
+                              ),
+                              SizedBox(
+                                width: 10,
+                              ),
+                              _reanderButton(
+                                btnName: '\u{1F4B3} 판매등록',
+                                onPressed: () {
+                                  Navigator.pushNamed(
+                                      context, '/trade/sell/create',
+                                      arguments: {'userId': partnerUser!.id});
+                                },
+                              ),
+                            ] else if (_isPartner == 'N')
                               _reanderButton(
                                 btnName: '파트너 신청',
                                 onPressed: () {
@@ -272,47 +302,44 @@ class _OtherProfileIndexState extends State<OtherProfileIndex> {
                               _reanderButton(
                                 btnName: '승인 대기중',
                                 onPressed: () {},
-                              )
+                              ),
                         ],
-                      ),
+                      )
                     ],
                   ),
                 ),
               ),
             ),
-            SliverToBoxAdapter(
+            const SliverToBoxAdapter(
               child: Divider(
                 color: Color(0xFFF5F6FA),
                 thickness: 10.0,
               ),
             ),
-          ];
-        },
-        body: Container(
-          color: Color(0xFFf5f6f8),
-          padding: EdgeInsets.symmetric(horizontal: 14.0),
-          child: userBusinessList != null && userBusinessList.isNotEmpty
-              ? CustomScrollView(
-                  slivers: [
-                    SliverList(
-                      delegate: SliverChildBuilderDelegate(
-                          (BuildContext context, int index) {
-                        UserBusiness item = userBusinessList[index];
+            userBusinessList != null && userBusinessList.isNotEmpty
+                ? SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                        (BuildContext context, int index) {
+                      UserBusiness item = userBusinessList[index];
 
-                        return GestureDetector(
-                          onTap: () {
-                            Navigator.pushNamed(context, '/business/info',
-                                arguments: {"userBusinessId": item.id});
-                          },
+                      return GestureDetector(
+                        onTap: () {
+                          Navigator.pushNamed(context, '/business/info',
+                              arguments: {"userBusinessId": item.id});
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 14),
                           child: ListRowBusinessCard(
                             item: item,
                           ),
-                        );
-                      }, childCount: userBusinessList.length),
-                    ),
-                  ],
-                )
-              : NoItems(),
+                        ),
+                      );
+                    }, childCount: userBusinessList.length),
+                  )
+                : SliverToBoxAdapter(
+                    child: NoItems(),
+                  )
+          ],
         ),
       ),
     );
@@ -393,13 +420,13 @@ class _reanderButton extends StatelessWidget {
         onPressed: onPressed,
         child: Text(
           btnName,
-          style: TextStyle(
+          style: const TextStyle(
               color: Colors.black, fontSize: 14.0, fontWeight: FontWeight.w500),
         ),
         style: ElevatedButton.styleFrom(
-          minimumSize: Size(double.infinity, 50),
-          backgroundColor: Color(0xFFF5F6FA),
-          foregroundColor: Color(0xFFF5F6FA),
+          minimumSize: const Size(double.infinity, 50),
+          backgroundColor: const Color(0xFFF5F6FA),
+          foregroundColor: const Color(0xFFF5F6FA),
           elevation: 0,
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
@@ -410,11 +437,11 @@ class _reanderButton extends StatelessWidget {
 }
 
 Widget _buildUserTab(String tabData, String tabTitle) {
-  final tabDataStyle = TextStyle(
+  final tabDataStyle = const TextStyle(
     fontWeight: FontWeight.w700,
     fontSize: 20.0,
   );
-  final tabTitleStyle = TextStyle(
+  final tabTitleStyle = const TextStyle(
     fontWeight: FontWeight.w400,
     fontSize: 12.0,
   );

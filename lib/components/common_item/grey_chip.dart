@@ -1,3 +1,4 @@
+import 'package:Deal_Connect/components/const/setting_style.dart';
 import 'package:flutter/cupertino.dart';
 
 class GreyChip extends StatelessWidget {
@@ -16,10 +17,7 @@ class GreyChip extends StatelessWidget {
           padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 7.0),
           child: Text(
             chipText,
-            style: TextStyle(
-                color: Color(0xFF5f5f66),
-                fontSize: 11.0,
-                fontWeight: FontWeight.w500),
+            style: SettingStyle.SMALL_TEXT_STYLE,
           ),
         )
     );

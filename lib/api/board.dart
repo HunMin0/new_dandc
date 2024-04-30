@@ -1,15 +1,42 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:Deal_Connect/Utils/custom_dialog.dart';
 import 'package:Deal_Connect/Utils/shared_pref_utils.dart';
 import 'package:Deal_Connect/api/server_config.dart';
-import 'package:Deal_Connect/items/image_picker_item.dart';
 import 'package:Deal_Connect/model/response_data.dart';
 import 'package:Deal_Connect/utils/utils.dart';
-import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 import 'package:path/path.dart';
+
+
+Future<ResponseData> getBoardWrites({Map? queryMap}) async {
+  var url = ServerConfig.SERVER_API_URL + 'app/board_write';
+  String? token = await SharedPrefUtils.getAccessToken();
+  var query = '';
+  if (queryMap != null) {
+    queryMap.forEach(((key, value) {
+      if (value != null) {
+        if (query.isNotEmpty) {
+          query += '&';
+        }
+        query += '$key=$value';
+      }
+    }));
+    if (query.isNotEmpty) {
+      url += '?$query';
+    }
+  }
+
+  http.Response response = await http.get(Uri.parse(url),
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": token!
+    },
+  );
+  var jsonBody = json.decode(utf8.decode(response.bodyBytes));
+  // print(jsonBody.toString());
+  return ResponseData.fromJSON(jsonBody, response.statusCode);
+}
 
 Future<ResponseData> storeGroupBoardWrite(
     Map mapData,
@@ -86,7 +113,7 @@ Future<ResponseData> updateGroupBoardWrite(
   print(response.statusCode);
 
   final res = await http.Response.fromStream(response);
-  // print(utf8.decode(res.bodyBytes));
+  print(utf8.decode(res.bodyBytes));
   var jsonBody = json.decode(utf8.decode(res.bodyBytes));
   return ResponseData.fromJSON(jsonBody, response.statusCode);
 }
@@ -113,10 +140,12 @@ Future<ResponseData> getBoardWriteLatestData(int groupId) async {
     Uri.parse(url),
     headers: {"Content-Type": "application/json", "Authorization": token!},
   );
+  print(utf8.decode(response.bodyBytes));
   var jsonBody = json.decode(utf8.decode(response.bodyBytes));
-  // print(jsonBody.toString());
   return ResponseData.fromJSON(jsonBody, response.statusCode);
 }
+
+
 
 Future<ResponseData> getBoardWrite(int id) async {
   var url = ServerConfig.SERVER_API_URL + 'app/group_board/$id';
@@ -129,3 +158,19 @@ Future<ResponseData> getBoardWrite(int id) async {
   // print(jsonBody.toString());
   return ResponseData.fromJSON(jsonBody, response.statusCode);
 }
+
+
+Future<ResponseData> deleteBoardWrite(int id) async {
+  var url = ServerConfig.SERVER_API_URL + 'app/group_board/$id';
+  print(url);
+  String? token = await SharedPrefUtils.getAccessToken();
+  http.Response response = await http.delete(Uri.parse(url),
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": token!
+    },
+  );
+  var jsonBody = json.decode(utf8.decode(response.bodyBytes));
+  return ResponseData.fromJSON(jsonBody, response.statusCode);
+}
+

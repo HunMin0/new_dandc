@@ -37,4 +37,19 @@ class File {
       mobile_path: json['mobile_path'],
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'hash_name': hash_name,
+      'origin_name': origin_name,
+      'ext': ext,
+      'path': path,
+      'size': size,
+      'created_at': created_at,
+      'updated_at': updated_at,
+      'mobile_hash_name': mobile_hash_name,
+      'mobile_path': mobile_path,
+    };
+  }
 }

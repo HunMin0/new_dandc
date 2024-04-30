@@ -1,10 +1,10 @@
 import 'package:Deal_Connect/api/group_user.dart';
 import 'package:Deal_Connect/components/alert/show_complete_dialog.dart';
+import 'package:Deal_Connect/components/const/setting_style.dart';
 import 'package:Deal_Connect/components/layout/default_logo_layout.dart';
 import 'package:Deal_Connect/components/list_group_user_card.dart';
 import 'package:Deal_Connect/components/loading.dart';
 import 'package:Deal_Connect/components/no_items.dart';
-import 'package:Deal_Connect/db/vertical_data.dart';
 import 'package:Deal_Connect/model/group_user.dart';
 import 'package:Deal_Connect/model/user.dart';
 import 'package:Deal_Connect/utils/custom_dialog.dart';
@@ -25,10 +25,10 @@ class _GroupManagePartnerState extends State<GroupManagePartner>
     with TickerProviderStateMixin {
   late final TabController tabController;
   int? groupId;
-  String? groupName;
   List<GroupUser> groupUserList = [];
   bool _isLoading = true;
   User? myUser;
+  int tapPage = 0;
 
   var args;
 
@@ -45,7 +45,6 @@ class _GroupManagePartnerState extends State<GroupManagePartner>
         if (args != null) {
           setState(() {
             groupId = args['groupId'];
-            groupName = args['groupName'];
           });
         }
       }
@@ -112,15 +111,28 @@ class _GroupManagePartnerState extends State<GroupManagePartner>
   Widget build(BuildContext context) {
     if (_isLoading) {
       // 로딩 중 인디케이터 표시
-      return Loading();
+      return const Loading();
     }
 
     return DefaultLogoLayout(
-        titleName: groupName,
+        titleName: '그룹관리',
         isNotInnerPadding: 'true',
-        child: NestedScrollView(
-            headerSliverBuilder: (context, innerBoxIsScrolled) {
-              return [
+        child: GestureDetector(
+          onTap: () {
+            FocusScope.of(context).requestFocus(FocusNode());
+          },
+          child: Container(
+            color: SettingStyle.GREY_COLOR,
+            child: CustomScrollView(
+              slivers: [
+                CupertinoSliverRefreshControl(
+                  onRefresh: () async {
+                    setState(() {
+                      _isLoading = true;
+                    });
+                    _initData();
+                  },
+                ),
                 SliverAppBar(
                   automaticallyImplyLeading: false,
                   pinned: false,
@@ -140,7 +152,7 @@ class _GroupManagePartnerState extends State<GroupManagePartner>
                                   decoration: InputDecoration(
                                     filled: true,
                                     fillColor: HexColor("#F5F6FA"),
-                                    contentPadding: EdgeInsets.symmetric(
+                                    contentPadding: const EdgeInsets.symmetric(
                                       vertical: 10,
                                       horizontal: 20,
                                     ),
@@ -148,9 +160,9 @@ class _GroupManagePartnerState extends State<GroupManagePartner>
                                       borderRadius: BorderRadius.circular(10),
                                       // 테두리를 둥글게 설정
                                       borderSide:
-                                          BorderSide.none, // 바텀 border 없애기
+                                      BorderSide.none, // 바텀 border 없애기
                                     ),
-                                    prefixIcon: Icon(Icons.search_rounded),
+                                    prefixIcon: const Icon(Icons.search_rounded),
                                     hintText: '검색 키워드를 입력해주세요',
                                   ),
                                 ),
@@ -162,40 +174,69 @@ class _GroupManagePartnerState extends State<GroupManagePartner>
                     ),
                   ),
                 ),
-                SliverToBoxAdapter(
+                const SliverToBoxAdapter(
                   child: Divider(
                     color: Color(0xFFF5F6FA),
                     thickness: 10.0,
                   ),
                 ),
                 SliverPersistentHeader(
-                  delegate: GroupPartnerTabHeaderDelegate(tabController),
+                  delegate: _SliverAppBarDelegate(
+                    TabBar(
+                      controller: tabController,
+                      indicatorColor: Colors.black,
+                      indicatorWeight: 2.0,
+                      labelColor: Colors.black,
+                      dividerColor: Colors.white,
+                      unselectedLabelColor: Colors.grey[500],
+                      labelStyle: SettingStyle.SUB_TITLE_STYLE,
+                      unselectedLabelStyle: SettingStyle.SUB_TITLE_STYLE,
+                      indicatorSize: TabBarIndicatorSize.tab,
+                      onTap: (value) {
+                        setState(() {
+                          tapPage = value;
+                        });
+                        print(tabController.index);
+                      },
+                      tabs: const [
+                        Tab(
+                          child: Text(
+                            '신규가입요청',
+                          ),
+                        ),
+                        Tab(
+                          child: Text(
+                            '기존회원',
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                   pinned: true,
                 ),
-                SliverToBoxAdapter(
+                const SliverToBoxAdapter(
                   child: Divider(
                     color: Color(0xFFF5F6FA),
                     thickness: 16.0,
                   ),
                 ),
-              ];
-            },
-            body: groupUserList != null && groupUserList.isNotEmpty
-                ? Column(
-                    children: [
-                      Expanded(
-                        child: Container(
-                          padding: EdgeInsets.symmetric(horizontal: 10.0),
-                          color: Color(0xFFF5F6FA),
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: Color(0xFFf5f6f8),
-                            ),
-                            child: ListView.builder(
-                              itemCount: groupUserList.length,
-                              itemBuilder: (context, index) {
-                                GroupUser item = groupUserList[index];
-                                return ListGroupUserCard(
+
+                (groupUserList != null &&
+                    groupUserList!.isNotEmpty) ?
+                  SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                            (BuildContext context, int index) {
+                          GroupUser item = groupUserList![index];
+                          return GestureDetector(
+                              onTap: () {
+                                Navigator.pushNamed(context, '/profile',
+                                    arguments: {"userId": item.user_id})
+                                    .then((value) {});
+                              },
+                              child: Padding(
+                                padding:
+                                const EdgeInsets.symmetric(horizontal: 14.0),
+                                child: ListGroupUserCard(
                                   item: item,
                                   isMine: myUser != null ? (item.user_id == myUser!.id ? true : false) : false,
                                   isManager: true,
@@ -211,15 +252,22 @@ class _GroupManagePartnerState extends State<GroupManagePartner>
                                   onManagerPressed: () {
                                     onManageButtonPressed(item, 'manager');
                                   },
-                                );
-                              },
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
+                                  onManagerDownPressed: () {
+                                    onManageButtonPressed(item, 'manager_down');
+                                  },
+                                ),
+                              ));
+                        }, childCount: groupUserList!.length),
                   )
-                : NoItems()));
+                :
+                  SliverToBoxAdapter(
+                    child: NoItems(),
+                  )
+              ],
+            ),
+          ),
+        )
+    );
   }
 
   void onManageButtonPressed(GroupUser user, String division) {
@@ -232,6 +280,8 @@ class _GroupManagePartnerState extends State<GroupManagePartner>
       rightBtnText = '방출';
     } else if (division == 'manager') {
       rightBtnText = '관리자로 승급';
+    } else if (division == 'manager_down') {
+      rightBtnText = '일반회원으로 강등';
     }
 
     CustomDialog.showDoubleBtnDialog(
@@ -280,58 +330,32 @@ class _GroupManagePartnerState extends State<GroupManagePartner>
       },
     );
   }
+
+
 }
 
-class GroupPartnerTabHeaderDelegate extends SliverPersistentHeaderDelegate {
-  final TabController tabController;
+class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
+  final TabBar _tabBar;
 
-  GroupPartnerTabHeaderDelegate(this.tabController);
+  _SliverAppBarDelegate(this._tabBar);
+
+  @override
+  double get minExtent => _tabBar.preferredSize.height;
+
+  @override
+  double get maxExtent => _tabBar.preferredSize.height;
 
   @override
   Widget build(
       BuildContext context, double shrinkOffset, bool overlapsContent) {
-    return Container(
-      height: 50.0,
-      color: Colors.white,
-      child: TabBar(
-        controller: tabController,
-        indicatorColor: Colors.black,
-        indicatorWeight: 2.0,
-        labelColor: Colors.black,
-        dividerColor: Colors.white,
-        unselectedLabelColor: Colors.grey[500],
-        labelStyle: TextStyle(
-          fontSize: 15.0,
-          fontWeight: FontWeight.w600,
-        ),
-        unselectedLabelStyle: TextStyle(
-          fontWeight: FontWeight.w500,
-        ),
-        indicatorSize: TabBarIndicatorSize.tab,
-        tabs: [
-          Tab(
-            child: Text(
-              '신규가입요청',
-            ),
-          ),
-          Tab(
-            child: Text(
-              '기존회원',
-            ),
-          ),
-        ],
-      ),
+    return Material(
+      elevation: 1.0,
+      child: _tabBar,
     );
   }
 
   @override
-  double get maxExtent => 50.0;
-
-  @override
-  double get minExtent => 50.0;
-
-  @override
-  bool shouldRebuild(covariant SliverPersistentHeaderDelegate oldDelegate) {
+  bool shouldRebuild(_SliverAppBarDelegate oldDelegate) {
     return false;
   }
 }

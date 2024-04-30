@@ -1,8 +1,5 @@
 import 'package:Deal_Connect/components/const/setting_style.dart';
 import 'package:Deal_Connect/components/layout/default_logo_layout.dart';
-import 'package:Deal_Connect/components/const/setting_colors.dart';
-import 'package:Deal_Connect/pages/group/group_search/group_search_index.dart';
-import 'package:Deal_Connect/pages/group/group_register/group_register_index.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';

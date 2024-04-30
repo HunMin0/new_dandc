@@ -24,8 +24,8 @@ class ListRankingCard extends StatelessWidget {
     ImageProvider? businessThumbnailImage =
     AssetImage('assets/images/no-image.png');
 
-    if (item != null && item.has_user!.has_user_profile?.has_profile_image != null) {
-      final profileImage = item.has_user!.has_user_profile!.has_profile_image!;
+    if (item != null && item.has_user!.profile?.has_profile_image != null) {
+      final profileImage = item.has_user!.profile!.has_profile_image!;
       profileThumbnailImage = CachedNetworkImageProvider(
         Utils.getImageFilePath(profileImage),
       );

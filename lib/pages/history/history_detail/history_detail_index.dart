@@ -82,7 +82,7 @@ class _HistoryDetailIndexState extends State<HistoryDetailIndex> {
 
     return DefaultLogoLayout(
       isNotInnerPadding: 'true',
-      titleName: '내가 받은 승인 요청',
+      titleName: division == 'mine' ? '내가 받은 승인 요청' : '내가 보낸 승인 요청',
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [

@@ -196,10 +196,10 @@ class _TradeBuyCreateConfirmState extends State<TradeBuyCreateConfirm> {
 
     if (userBusiness != null &&
         userBusiness!.has_owner != null &&
-        userBusiness!.has_owner!.has_user_profile != null &&
-        userBusiness!.has_owner!.has_user_profile!.has_profile_image != null) {
+        userBusiness!.has_owner!.profile != null &&
+        userBusiness!.has_owner!.profile!.has_profile_image != null) {
       final profileImage =
-          userBusiness!.has_owner!.has_user_profile!.has_profile_image!;
+          userBusiness!.has_owner!.profile!.has_profile_image!;
       profileThumbnailImage = CachedNetworkImageProvider(
         Utils.getImageFilePath(profileImage),
       );

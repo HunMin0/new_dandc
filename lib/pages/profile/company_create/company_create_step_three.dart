@@ -5,6 +5,7 @@ import 'package:Deal_Connect/Utils/custom_dialog.dart';
 import 'package:Deal_Connect/api/business.dart';
 import 'package:Deal_Connect/components/alert/show_complete_dialog.dart';
 import 'package:Deal_Connect/components/const/setting_colors.dart';
+import 'package:Deal_Connect/components/const/setting_style.dart';
 import 'package:Deal_Connect/components/custom/join_text_form_field.dart';
 import 'package:Deal_Connect/components/layout/default_next_layout.dart';
 
@@ -32,6 +33,7 @@ class _CompanyCreateStepThreeState extends State<CompanyCreateStepThree> {
   String holiday = '';
   String weekend = '';
   String description = '';
+  UserBusiness? userBusiness;
 
   bool isProcessable = true;
   final GlobalKey<FormState> _companyFormKey = GlobalKey<FormState>();
@@ -40,6 +42,7 @@ class _CompanyCreateStepThreeState extends State<CompanyCreateStepThree> {
 
   final List<String> keywords = [];
   final TextEditingController _controller = TextEditingController();
+  final TextEditingController _websiteController = TextEditingController();
 
   void _addKeyword() {
     final text = _controller.text;
@@ -78,13 +81,25 @@ class _CompanyCreateStepThreeState extends State<CompanyCreateStepThree> {
             address2 = args['address2'];
             hasHoliday = args['hasHoliday'];
             hasWeekend = args['hasWeekend'];
-            print('userBusinessCategoryId :' + userBusinessCategoryId.toString());
-            print('hasHoliday :' + hasHoliday.toString());
-            print('hasWeekend :' + hasWeekend.toString());
             workTime = args['workTime'];
             holiday = args['holiday'];
             weekend = args['weekend'];
             description = args['description'];
+
+            userBusiness = args['userBusiness'];
+            if (userBusiness != null) {
+              if (userBusiness!.has_keywords != null) {
+                if (userBusiness!.has_keywords != null) {
+                  for (var keywordItem in userBusiness!.has_keywords!) {
+                    keywords.add(keywordItem.keyword);
+                  }
+                }
+              }
+              if (userBusiness!.website != null && userBusiness!.website != '') {
+                isHomepage = true;
+                _websiteController.text = userBusiness!.website ?? '';
+              }
+            }
           });
         }
       }
@@ -93,19 +108,6 @@ class _CompanyCreateStepThreeState extends State<CompanyCreateStepThree> {
 
   @override
   Widget build(BuildContext context) {
-    final baseBorder = OutlineInputBorder(
-      borderSide: BorderSide(
-        color: INPUT_BORDER_COLOR,
-        width: 1.0,
-      ),
-    );
-
-    final bottomTextStyle = TextStyle(
-      color: Color(0xFF232323),
-      fontSize: 14.0,
-      //fontWeight: FontWeight.w600
-    );
-
 
     return GestureDetector(
       onTap: () {
@@ -120,11 +122,7 @@ class _CompanyCreateStepThreeState extends State<CompanyCreateStepThree> {
         nextTitle: '등록 완료하기',
         prevOnPressed: () {},
         nextOnPressed: () {
-          if (_companyFormKey.currentState!.validate()) {
-            // 유효한 경우 실행할 코드 추가
-            _submit();
-            //_showCompleteDialog(context);
-          }
+          userBusiness != null ? _modify() : _submit();
         },
         child: Column(
           children: [
@@ -171,22 +169,7 @@ class _CompanyCreateStepThreeState extends State<CompanyCreateStepThree> {
                           ),
                           TextField(
                             controller: _controller,
-                            decoration: InputDecoration(
-                              fillColor: INPUT_BG_COLOR,
-                              filled: true,
-                              // fillColor에 배경색이 있을 경우 색상반영, false 미적용
-                              // 기본보더
-                              border: baseBorder,
-                              // 선택되지 않은상태에서 활성화 되어있는 필드
-                              enabledBorder: baseBorder,
-                              // 포커스보더
-                              focusedBorder: baseBorder.copyWith(
-                                borderSide: baseBorder.borderSide.copyWith(
-                                  color: PRIMARY_COLOR,
-                                ),
-                              ),
-                              contentPadding: EdgeInsets.all(12.0),
-                              // 필드 패딩
+                            decoration: SettingStyle.INPUT_STYLE.copyWith(
                               labelText: '키워드 추가',
                               suffixIcon: IconButton(
                                 icon: Icon(Icons.add),
@@ -195,7 +178,7 @@ class _CompanyCreateStepThreeState extends State<CompanyCreateStepThree> {
                             ),
                             onSubmitted: (value) => _addKeyword(),
                           ),
-                          SizedBox(height: 10),
+                          const SizedBox(height: 10),
                           Wrap(
                             spacing: 8.0, // 각 Chip의 간격
                             children: keywords
@@ -208,8 +191,6 @@ class _CompanyCreateStepThreeState extends State<CompanyCreateStepThree> {
                         ],
                       ),
                       _buildHomePage(),
-
-
                     ],
                   ),
                 ),
@@ -221,9 +202,35 @@ class _CompanyCreateStepThreeState extends State<CompanyCreateStepThree> {
     );
   }
 
+  _modify() async {
+    CustomDialog.showProgressDialog(context);
+    updateUserBusiness(userBusiness!.id, {
+      'user_business_category_id': userBusinessCategoryId,
+      'name': name,
+      'phone': phone,
+      'address1': address1,
+      'address2': address2,
+      'has_holiday': hasHoliday,
+      'has_weekend': hasWeekend,
+      'work_time': workTime,
+      'holiday': holiday,
+      'weekend': weekend,
+      'website': _websiteController.text,
+      'description': description,
+      'keywords': jsonEncode(keywords),
+    }, imageFile).then((response) async {
+      CustomDialog.dismissProgressDialog();
+
+      if (response.status == 'success') {
+        _showModifyCompleteDialog(context);
+      } else {
+        CustomDialog.showServerValidatorErrorMsg(response);
+      }
+    });
+  }
+
   _submit() async {
     CustomDialog.showProgressDialog(context);
-    print('userBusinessCategoryId :' + userBusinessCategoryId.toString());
     storeUserBusiness({
       'user_business_category_id': userBusinessCategoryId,
       'name': name,
@@ -235,7 +242,7 @@ class _CompanyCreateStepThreeState extends State<CompanyCreateStepThree> {
       'work_time': workTime,
       'holiday': holiday,
       'weekend': weekend,
-      'website': website,
+      'website': _websiteController.text,
       'description': description,
       'keywords': jsonEncode(keywords),
     }, imageFile).then((response) async {
@@ -271,86 +278,50 @@ class _CompanyCreateStepThreeState extends State<CompanyCreateStepThree> {
     );
   }
 
-  Column _buildHomePage() {
-    final homePageButtonStyle = ElevatedButton.styleFrom(
-      foregroundColor: isHomepage == true ? Colors.white : Color(0xFFABABAB),
-      backgroundColor: isHomepage == true ? Color(0xFF75A8E4) : Colors.white,
-      side: BorderSide(
-        color: isHomepage == true ? Color(0xFF75A8E4) : Color(0xFFD9D9D9),
-        width: 1.0,
-      ),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10.0),
-      ),
-      fixedSize: Size.fromHeight(50.0),
-      elevation: 0,
+  void _showModifyCompleteDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return ShowCompleteDialog(
+          messageTitle: '업체수정완료',
+          messageText: '수정이 완료되었습니다.',
+          buttonText: '확인',
+          onConfirmed: () {
+            Navigator.of(context).popUntil((route) => route.isFirst);
+          },
+        );
+      },
     );
+  }
 
-    final noHomePageButtonStyle = ElevatedButton.styleFrom(
-      foregroundColor: isHomepage == false ? Colors.white : Color(0xFFABABAB),
-      backgroundColor: isHomepage == false ? Color(0xFF75A8E4) : Colors.white,
-      side: BorderSide(
-        color: isHomepage == false ? Color(0xFF75A8E4) : Color(0xFFD9D9D9),
-        width: 1.0,
-      ),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10.0),
-      ),
-      fixedSize: Size.fromHeight(50.0),
-      elevation: 0,
-    );
+  Column _buildHomePage() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         SizedBox(
           height: 15.0,
         ),
-        Text(
-          '웹사이트',
-        ),
-        SizedBox(
-          height: 10.0,
-        ),
-        Row(
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Expanded(
-                child: ElevatedButton(
-                    style: homePageButtonStyle,
-                    onPressed: () {
-                      setState(() {
-                        isHomepage = true;
-                      });
-                    },
-                    child: Text(
-                      '웹사이트가 있어요',
-                      style: TextStyle(fontSize: 13.0),
-                    ))),
-            SizedBox(
-              width: 10.0,
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 10.0),
+              child: Text(
+                '웹사이트',
+                style: SettingStyle.NORMAL_TEXT_STYLE,
+              ),
             ),
-            Expanded(
-                child: ElevatedButton(
-                    style: noHomePageButtonStyle,
-                    onPressed: () {
-                      setState(() {
-                        isHomepage = false;
-                      });
-                    },
-                    child: Text(
-                      '웹사이트가 없어요',
-                      style: TextStyle(fontSize: 13.0),
-                    ))),
+            TextField(
+              controller: _websiteController,
+              decoration: SettingStyle.INPUT_STYLE.copyWith(
+                hintText: '웹사이트 URL을 입력하세요.',
+                helperText: 'http://abc.com',
+              ),
+              keyboardType: TextInputType.url, // 키보드 유형을 URL로 설정
+            ),
           ],
         ),
-        SizedBox(
-          height: 10.0,
-        ),
-        if (isHomepage)
-          BasicJoinTextFormField(
-              hintText: '여기를 눌러 웹사이트 입력',
-              onChanged: (String value) {
-                website = value;
-              }),
       ],
     );
   }
@@ -359,6 +330,8 @@ class _CompanyCreateStepThreeState extends State<CompanyCreateStepThree> {
   void dispose() {
     super.dispose();
   }
+
+
 }
 
 void _showKeyWordsDialog(BuildContext context) {

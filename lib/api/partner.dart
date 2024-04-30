@@ -1,14 +1,8 @@
 import 'dart:convert';
-import 'dart:io';
-import 'package:Deal_Connect/Utils/custom_dialog.dart';
 import 'package:Deal_Connect/Utils/shared_pref_utils.dart';
 import 'package:Deal_Connect/api/server_config.dart';
 import 'package:Deal_Connect/model/response_data.dart';
-import 'package:Deal_Connect/utils/utils.dart';
-import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
-import 'package:http_parser/http_parser.dart';
-import 'package:path/path.dart';
 
 
 Future<ResponseData> getPartnerUser(int id) async {
@@ -117,6 +111,7 @@ Future<ResponseData> getPartnership(int id) async {
 
   var jsonBody = json.decode(utf8.decode(response.bodyBytes));
 
+  print(jsonBody.toString());
   return ResponseData.fromJSON(jsonBody, response.statusCode);
 }
 

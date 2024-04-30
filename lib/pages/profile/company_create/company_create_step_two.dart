@@ -1,8 +1,8 @@
 import 'dart:io';
 
-import 'package:Deal_Connect/components/custom/join_text_form_field.dart';
+import 'package:Deal_Connect/components/const/setting_style.dart';
 import 'package:Deal_Connect/components/layout/default_next_layout.dart';
-import 'package:Deal_Connect/pages/profile/company_create/company_create_step_three.dart';
+import 'package:Deal_Connect/model/user_business.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -27,9 +27,17 @@ class _CompanyCreateStepTwoState extends State<CompanyCreateStepTwo> {
 
   bool hasHoliday = false;
   bool hasWeekend = false;
+  TextEditingController _holidayController = TextEditingController();
+  TextEditingController _weekendController = TextEditingController();
+
+
   String workTime = '';
+
+
   String holiday = '';
   String weekend = '';
+
+  UserBusiness? userBusiness;
 
   var args;
 
@@ -50,6 +58,16 @@ class _CompanyCreateStepTwoState extends State<CompanyCreateStepTwo> {
             address1 = args['address1'];
             address2 = args['address2'];
             description = args['description'];
+            userBusiness = args['userBusiness'];
+
+            if (userBusiness != null) {
+              hasHoliday = userBusiness!.has_holiday;
+              hasWeekend = userBusiness!.has_weekend;
+              workTime = userBusiness!.work_time ?? '';
+              _holidayController.text = userBusiness!.holiday ?? '';
+              _weekendController.text = userBusiness!.weekend ?? '';
+              isProcessable = true;
+            }
           });
         }
       }
@@ -164,12 +182,13 @@ class _CompanyCreateStepTwoState extends State<CompanyCreateStepTwo> {
                 'phone': phone,
                 'address1': address1,
                 'address2': address2,
+                'description': description,
                 'hasHoliday': hasHoliday,
                 'hasWeekend': hasWeekend,
                 'workTime': workTime,
-                'holiday': holiday,
-                'weekend': weekend,
-                'description': description,
+                'holiday': _holidayController.text,
+                'weekend': _weekendController.text,
+                'userBusiness': userBusiness,
               });
         },
         child: SingleChildScrollView(
@@ -199,6 +218,7 @@ class _CompanyCreateStepTwoState extends State<CompanyCreateStepTwo> {
                               onPressed: () {
                                 setState(() {
                                   hasHoliday = true;
+                                  _checkFormValidate();
                                 });
                               },
                               child: Text(
@@ -214,6 +234,7 @@ class _CompanyCreateStepTwoState extends State<CompanyCreateStepTwo> {
                               onPressed: () {
                                 setState(() {
                                   hasHoliday = false;
+                                  _checkFormValidate();
                                 });
                               },
                               child: Text(
@@ -226,12 +247,27 @@ class _CompanyCreateStepTwoState extends State<CompanyCreateStepTwo> {
                     height: 10.0,
                   ),
                   if (hasHoliday)
-                    JoinTextFormField(
-                        label: '휴무일을 입력해주세요',
-                        hintText: '예) 공휴일 휴무, 월요일 마다 휴무',
-                        onChanged: (String value) {
-                          holiday = value;
-                        }),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Padding(
+                          padding: EdgeInsets.symmetric(vertical: 10.0),
+                          child: Text(
+                            '휴무일',
+                            style: SettingStyle.NORMAL_TEXT_STYLE,
+                          ),
+                        ),
+                        TextField(
+                          controller: _holidayController,
+                          decoration: SettingStyle.INPUT_STYLE.copyWith(
+                            hintText: '예) 공휴일 휴무, 월요일 마다 휴무',
+                          ),
+                          onChanged: (value) {
+                            _checkFormValidate();
+                          },
+                        ),
+                      ],
+                    ),
                   SizedBox(
                     height: 10.0,
                   ),
@@ -279,16 +315,17 @@ class _CompanyCreateStepTwoState extends State<CompanyCreateStepTwo> {
                             return _BuildDateTime(
                               onConfirmation: (bool value) {
                                 setState(() {
-                                  isProcessable = value;
+                                  _checkFormValidate();
+
                                 });
                               },
                               onTimeSelected:
                                   (DateTime startTime, DateTime endTime) {
                                 setState(() {
                                   String formattedStartTime =
-                                      "${startTime.hour}:${startTime.minute.toString().padLeft(2, '0')}";
+                                      "${startTime.hour.toString().padLeft(2, '0')}:${startTime.minute.toString().padLeft(2, '0')}";
                                   String formattedEndTime =
-                                      "${endTime.hour}:${endTime.minute.toString().padLeft(2, '0')}";
+                                      "${endTime.hour.toString().padLeft(2, '0')}:${endTime.minute.toString().padLeft(2, '0')}";
                                   workTime =
                                       '영업시간: $formattedStartTime ~ $formattedEndTime';
                                 });
@@ -343,6 +380,7 @@ class _CompanyCreateStepTwoState extends State<CompanyCreateStepTwo> {
                           onPressed: () {
                             setState(() {
                               hasWeekend = false;
+                              _checkFormValidate();
                             });
                           },
                           child: Text(
@@ -358,6 +396,7 @@ class _CompanyCreateStepTwoState extends State<CompanyCreateStepTwo> {
                           onPressed: () {
                             setState(() {
                               hasWeekend = true;
+                              _checkFormValidate();
                             });
                           },
                           child: Text(
@@ -370,16 +409,44 @@ class _CompanyCreateStepTwoState extends State<CompanyCreateStepTwo> {
                 height: 10.0,
               ),
               if (hasWeekend)
-                JoinTextFormField(
-                    label: '주말/공휴일 시간을 입력해주세요',
-                    hintText: '예) 주말 13:00~18:00',
-                    onChanged: (String value) {
-                      weekend = value;
-                    }),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 10.0),
+                      child: Text(
+                        '주말/공휴일',
+                        style: SettingStyle.NORMAL_TEXT_STYLE,
+                      ),
+                    ),
+                    TextField(
+                      controller: _weekendController,
+                      decoration: SettingStyle.INPUT_STYLE.copyWith(
+                        hintText: '예) 주말 13:00~18:00',
+                      ),
+                      onChanged: (value) {
+                        _checkFormValidate();
+                      },
+                    ),
+                  ],
+                ),
             ],
           )
       ],
     );
+  }
+
+  void _checkFormValidate() {
+    if ((hasHoliday == false || (hasHoliday == true && _holidayController.text != ''))
+        && (hasWeekend == false || (hasWeekend == true && _weekendController.text != '')) && workTime != '' ) {
+      setState(() {
+        isProcessable = true;
+      });
+    } else {
+      setState(() {
+        isProcessable = false;
+      });
+    }
   }
 }
 

@@ -1,4 +1,5 @@
 import 'package:Deal_Connect/components/const/setting_colors.dart';
+import 'package:Deal_Connect/components/const/setting_style.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -51,10 +52,7 @@ class _JoinTextFormFieldState extends State<JoinTextFormField> {
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 10.0),
           child: Text(widget.label,
-            style: TextStyle(
-              fontWeight: FontWeight.w400,
-              fontSize: 13.0,
-            ),),
+            style: SettingStyle.NORMAL_TEXT_STYLE),
         ),
         TextFormField(
           enabled: widget.enabled,

@@ -1,16 +1,10 @@
 import 'package:Deal_Connect/api/group.dart';
 import 'package:Deal_Connect/components/layout/default_search_layout.dart';
-import 'package:Deal_Connect/components/list_card.dart';
 import 'package:Deal_Connect/components/grid_group_card.dart';
 import 'package:Deal_Connect/components/loading.dart';
 import 'package:Deal_Connect/components/no_items.dart';
-import 'package:Deal_Connect/db/group_data.dart';
-import 'package:Deal_Connect/db/vertical_data.dart';
 import 'package:Deal_Connect/model/group.dart';
 import 'package:flutter/material.dart';
-import 'package:hexcolor/hexcolor.dart';
-
-import '../../search/components/partner_card.dart';
 
 class GroupSearchIndex extends StatefulWidget {
   @override
@@ -83,7 +77,6 @@ class _GroupSearchIndexState extends State<GroupSearchIndex> {
                   Group item = groups![index];
                   return GestureDetector(
                     onTap: () {
-                      print(item.id);
                       Navigator.pushNamed(context, '/group/info',
                           arguments: {'groupId': item.id});
                     },
@@ -94,5 +87,10 @@ class _GroupSearchIndexState extends State<GroupSearchIndex> {
                               )
       ) : NoItems(),
     );
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 }

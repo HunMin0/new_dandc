@@ -34,6 +34,6 @@ Future<ResponseData> getMainData(BuildContext context, {Map? queryMap}) async {
   }
 
   var jsonBody = json.decode(utf8.decode(response.bodyBytes));
-  print(jsonBody.toString());
+  // print(jsonBody.toString());
   return ResponseData.fromJSON(jsonBody, response.statusCode);
 }

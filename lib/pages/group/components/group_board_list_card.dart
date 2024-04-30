@@ -1,7 +1,7 @@
 import 'package:Deal_Connect/model/board_write.dart';
-import 'package:Deal_Connect/model/file.dart';
 import 'package:Deal_Connect/utils/utils.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class GroupBoardListCard extends StatelessWidget {
@@ -48,16 +48,34 @@ class GroupBoardListCard extends StatelessWidget {
 
   Row _viewCntArea() {
     return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Icon(
-          Icons.remove_red_eye_sharp,
-          color: Colors.grey,
-          size: 18.0,
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Icon(
+              CupertinoIcons.eye_fill,
+              color: Colors.grey,
+              size: 14.0,
+            ),
+            SizedBox(width: 3.0),
+            Text(item.hits.toString(),
+                style: TextStyle(color: Colors.grey, fontSize: 14.0)),
+          ],
         ),
-        SizedBox(width: 3.0),
-        Text(item.hits.toString(),
-            style: TextStyle(color: Colors.grey, fontSize: 14.0)),
+        SizedBox(width: 10,),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Icon(
+              CupertinoIcons.bubble_right_fill,
+              color: Colors.grey,
+              size: 14.0,
+            ),
+            SizedBox(width: 3.0),
+            Text(item.has_comments_count.toString(),
+                style: TextStyle(color: Colors.grey, fontSize: 14.0)),
+          ],
+        ),
       ],
     );
   }
@@ -112,11 +130,11 @@ class GroupBoardListCard extends StatelessWidget {
     ImageProvider? avatarImage;
 
     if (item.has_writer != null &&
-        item.has_writer!.has_user_profile != null &&
-        item.has_writer!.has_user_profile!.has_profile_image != null) {
+        item.has_writer!.profile != null &&
+        item.has_writer!.profile!.has_profile_image != null) {
       avatarImage = CachedNetworkImageProvider(
         Utils.getImageFilePath(
-            item.has_writer!.has_user_profile!.has_profile_image!),
+            item.has_writer!.profile!.has_profile_image!),
       );
     } else {
       avatarImage = AssetImage('assets/images/no-image.png');
@@ -146,7 +164,7 @@ class GroupBoardListCard extends StatelessWidget {
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13.0),
                 ),
                 Text(
-                  item.created_at,
+                  Utils.formatTimeAgoFromString(item.created_at),
                   style: TextStyle(color: Colors.grey, fontSize: 11.0),
                 )
               ],

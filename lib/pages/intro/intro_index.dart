@@ -10,20 +10,23 @@ class IntroIndex extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: const BoxDecoration(
-        image: DecorationImage(
-            image: AssetImage("assets/images/sample/sample_intro.jpg"),
-            fit: BoxFit.cover),
-      ),
-      child: Scaffold(
-        backgroundColor: Colors.black.withOpacity(0.7),
-        body: SafeArea(
-          child: Stack(
-            children: [
-              _IntroLogo(context),
-              _IntroText(context),
-            ],
+    return MediaQuery(
+      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+      child: Container(
+        decoration: const BoxDecoration(
+          image: DecorationImage(
+              image: AssetImage("assets/images/sample/sample_intro.jpg"),
+              fit: BoxFit.cover),
+        ),
+        child: Scaffold(
+          backgroundColor: Colors.black.withOpacity(0.7),
+          body: SafeArea(
+            child: Stack(
+              children: [
+                _IntroLogo(context),
+                _IntroText(context),
+              ],
+            ),
           ),
         ),
       ),
@@ -88,7 +91,7 @@ class IntroIndex extends StatelessWidget {
                       borderRadius: BorderRadius.circular(40.0),
                     )),
                 onPressed: () {
-                  Navigator.of(context).pushReplacementNamed('/register/terms');
+                  Navigator.of(context).pushNamed('/register/terms');
                 },
                 child: Text(
                   '시작하기',
@@ -115,8 +118,8 @@ class IntroIndex extends StatelessWidget {
                 ),
                 TextButton(
                     onPressed: () {
-                      Navigator.pushNamedAndRemoveUntil(
-                          context, '/login', (route) => false);
+                      Navigator.pushNamed(
+                          context, '/login');
                     },
                     child: Text(
                       '로그인',

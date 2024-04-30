@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:Deal_Connect/api/user_business_service.dart';
 import 'package:Deal_Connect/components/alert/show_complete_dialog.dart';
 import 'package:Deal_Connect/components/const/setting_style.dart';
-import 'package:Deal_Connect/components/custom/join_text_form_field.dart';
 import 'package:Deal_Connect/components/layout/default_next_layout.dart';
 import 'package:Deal_Connect/model/user_business_service.dart';
 import 'package:Deal_Connect/utils/custom_dialog.dart';
@@ -89,10 +88,10 @@ class _BusinessServiceCreateState extends State<BusinessServiceCreate> {
         Utils.getImageFilePath(userBusinessService!.has_image!),
       );
     } else {
-      serviceImage = AssetImage('assets/images/no-image.png');
+      serviceImage = const AssetImage('assets/images/no-image.png');
     }
 
-    final bottomTextStyle = TextStyle(
+    final bottomTextStyle = const TextStyle(
       color: Color(0xFF232323),
       fontSize: 14.0,
       //fontWeight: FontWeight.w600
@@ -111,8 +110,9 @@ class _BusinessServiceCreateState extends State<BusinessServiceCreate> {
         prevTitle: '',
         child: SingleChildScrollView(
           child: GestureDetector(
+            behavior: HitTestBehavior.translucent,
             onTap: () {
-              FocusScope.of(context).unfocus();
+              FocusScope.of(context).requestFocus(FocusNode());
             },
             child: Column(
               children: [
@@ -154,7 +154,7 @@ class _BusinessServiceCreateState extends State<BusinessServiceCreate> {
                                         });
                                       },
                                     ),
-                                    Divider(
+                                    const Divider(
                                       height: 1.0,
                                       color: Color(0xFFdddddd),
                                     ),
@@ -252,7 +252,7 @@ class _BusinessServiceCreateState extends State<BusinessServiceCreate> {
                     ),
                   ],
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 10,
                 ),
                 Column(

@@ -10,6 +10,7 @@ import 'dart:io' as IO;
 
 class Utils {
 
+
 // 로그인 정보 초기화 후 '/intro'로 리다이렉션하는 함수
   Future<void> logoutAndRedirectToIntro(BuildContext context) async {
     // 토큰 초기화
@@ -38,7 +39,7 @@ class Utils {
   }
 
   static String moneyGenerator(int num) {
-    if (num > 999 && num < 99999) {
+    if (num > 999 && num < 999999) {
       return "${(num / 10000).toStringAsFixed(1)}만원";
     } else if (num > 999999 && num < 9999999) {
       return "${(num / 1000000).toStringAsFixed(0)}백만원";
@@ -104,4 +105,49 @@ class Utils {
     );
     return IMG.encodeJpg(resizedTempImage);
   }
+
+  static String formatTimeAgoFromString(String dateTimeString) {
+    DateTime time = DateTime.parse(dateTimeString);
+    return formatTimeAgo(time);
+  }
+
+  static String formatTimeAgo(DateTime time) {
+    final now = DateTime.now();
+    final difference = now.difference(time);
+
+    // 년 차이 계산
+    int yearDifference = now.year - time.year;
+    // 월 차이 계산. 현재 월이 더 작은 경우, 년에서 1을 빼고, 월 차이를 계산
+    int monthDifference = now.month - time.month;
+    if (monthDifference < 0) {
+      yearDifference -= 1;
+      monthDifference += 12; // 전년도로부터의 월 차이 보정
+    }
+
+    // 년도로 표시
+    if (yearDifference > 0) {
+      return '${yearDifference}년 전';
+    }
+    // 달로 표시
+    else if (monthDifference > 0) {
+      return '${monthDifference}달 전';
+    }
+    // 일로 표시
+    else if (difference.inDays > 0) {
+      return '${difference.inDays}일 전';
+    }
+    // 시간으로 표시
+    else if (difference.inHours > 0) {
+      return '${difference.inHours}시간 전';
+    }
+    // 분으로 표시
+    else if (difference.inMinutes > 0) {
+      return '${difference.inMinutes}분 전';
+    }
+    // 방금 전
+    else {
+      return '방금 전';
+    }
+  }
+
 }

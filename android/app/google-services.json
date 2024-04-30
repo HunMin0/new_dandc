@@ -1,21 +1,30 @@
 {
   "project_info": {
-    "project_number": "795195275036",
-    "project_id": "dealnconnect",
-    "storage_bucket": "dealnconnect.appspot.com"
+    "project_number": "430202066800",
+    "project_id": "gothic-sum-420105",
+    "storage_bucket": "gothic-sum-420105.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:795195275036:android:dd65c9bc7cd8edafdcacd9",
+        "mobilesdk_app_id": "1:430202066800:android:4a5d3e2c8de0b1d5cb61b5",
         "android_client_info": {
-          "package_name": "com.flutter.new_dandc_app"
+          "package_name": "com.flutter.DealnConnectApplication"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "430202066800-heavqg4b2e3lk21roomd2j6nc9ulfjjb.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.flutter.DealnConnectApplication",
+            "certificate_hash": "e66498f639460ce84bffcc723821565d605d1525"
+          }
+        }
+      ],
       "api_key": [
         {
-          "current_key": "AIzaSyDLeoz-KgbKGom1MhD2-kC1GObpFAR18Ns"
+          "current_key": "AIzaSyA-C8X6_aUfeSw8QSFsMdPuQXWqe1kgDpM"
         }
       ],
       "services": {

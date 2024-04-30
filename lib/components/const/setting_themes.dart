@@ -5,6 +5,15 @@ import 'package:Deal_Connect/components/const/setting_colors.dart';
 // light 테마
 class SettingThemes {
   static CupertinoThemeData get cupertinoTheme => CupertinoThemeData(
+        primaryColor: Colors.black,
+        primaryContrastingColor: Colors.white,
+        brightness: Brightness.light,
+        barBackgroundColor: Colors.white,
+        scaffoldBackgroundColor: Colors.white,
+        textTheme: CupertinoTextThemeData(
+          textStyle: TextStyle(color: Colors.black, fontFamily: 'NotoSans'),
+        ),
+
       );
 
   static ThemeData get lightTheme => ThemeData(
@@ -16,20 +25,21 @@ class SettingThemes {
           surfaceTint: Colors.transparent,
           surface: Colors.white,
         ),
-        appBarTheme: AppBarTheme(surfaceTintColor: Colors.transparent),
+        appBarTheme: const AppBarTheme(surfaceTintColor: Colors.transparent),
         bottomAppBarTheme:
-            BottomAppBarTheme(surfaceTintColor: Colors.transparent),
+            const BottomAppBarTheme(surfaceTintColor: Colors.transparent),
         elevatedButtonTheme: ElevatedButtonThemeData(
             style: ButtonStyle(
           surfaceTintColor: MaterialStateProperty.resolveWith<Color>(
               (states) => Colors.transparent),
+
         )),
         scaffoldBackgroundColor: Colors.white,
         datePickerTheme:
-            DatePickerThemeData(surfaceTintColor: Colors.transparent),
+            const DatePickerThemeData(surfaceTintColor: Colors.transparent),
 
-        dialogTheme: DialogTheme(surfaceTintColor: Colors.transparent),
-        buttonTheme: ButtonThemeData(
+        dialogTheme: const DialogTheme(surfaceTintColor: Colors.transparent),
+        buttonTheme: const ButtonThemeData(
             hoverColor: Colors.transparent,
             splashColor: Colors.transparent,
             highlightColor: Colors.transparent),

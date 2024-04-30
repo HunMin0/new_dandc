@@ -3,6 +3,7 @@ import 'package:hexcolor/hexcolor.dart';
 
 class SettingStyle {
   static const Color MAIN_COLOR = Color(0xFF75A8E4);
+  static const Color ALERT_COLOR = Color(0xFFff0000);
   static const Color PRIMARY_COLOR = Color(0xFF75a8e4);
   static const Color BODY_TEXT_COLOR = Color(0xFF868686);
   static const Color INPUT_BG_COLOR = Color(0xFFFBFBFB);
@@ -10,19 +11,19 @@ class SettingStyle {
   static const Color GREY_COLOR = Color(0xFFf5f6fa);
 
   static const TextStyle NORMAL_TEXT_STYLE = TextStyle(
-      color: Colors.black, fontSize: 15);
+      color: Colors.black, fontSize: 15, fontFamily: 'NotoSans');
 
   static const TextStyle SMALL_TEXT_STYLE = TextStyle(
-      color: Colors.black, fontSize: 12);
+      color: Colors.black, fontSize: 12, fontFamily: 'NotoSans');
 
   static TextStyle SUB_GREY_TEXT = TextStyle(
-      color: HexColor("#aaaaaa"), fontSize: 11, fontWeight: FontWeight.w500);
+      color: HexColor("#aaaaaa"), fontSize: 14, fontWeight: FontWeight.w500, fontFamily: 'NotoSans');
 
   static const TextStyle SUB_TITLE_STYLE = TextStyle(
-      color: Colors.black, fontSize: 15, fontWeight: FontWeight.w500);
+      color: Colors.black, fontSize: 16, fontWeight: FontWeight.w500, fontFamily: 'NotoSans');
 
   static const TextStyle TITLE_STYLE = TextStyle(
-      color: Colors.black, fontSize: 18, fontWeight: FontWeight.bold);
+      color: Colors.black, fontSize: 20, fontWeight: FontWeight.bold, fontFamily: 'NotoSans');
 
 
 

@@ -31,7 +31,34 @@ Future<ResponseData> getGroups({Map? queryMap}) async {
     },
   );
   var jsonBody = json.decode(utf8.decode(response.bodyBytes));
-  // print(url.toString());
+  print(jsonBody.toString());
+  return ResponseData.fromJSON(jsonBody, response.statusCode);
+}
+
+
+Future<ResponseData> getMyGroups({Map? queryMap}) async {
+  var url = ServerConfig.SERVER_API_URL + 'app/group_my';
+  String? token = await SharedPrefUtils.getAccessToken();
+  var query = '';
+  if (queryMap != null) {
+    queryMap.forEach(((key, value) {
+      if (query.isNotEmpty && query != null) {
+        query += '&';
+      }
+      query += '$key=$value';
+    }));
+    if (query.isNotEmpty && query != null) {
+      url += '?$query';
+    }
+  }
+  http.Response response = await http.get(Uri.parse(url),
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": token!
+    },
+  );
+  var jsonBody = json.decode(utf8.decode(response.bodyBytes));
+  // print(jsonBody.toString());
   return ResponseData.fromJSON(jsonBody, response.statusCode);
 }
 
@@ -114,5 +141,32 @@ Future<ResponseData> updateGroup(int id, Map mapData, File? imageFile) async {
   final res = await http.Response.fromStream(response);
   // print(utf8.decode(res.bodyBytes));
   var jsonBody = json.decode(utf8.decode(res.bodyBytes));
+  return ResponseData.fromJSON(jsonBody, response.statusCode);
+}
+
+
+Future<ResponseData> getGroupUserBusinesses({Map? queryMap}) async {
+  var url = ServerConfig.SERVER_API_URL + 'app/group_business';
+  String? token = await SharedPrefUtils.getAccessToken();
+  var query = '';
+  if (queryMap != null) {
+    queryMap.forEach(((key, value) {
+      if (query.isNotEmpty && query != null) {
+        query += '&';
+      }
+      query += '$key=$value';
+    }));
+    if (query.isNotEmpty && query != null) {
+      url += '?$query';
+    }
+  }
+  http.Response response = await http.get(Uri.parse(url),
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": token!
+    },
+  );
+  var jsonBody = json.decode(utf8.decode(response.bodyBytes));
+  print(url.toString());
   return ResponseData.fromJSON(jsonBody, response.statusCode);
 }

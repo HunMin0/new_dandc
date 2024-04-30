@@ -247,9 +247,20 @@ class _TradeBuyCreateFormState extends State<TradeBuyCreateForm> {
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
       context: context,
+      initialEntryMode: DatePickerEntryMode.calendarOnly,
       initialDate: DateTime.now(),
       firstDate: DateTime(2000),
       lastDate: DateTime.now(),
+      builder: (BuildContext context, Widget? child) {
+        return Theme(
+          data: ThemeData.light().copyWith(
+            datePickerTheme: DatePickerThemeData(
+              surfaceTintColor: Colors.white
+            ),
+          ),
+          child: child!,
+        );
+      },
     );
 
     if (picked != null) {

@@ -16,17 +16,16 @@ class ListTradeCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     ImageProvider? profileThumbnailImage =
         const AssetImage('assets/images/no-image.png');
     ImageProvider? businessThumbnailImage =
         const AssetImage('assets/images/no-image.png');
 
     if (item.has_business_owner != null &&
-        item.has_business_owner!.has_user_profile != null &&
-        item.has_business_owner!.has_user_profile!.has_profile_image != null) {
+        item.has_business_owner!.profile != null &&
+        item.has_business_owner!.profile!.has_profile_image != null) {
       final profileImage =
-          item.has_business_owner!.has_user_profile!.has_profile_image!;
+          item.has_business_owner!.profile!.has_profile_image!;
       profileThumbnailImage = CachedNetworkImageProvider(
         Utils.getImageFilePath(profileImage),
       );
@@ -40,8 +39,12 @@ class ListTradeCard extends StatelessWidget {
     }
 
     return Container(
-      color: HexColor("#FFFFFF"),
       width: double.infinity,
+      margin: const EdgeInsets.only(left: 12.0, right: 12.0, bottom: 12.0),
+      decoration: BoxDecoration(
+        color: HexColor("#FFFFFF"),
+        borderRadius: BorderRadius.all(Radius.circular(10.0)),
+      ),
       child: Column(
         children: [
           Padding(
@@ -79,24 +82,14 @@ class ListTradeCard extends StatelessWidget {
                               chipText: '승인대기',
                             ),
                           if (item.trade_status == 'approved')
-                          ColorChip(
+                            ColorChip(
                               color: HexColor("#4455aa"),
                               textColor: HexColor("#ffffff"),
                               chipText: '승인',
-                          ),
+                            ),
                         ],
                       ),
-                      Row(
-                        children: [
-                          Text(
-                            '거래일자',
-                            style: SettingStyle.SMALL_TEXT_STYLE,
-                          ),
-                          Spacer(),
-                          Text(item.traded_at!.substring(0, 16),
-                              style: SettingStyle.SMALL_TEXT_STYLE),
-                        ],
-                      ),
+
                       Row(
                         children: [
                           Text('대표자명', style: SettingStyle.SMALL_TEXT_STYLE),
@@ -129,7 +122,7 @@ class ListTradeCard extends StatelessWidget {
                       ),
                       Row(
                         children: [
-                          const Text('거래 금액',
+                          Text(item.traded_at!.substring(0, 10),
                               style: SettingStyle.SMALL_TEXT_STYLE),
                           Spacer(),
                           Text(Utils.parsePrice(item.price),
@@ -142,11 +135,6 @@ class ListTradeCard extends StatelessWidget {
               ],
             ),
           ),
-          Divider(
-            thickness: 10,
-            height: 10,
-            color: HexColor('#F5F6FA'),
-          )
         ],
       ),
     );

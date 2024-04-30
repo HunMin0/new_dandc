@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:Deal_Connect/components/const/setting_colors.dart';
 
 class DefaultBasicLayout extends StatelessWidget {
   final Widget child;
@@ -9,10 +8,15 @@ class DefaultBasicLayout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: backgroundColor ?? SettingColors.primaryMeterialColor,
-      body: SafeArea(
-        child: child,
+    return MediaQuery(
+      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        body: SafeArea(
+          child: Container(
+              color: Colors.white,
+              child: child),
+        ),
       ),
     );
   }

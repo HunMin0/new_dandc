@@ -39,7 +39,6 @@ class _GroupManageInfoState extends State<GroupManageInfo> {
         if (args != null) {
           setState(() {
             groupId = args['groupId'];
-            groupName = args['groupName'];
           });
         }
 

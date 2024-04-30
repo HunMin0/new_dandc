@@ -1,4 +1,5 @@
 import 'package:Deal_Connect/api/partner.dart';
+import 'package:Deal_Connect/components/layout/default_logo_layout.dart';
 import 'package:Deal_Connect/components/layout/default_search_layout.dart';
 import 'package:Deal_Connect/components/list_partner_card.dart';
 import 'package:Deal_Connect/components/loading.dart';
@@ -22,6 +23,7 @@ class _TradeSellIndexState extends State<TradeSellIndex> {
   String? searchKeyword;
   List<Partner>? partnerList = [];
   bool _isLoading = true;
+  TextEditingController _textController = TextEditingController();
 
 
   @override
@@ -31,7 +33,7 @@ class _TradeSellIndexState extends State<TradeSellIndex> {
   }
 
   void _initData() {
-    getPartners(queryMap: { 'keyword': searchKeyword }).then((response) {
+    getPartners(queryMap: { 'keyword': _textController.text }).then((response) {
       if (response.status == 'success') {
         Iterable iterable = response.data;
         List<Partner>? partnerListData = List<Partner>.from(
@@ -52,37 +54,71 @@ class _TradeSellIndexState extends State<TradeSellIndex> {
       return Loading();
     }
 
-    return DefaultSearchLayout(
+    return DefaultLogoLayout(
       isNotInnerPadding: 'true',
-      onSubmit: (keyword) {
-        setState(() {
-          searchKeyword = keyword;
-          _initData();
-        });
-      },
-      child: Container(
-        color: HexColor('#F5F6FA'),
+      titleName: '판매등록',
+      child: GestureDetector(
+        onTap: () {
+          FocusScope.of(context).unfocus();
+        },
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            partnerList != null && partnerList!.isNotEmpty ? Expanded(child: Container(
-              padding: EdgeInsets.all(13.0),
-              decoration: BoxDecoration(
-                color: Color(0xFFf5f6f8),
-              ),
-              child: ListView.builder(
-                itemCount: partnerList!.length,
-                itemBuilder: (context, index) {
-                  Partner item = partnerList![index];
-                  return GestureDetector(
-                    onTap: () {
-                      Navigator.pushNamed(context, '/trade/sell/create', arguments: {'userId' : item.has_user!.id});
-                    },
-                    child: ListPartnerCard(item : item.has_user, onApprovePressed: () {}, onDeletePressed: () {},),
-                  );
+            Container(
+              color: HexColor("#ffffff"),
+              padding: EdgeInsets.all(10.0),
+              child: TextField(
+                controller: _textController,
+                onSubmitted: (value) {
+                  setState(() {
+                    _isLoading = true;
+                  });
+                  _initData();
                 },
+                decoration: InputDecoration(
+                  filled: true,
+                  fillColor: HexColor("#F5F6FA"),
+                  contentPadding: EdgeInsets.symmetric(
+                    vertical: 10,
+                    horizontal: 20,
+                  ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    // 테두리를 둥글게 설정
+                    borderSide: BorderSide.none, // 바텀 border 없애기
+                  ),
+                  prefixIcon: Icon(Icons.search_rounded),
+                  hintText: '검색 키워드를 입력해주세요',
+                ),
               ),
-            )) : NoItems()
+            ),
+            Expanded(
+              child: Container(
+                color: Color(0xFFf5f6f8),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    partnerList != null && partnerList!.isNotEmpty ? Expanded(child: Container(
+                      padding: EdgeInsets.all(13.0),
+                      decoration: BoxDecoration(
+                        color: Color(0xFFf5f6f8),
+                      ),
+                      child: ListView.builder(
+                        itemCount: partnerList!.length,
+                        itemBuilder: (context, index) {
+                          Partner item = partnerList![index];
+                          return GestureDetector(
+                            onTap: () {
+                              Navigator.pushNamed(context, '/trade/sell/create', arguments: {'userId' : item.has_user!.id});
+                            },
+                            child: ListPartnerCard(item : item.has_user, onApprovePressed: () {}, onDeletePressed: () {},),
+                          );
+                        },
+                      ),
+                    )) : NoItems()
+                  ],
+                ),
+              ),
+            ),
           ],
         ),
       ),

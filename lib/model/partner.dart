@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:Deal_Connect/model/user.dart';
 
 class Partner {

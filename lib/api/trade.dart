@@ -21,7 +21,7 @@ Future<ResponseData> getTrade(int id) async {
     },
   );
   var jsonBody = json.decode(utf8.decode(response.bodyBytes));
-  // print(jsonBody.toString());
+  print(utf8.decode(response.bodyBytes));
   return ResponseData.fromJSON(jsonBody, response.statusCode);
 }
 
@@ -65,9 +65,9 @@ Future<ResponseData> getTradeHistoryDashboard(BuildContext context) async {
   if (response.statusCode == 401) {
     context.logoutAndRedirectToIntro();
   }
-
+print(utf8.decode(response.bodyBytes));
   var jsonBody = json.decode(utf8.decode(response.bodyBytes));
-  print(jsonBody.toString());
+
   return ResponseData.fromJSON(jsonBody, response.statusCode);
 }
 
@@ -138,14 +138,11 @@ Future<ResponseData> storeTrade(Map mapData, File? imageFile) async {
   request.headers
       .addAll({"Content-Type": "application/json", "Authorization": token!});
 
-
-
   http.StreamedResponse response = await request.send();
-  // print(response.statusCode);
 
   final res = await http.Response.fromStream(response);
-
   var jsonBody = json.decode(utf8.decode(res.bodyBytes));
+  print(jsonBody.toString());
   return ResponseData.fromJSON(jsonBody, response.statusCode);
 }
 
@@ -162,7 +159,6 @@ Future<ResponseData> manageTrade(int id, Map mapData) async {
   );
 
   var jsonBody = json.decode(utf8.decode(response.bodyBytes));
-  print(utf8.decode(response.bodyBytes));
   return ResponseData.fromJSON(jsonBody, response.statusCode);
 }
 

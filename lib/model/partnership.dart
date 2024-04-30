@@ -1,7 +1,3 @@
-import 'dart:ffi';
-
-import 'package:Deal_Connect/model/user.dart';
-
 class Partnership {
   final bool is_partner;
   final int partners_count;

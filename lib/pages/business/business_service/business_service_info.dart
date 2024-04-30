@@ -46,15 +46,9 @@ class _BusinessServiceInfoState extends State<BusinessServiceInfo> {
   void _initData() async {
     final widgetsBinding = WidgetsBinding.instance;
     widgetsBinding?.addPostFrameCallback((callback) async {
-      if (ModalRoute
-          .of(context)
-          ?.settings
-          .arguments != null) {
+      if (ModalRoute.of(context)?.settings.arguments != null) {
         setState(() {
-          args = ModalRoute
-              .of(context)
-              ?.settings
-              .arguments;
+          args = ModalRoute.of(context)?.settings.arguments;
         });
 
         if (args != null) {
@@ -67,7 +61,7 @@ class _BusinessServiceInfoState extends State<BusinessServiceInfo> {
           await getUserBusinessService(businessServiceId!).then((response) {
             if (response.status == 'success') {
               UserBusinessService resultData =
-              UserBusinessService.fromJSON(response.data);
+                  UserBusinessService.fromJSON(response.data);
               setState(() {
                 userBusinessService = resultData;
                 if (myUser != null) {
@@ -88,7 +82,6 @@ class _BusinessServiceInfoState extends State<BusinessServiceInfo> {
       }
     });
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -114,12 +107,10 @@ class _BusinessServiceInfoState extends State<BusinessServiceInfo> {
       isProcessable: true,
       bottomBar: _isManageable,
       nextOnPressed: () {
-        Navigator.pushNamed(
-            context, '/business/service/edit',
-            arguments: {
-              'userBusinessServiceId': userBusinessService!.id,
-              'storeName': storeName
-            }).then((value) {
+        Navigator.pushNamed(context, '/business/service/edit', arguments: {
+          'userBusinessServiceId': userBusinessService!.id,
+          'storeName': storeName
+        }).then((value) {
           _initData();
         });
       },
@@ -130,11 +121,15 @@ class _BusinessServiceInfoState extends State<BusinessServiceInfo> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(userBusinessService!.name != null
-                ? userBusinessService!.name
-                : '',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20.0),),
-            SizedBox(height: 10.0,),
+            Text(
+              userBusinessService!.name != null
+                  ? userBusinessService!.name
+                  : '',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20.0),
+            ),
+            SizedBox(
+              height: 10.0,
+            ),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -144,7 +139,9 @@ class _BusinessServiceInfoState extends State<BusinessServiceInfo> {
                     fit: BoxFit.cover,
                   ),
                 ),
-                SizedBox(height: 10,),
+                SizedBox(
+                  height: 10,
+                ),
                 Text(userBusinessService!.description)
               ],
             ),
@@ -155,11 +152,12 @@ class _BusinessServiceInfoState extends State<BusinessServiceInfo> {
   }
 
   void _deleteItem() {
-    CustomDialog.showDoubleBtnDialog(context: context,
+    CustomDialog.showDoubleBtnDialog(
+        context: context,
         msg: '정말 삭제하시겠습니까?',
         rightBtnText: '삭제',
         onLeftBtnClick: () {},
-        onRightBtnClick: (){
+        onRightBtnClick: () {
           _deleteSubmit();
         });
   }
@@ -178,7 +176,6 @@ class _BusinessServiceInfoState extends State<BusinessServiceInfo> {
     });
   }
 
-
   void _showCompleteDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -191,7 +188,9 @@ class _BusinessServiceInfoState extends State<BusinessServiceInfo> {
           onConfirmed: () {
             Navigator.of(context).pop();
             Navigator.of(context).pop();
-            Navigator.popAndPushNamed(context, '/business/info', arguments: { "userBusinessId": userBusinessService!.user_business_id });
+            Navigator.popAndPushNamed(context, '/business/info', arguments: {
+              "userBusinessId": userBusinessService!.user_business_id
+            });
           },
         );
       },

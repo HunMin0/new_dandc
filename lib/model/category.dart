@@ -2,15 +2,15 @@ import 'package:Deal_Connect/model/file.dart';
 
 class Category {
   final int id;
-  final int category_icon_id;
+  final int? category_icon_id;
   final String name;
   final File? has_category_icon_image;
 
   Category({
     required this.id,
-    required this.category_icon_id,
+    this.category_icon_id,
     required this.name,
-    required this.has_category_icon_image,
+    this.has_category_icon_image,
   });
 
   factory Category.fromJSON(Map<String, dynamic> json) {
@@ -22,5 +22,15 @@ class Category {
       category_icon_id: json['category_icon_id'],
       has_category_icon_image: has_category_icon_image
     );
+  }
+
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'category_icon_id': category_icon_id,
+      'has_category_icon_image': has_category_icon_image?.toJson(),
+    };
   }
 }

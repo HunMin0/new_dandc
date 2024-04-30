@@ -19,4 +19,12 @@ class GroupKeyword {
       keyword: json['keyword'],
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'group_id': group_id,
+      'keyword': keyword,
+    };
+  }
 }

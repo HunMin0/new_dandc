@@ -15,6 +15,7 @@ import 'package:Deal_Connect/components/const/setting_colors.dart';
 import 'package:Deal_Connect/utils/utils.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:hexcolor/hexcolor.dart';
 import 'package:image_picker/image_picker.dart';
 
 class ProfileEditIndex extends StatefulWidget {
@@ -85,11 +86,11 @@ class _ProfileEditIndexState extends State<ProfileEditIndex> {
     ImageProvider? backgroundImage;
 
     if (myPageData != null &&
-        myPageData!.has_user_profile != null &&
-        myPageData!.has_user_profile!.has_profile_image != null) {
+        myPageData!.profile != null &&
+        myPageData!.profile!.has_profile_image != null) {
       backgroundImage = CachedNetworkImageProvider(
         Utils.getImageFilePath(
-            myPageData!.has_user_profile!.has_profile_image!),
+            myPageData!.profile!.has_profile_image!),
       );
     } else {
       backgroundImage = AssetImage('assets/images/no-image.png');
@@ -195,10 +196,7 @@ class _ProfileEditIndexState extends State<ProfileEditIndex> {
                     padding: EdgeInsets.symmetric(vertical: 10.0),
                     child: Text(
                       '이름',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w400,
-                        fontSize: 13.0,
-                      ),
+                      style: SettingStyle.NORMAL_TEXT_STYLE,
                     ),
                   ),
                   TextFormField(
@@ -217,10 +215,7 @@ class _ProfileEditIndexState extends State<ProfileEditIndex> {
                     padding: EdgeInsets.symmetric(vertical: 10.0),
                     child: Text(
                       '전화번호',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w400,
-                        fontSize: 13.0,
-                      ),
+                      style: SettingStyle.NORMAL_TEXT_STYLE,
                     ),
                   ),
                   TextFormField(
@@ -239,10 +234,7 @@ class _ProfileEditIndexState extends State<ProfileEditIndex> {
                     padding: EdgeInsets.symmetric(vertical: 10.0),
                     child: Text(
                       '이메일',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w400,
-                        fontSize: 13.0,
-                      ),
+                      style: SettingStyle.NORMAL_TEXT_STYLE,
                     ),
                   ),
                   TextFormField(
@@ -251,6 +243,9 @@ class _ProfileEditIndexState extends State<ProfileEditIndex> {
                   ),
                 ],
               ),
+              SizedBox(
+                height: 10.0,
+              ),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -258,10 +253,7 @@ class _ProfileEditIndexState extends State<ProfileEditIndex> {
                     padding: const EdgeInsets.symmetric(vertical: 10.0),
                     child: Text(
                       '검색 키워드',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w400,
-                        fontSize: 13.0,
-                      ),
+                      style: SettingStyle.NORMAL_TEXT_STYLE,
                     ),
                   ),
                   TextField(
@@ -377,8 +369,10 @@ class _ProfileEditIndexState extends State<ProfileEditIndex> {
       CustomDialog.dismissProgressDialog();
 
       if (response.status == 'success') {
+
         User user = User.fromJSON(response.data);
         SharedPrefUtils.setUser(user).then((value) {
+          print(value);
           _showCompleteDialog(context);
         });
 

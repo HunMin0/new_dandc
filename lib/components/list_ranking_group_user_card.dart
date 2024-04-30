@@ -1,7 +1,6 @@
 import 'package:Deal_Connect/components/common_item/grey_chip.dart';
 import 'package:Deal_Connect/components/common_item/stack_thumbnail.dart';
-import 'package:Deal_Connect/model/group_user.dart';
-import 'package:Deal_Connect/model/partner.dart';
+import 'package:Deal_Connect/model/group_rank.dart';
 import 'package:Deal_Connect/model/user_keyword.dart';
 import 'package:Deal_Connect/utils/utils.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -10,7 +9,7 @@ import 'package:hexcolor/hexcolor.dart';
 import 'package:intl/intl.dart';
 
 class ListRankingGroupUserCard extends StatelessWidget {
-  GroupUser item;
+  GroupRank item;
   int index;
 
   ListRankingGroupUserCard(
@@ -25,8 +24,8 @@ class ListRankingGroupUserCard extends StatelessWidget {
     ImageProvider? businessThumbnailImage =
     AssetImage('assets/images/no-image.png');
 
-    if (item != null && item.has_user!.has_user_profile?.has_profile_image != null) {
-      final profileImage = item.has_user!.has_user_profile!.has_profile_image!;
+    if (item != null && item.has_user!.profile?.has_profile_image != null) {
+      final profileImage = item.has_user!.profile!.has_profile_image!;
       profileThumbnailImage = CachedNetworkImageProvider(
         Utils.getImageFilePath(profileImage),
       );

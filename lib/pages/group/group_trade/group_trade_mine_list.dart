@@ -1,17 +1,11 @@
 import 'package:Deal_Connect/api/group_trade.dart';
 import 'package:Deal_Connect/components/const/setting_style.dart';
 import 'package:Deal_Connect/components/list_group_trade_card.dart';
-import 'package:Deal_Connect/components/list_trade_card.dart';
 import 'package:Deal_Connect/components/loading.dart';
 import 'package:Deal_Connect/components/no_items.dart';
-import 'package:Deal_Connect/db/trade_data.dart';
 import 'package:Deal_Connect/model/group_trade.dart';
-import 'package:Deal_Connect/pages/history/history_detail/history_detail_index.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:hexcolor/hexcolor.dart';
-
-import '../../history/components/list_card.dart';
 
 class GroupTradeMineList extends StatefulWidget {
   int? groupId;

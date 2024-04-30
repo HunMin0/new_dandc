@@ -6,11 +6,7 @@ import 'package:Deal_Connect/components/layout/default_basic_layout.dart';
 import 'package:Deal_Connect/components/list_trade_card.dart';
 import 'package:Deal_Connect/components/loading.dart';
 import 'package:Deal_Connect/components/no_items.dart';
-import 'package:Deal_Connect/db/trade_data.dart';
 import 'package:Deal_Connect/model/trade.dart';
-import 'package:Deal_Connect/pages/history/components/list_card.dart';
-import 'package:Deal_Connect/pages/history/history_detail/history_detail_index.dart';
-import 'package:Deal_Connect/pages/history/history_ranking/history_ranking_index.dart';
 import 'package:Deal_Connect/utils/utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -24,7 +20,7 @@ class HistoryIndex extends StatefulWidget {
 }
 
 class _HistoryIndexState extends State<HistoryIndex>
-    with TickerProviderStateMixin {
+    with TickerProviderStateMixin, AutomaticKeepAliveClientMixin {
   late final TabController tabController;
   var tradeHistoryDashboardData;
   List<Trade>? tradeList = [];
@@ -33,51 +29,51 @@ class _HistoryIndexState extends State<HistoryIndex>
 
   @override
   void initState() {
-    _initData();
     super.initState();
-    // tab컨트롤러 초기화
+    _initData();
     tabController = TabController(
       length: 3,
       vsync: this,
     );
   }
 
-  void _initData() {
-    getTradeHistoryDashboard(context).then((response) {
-      if (response.status == 'success') {
+  void _initData() async {
+    await Future.delayed(Duration(milliseconds: 500));
+    if (mounted) {
+      var response = await getTradeHistoryDashboard(context);
+      if (response.status == 'success' && mounted) {
         var responseData = response.data;
-
         setState(() {
           if (responseData != null) {
             tradeHistoryDashboardData = responseData;
           }
         });
       }
-      _initTradeData();
-    });
-
-    setState(() {
-      _isLoading = false;
-    });
+      await _initTradeData();
+    }
   }
 
-  void _initTradeData() {
-    getTrades(queryMap: {'trade_type': tradeType, 'is_my_trades' : 'true'}).then((response) {
-      if (response.status == 'success') {
-        Iterable iterable = response.data;
+  Future<void> _initTradeData() async {
+    var response = await getTrades(queryMap: {'trade_type': tradeType, 'is_my_trades': 'true', 'selectedMonth': '1'});
+    if (response.status == 'success' && mounted) {
+      Iterable iterable = response.data;
 
-        List<Trade>? tradeListData =
-            List<Trade>.from(iterable.map((e) => Trade.fromJSON(e)));
+      List<Trade>? tradeListData =
+      List<Trade>.from(iterable.map((e) => Trade.fromJSON(e)));
 
-        setState(() {
-          this.tradeList = tradeListData;
-        });
-      }
-    });
+      setState(() {
+        this.tradeList = tradeListData;
+        _isLoading = false;
+      });
+    }
   }
 
   @override
+  bool get wantKeepAlive => true;
+
+  @override
   Widget build(BuildContext context) {
+    super.build(context);
     int totalSellAmount = 0;
     int totalBuyAmount = 0;
     int totalBuyCount = 0;
@@ -143,24 +139,32 @@ class _HistoryIndexState extends State<HistoryIndex>
 
     if (_isLoading || tradeHistoryDashboardData == null) {
       // 로딩 중 인디케이터 표시
-      return Loading();
+      return const Loading();
     }
     return DefaultBasicLayout(
       child: CustomScrollView(
         slivers: [
+          CupertinoSliverRefreshControl(
+            onRefresh: () async {
+              setState(() {
+                _isLoading = true;
+              });
+              _initData();
+            },
+          ),
           SliverAppBar(
-            expandedHeight: 510.0,
+            collapsedHeight: 490.0,
             automaticallyImplyLeading: false,
             flexibleSpace: FlexibleSpaceBar(
-              background: Padding(
+              background: Container(
+                color: Colors.white,
                 padding: const EdgeInsets.all(12.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text(
                       '나의 브릿지 현황',
-                      style:
-                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      style: SettingStyle.TITLE_STYLE,
                     ),
                     const SizedBox(
                       height: 14.0,
@@ -176,20 +180,25 @@ class _HistoryIndexState extends State<HistoryIndex>
                           Row(
                             children: [
                               Expanded(
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 10.0,
-                                  ),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      const Text('판매내역'),
-                                      Text(
-                                        Utils.parsePrice(totalSellAmount),
-                                        style: SettingStyle.SUB_TITLE_STYLE,
-                                      )
-                                    ],
+                                child: GestureDetector(
+                                  onTap: () {
+                                    Navigator.pushNamed(context, '/trade/history/list', arguments: { 'division': 'sell' });
+                                  },
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 10.0,
+                                    ),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                      CrossAxisAlignment.start,
+                                      children: [
+                                        const Text('판매내역'),
+                                        Text(
+                                          Utils.parsePrice(totalSellAmount),
+                                          style: SettingStyle.SUB_TITLE_STYLE,
+                                        )
+                                      ],
+                                    ),
                                   ),
                                 ),
                               ),
@@ -203,20 +212,25 @@ class _HistoryIndexState extends State<HistoryIndex>
                                 ),
                               ),
                               Expanded(
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 10.0,
-                                  ),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      const Text('구매내역'),
-                                      Text(
-                                        Utils.parsePrice(totalBuyAmount),
-                                        style: SettingStyle.SUB_TITLE_STYLE,
-                                      )
-                                    ],
+                                child: GestureDetector(
+                                  onTap: () {
+                                    Navigator.pushNamed(context, '/trade/history/list', arguments: { 'division': 'buy' });
+                                  },
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 10.0,
+                                    ),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                      CrossAxisAlignment.start,
+                                      children: [
+                                        const Text('구매내역'),
+                                        Text(
+                                          Utils.parsePrice(totalBuyAmount),
+                                          style: SettingStyle.SUB_TITLE_STYLE,
+                                        )
+                                      ],
+                                    ),
                                   ),
                                 ),
                               )
@@ -262,14 +276,16 @@ class _HistoryIndexState extends State<HistoryIndex>
                                         value: totalCount == 0
                                             ? 0
                                             : (totalSellCount /
-                                                totalCount.toDouble()),
-                                        borderRadius: BorderRadius.all(
+                                            totalCount.toDouble()),
+                                        borderRadius:
+                                        const BorderRadius.all(
                                             Radius.circular(10)),
                                         minHeight: 6,
-                                        backgroundColor: HexColor('#D9D9D9'),
+                                        backgroundColor:
+                                        HexColor('#D9D9D9'),
                                         valueColor:
-                                            AlwaysStoppedAnimation<Color>(
-                                                HexColor('#75A8E4')),
+                                        AlwaysStoppedAnimation<Color>(
+                                            HexColor('#75A8E4')),
                                       ),
                                     ),
                                   ],
@@ -281,14 +297,14 @@ class _HistoryIndexState extends State<HistoryIndex>
                                   children: [
                                     Text(
                                       '$totalSellCount 건',
-                                      style: TextStyle(
+                                      style: const TextStyle(
                                           fontSize: 13,
                                           fontWeight: FontWeight.w500),
                                     ),
-                                    Spacer(),
+                                    const Spacer(),
                                     Text(
                                       '$totalBuyCount 건',
-                                      style: TextStyle(
+                                      style: const TextStyle(
                                           fontSize: 13,
                                           fontWeight: FontWeight.w500),
                                     ),
@@ -305,32 +321,38 @@ class _HistoryIndexState extends State<HistoryIndex>
                               text: TextSpan(
                                 text: '총 누적거래 ',
                                 style: SettingStyle.SMALL_TEXT_STYLE
-                                    .copyWith(color: Color(0xFF444444)),
+                                    .copyWith(
+                                    color: const Color(0xFF444444)),
                                 children: <TextSpan>[
                                   TextSpan(
                                     text: '$totalCount 건',
                                     style: SettingStyle.SMALL_TEXT_STYLE
-                                        .copyWith(color: Color(0xFF75A8E4)),
+                                        .copyWith(
+                                        color: const Color(0xFF75A8E4)),
                                   ),
                                   TextSpan(
                                     text: ' 중 ',
                                     style: SettingStyle.SMALL_TEXT_STYLE
-                                        .copyWith(fontWeight: FontWeight.bold),
+                                        .copyWith(
+                                        fontWeight: FontWeight.bold),
                                   ),
                                   TextSpan(
                                     text: '$sellOrBuy 건 수가 ',
                                     style: SettingStyle.SMALL_TEXT_STYLE
-                                        .copyWith(fontWeight: FontWeight.bold),
+                                        .copyWith(
+                                        fontWeight: FontWeight.bold),
                                   ),
                                   TextSpan(
                                     text: countSpace.toString() + ' 건',
                                     style: SettingStyle.SMALL_TEXT_STYLE
-                                        .copyWith(color: Color(0xFF75A8E4)),
+                                        .copyWith(
+                                        color: const Color(0xFF75A8E4)),
                                   ),
                                   TextSpan(
                                     text: " 많아요\u{1f525}",
                                     style: SettingStyle.SMALL_TEXT_STYLE
-                                        .copyWith(fontWeight: FontWeight.bold),
+                                        .copyWith(
+                                        fontWeight: FontWeight.bold),
                                   ),
                                 ],
                               ),
@@ -341,7 +363,7 @@ class _HistoryIndexState extends State<HistoryIndex>
                     const SizedBox(
                       height: 14.0,
                     ),
-                    _buildMyRanking(),
+                    const _buildMyRanking(),
                     const SizedBox(
                       height: 14.0,
                     ),
@@ -353,22 +375,22 @@ class _HistoryIndexState extends State<HistoryIndex>
                       decoration: BoxDecoration(
                         color: HexColor('#F5F6FA'),
                         borderRadius:
-                            const BorderRadius.all(Radius.circular(10)),
+                        const BorderRadius.all(Radius.circular(10)),
                       ),
                       child: Column(
                         children: [
                           GestureDetector(
                             onTap: () {
                               Navigator.pushNamed(
-                                      context, '/trade/history/approve',
-                                      arguments: {'division': 'mine'})
+                                  context, '/trade/history/approve',
+                                  arguments: {'division': 'mine'})
                                   .then((value) {
                                 _initData();
                               });
                             },
                             child: Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(vertical: 10.0),
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 10.0),
                               child: Row(
                                 children: [
                                   Icon(
@@ -383,8 +405,8 @@ class _HistoryIndexState extends State<HistoryIndex>
                                   const Spacer(),
                                   Text(
                                     '$totalNeedMyApproveCount 건',
-                                    style:
-                                        TextStyle(fontWeight: FontWeight.bold),
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.bold),
                                   ),
                                   const SizedBox(
                                     width: 10,
@@ -404,8 +426,8 @@ class _HistoryIndexState extends State<HistoryIndex>
                           GestureDetector(
                             onTap: () {
                               Navigator.pushNamed(
-                                      context, '/trade/history/approve',
-                                      arguments: {'division': 'partner'})
+                                  context, '/trade/history/approve',
+                                  arguments: {'division': 'partner'})
                                   .then((value) {
                                 _initData();
                               });
@@ -424,12 +446,12 @@ class _HistoryIndexState extends State<HistoryIndex>
                                   const SizedBox(
                                     width: 10,
                                   ),
-                                  Text('내가 보낸 승인 요청'),
+                                  const Text('내가 보낸 승인 요청'),
                                   const Spacer(),
                                   Text(
                                     '$totalNeedPartnerApproveCount 건',
-                                    style:
-                                        TextStyle(fontWeight: FontWeight.bold),
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.bold),
                                   ),
                                   const SizedBox(
                                     width: 10,
@@ -446,9 +468,6 @@ class _HistoryIndexState extends State<HistoryIndex>
                         ],
                       ),
                     ),
-                    SizedBox(
-                      height: 10.0,
-                    ),
                   ],
                 ),
               ),
@@ -457,6 +476,7 @@ class _HistoryIndexState extends State<HistoryIndex>
           const SliverToBoxAdapter(
             child: Divider(
               color: Color(0xFFF5F6FA),
+              height: 16.0,
               thickness: 16.0,
             ),
           ),
@@ -469,13 +489,8 @@ class _HistoryIndexState extends State<HistoryIndex>
                 labelColor: Colors.black,
                 dividerColor: Colors.white,
                 unselectedLabelColor: Colors.grey[500],
-                labelStyle: TextStyle(
-                  fontSize: 15.0,
-                  fontWeight: FontWeight.w600,
-                ),
-                unselectedLabelStyle: TextStyle(
-                  fontWeight: FontWeight.w500,
-                ),
+                labelStyle: SettingStyle.SUB_TITLE_STYLE,
+                unselectedLabelStyle: SettingStyle.SUB_TITLE_STYLE,
                 indicatorSize: TabBarIndicatorSize.tab,
                 onTap: (value) {
                   setState(() {
@@ -488,10 +503,11 @@ class _HistoryIndexState extends State<HistoryIndex>
                     if (value == 2) {
                       tradeType = 'sell';
                     }
+                    _isLoading = true;
                   });
                   _initTradeData();
                 },
-                tabs: [
+                tabs: const [
                   Tab(
                     child: Text(
                       '전체',
@@ -512,39 +528,37 @@ class _HistoryIndexState extends State<HistoryIndex>
             ),
             pinned: true,
           ),
-          const SliverToBoxAdapter(
-            child: Divider(
-              color: Color(0xFFF5F6FA),
-              thickness: 16.0,
-            ),
-          ),
-          tradeList != null && tradeList!.isNotEmpty
+          (tradeList != null && tradeList!.isNotEmpty)
               ? SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (BuildContext context, int index) {
-                      return GestureDetector(
-                          onTap: () {
-                            Navigator.pushNamed(
-                                context, '/trade/history/info',
-                                arguments: {'tradeId': tradeList![index].id})
-                                .then((value) {
-                              _initData();
-                            });
-                          },
-                          child: ListTradeCard(
-                            item: tradeList![index],
-                          ));
+            delegate: SliverChildBuilderDelegate(
+                  (BuildContext context, int index) {
+                return GestureDetector(
+                    onTap: () {
+                      Navigator.pushNamed(
+                          context, '/trade/history/info',
+                          arguments: {
+                            'tradeId': tradeList![index].id
+                          }).then((value) {
+                        _initData();
+                      });
                     },
-                    childCount: tradeList!.length,
-                  ),
-                )
-              : const SliverToBoxAdapter(
-                  child: NoItems(),
-                ),
+                    child: ListTradeCard(
+                      item: tradeList![index],
+                    ));
+              },
+              childCount: tradeList!.length,
+            ),
+          ) : SliverToBoxAdapter(child: NoItems(),)
         ],
       ),
     );
   }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
 }
 
 class _buildMyRanking extends StatelessWidget {
@@ -554,6 +568,7 @@ class _buildMyRanking extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
     return GestureDetector(
       onTap: () {
         Navigator.pushNamed(context, '/trade/history/ranking');
@@ -571,17 +586,16 @@ class _buildMyRanking extends StatelessWidget {
               children: [
                 Text(
                   '나의 파트너들 중 누가 제일 큰손일까요!?',
-                  style: TextStyle(
-                    color: HexColor('#FFFFFF'),
-                    fontSize: 13,
+                  style: SettingStyle.SMALL_TEXT_STYLE.copyWith(
+                    color: Colors.white
                   ),
                 ),
+                SizedBox(height: 2,),
                 Text(
                   '랭킹 보러가기',
-                  style: TextStyle(
-                      color: HexColor('#FFFFFF'),
-                      fontSize: 15,
-                      fontWeight: FontWeight.bold),
+                  style: SettingStyle.SUB_TITLE_STYLE.copyWith(
+                    color: Colors.white
+                  ),
                 )
               ],
             ),
@@ -596,6 +610,7 @@ class _buildMyRanking extends StatelessWidget {
       ),
     );
   }
+
 }
 
 class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {

@@ -16,7 +16,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
-version: 1.0.0+1
+version: 1.0.0+4
 
 environment:
   sdk: '>=3.2.0 <4.0.0'
@@ -37,7 +37,7 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
   # 네트워크 설정
-  dio: ^5.3.4
+  dio: ^5.0.3
 
   # 추가셋
   hexcolor: ^3.0.1
@@ -59,10 +59,20 @@ dependencies:
   image_cropper: ^4.0.1
   cached_network_image: ^3.3.1
   carousel_slider: ^4.0.0
-  webview_flutter: ^3.0.0
+  webview_flutter: ^4.0.7
   firebase_messaging: ^14.7.16
   firebase_core: ^2.25.4
   flutter_local_notifications: ^9.0.1
+  url_launcher: ^6.0.10
+  share_plus: ^7.2.2
+  loading_animation_widget: ^1.2.1
+  firebase_auth: ^4.17.8
+  google_sign_in: ^6.2.1
+  kakao_flutter_sdk: ^1.9.1+2
+  flutter_launcher_icons: ^0.13.1
+  flutter_naver_login: ^1.8.0
+  uni_links: ^0.5.1
+  sign_in_with_apple: ^5.0.0
 
 dev_dependencies:
   flutter_test:

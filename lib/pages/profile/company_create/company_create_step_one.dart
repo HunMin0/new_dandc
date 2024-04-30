@@ -2,11 +2,14 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:Deal_Connect/components/const/setting_colors.dart';
+import 'package:Deal_Connect/components/const/setting_style.dart';
 import 'package:Deal_Connect/components/custom/join_text_form_field.dart';
 import 'package:Deal_Connect/components/layout/default_next_layout.dart';
 import 'package:Deal_Connect/model/search_address_result.dart';
+import 'package:Deal_Connect/model/user_business.dart';
 import 'package:Deal_Connect/pages/profile/company_create/company_create_step_two.dart';
 import 'package:flutter/material.dart';
+import 'package:hexcolor/hexcolor.dart';
 
 class CompanyCreateStepOne extends StatefulWidget {
   const CompanyCreateStepOne({super.key});
@@ -20,6 +23,11 @@ class _CompanyCreateStepOneState extends State<CompanyCreateStepOne> {
   File? imageFile;
 
   String name = '';
+  TextEditingController _nameController = TextEditingController();
+  TextEditingController _phoneController = TextEditingController();
+  TextEditingController _address2Controller = TextEditingController();
+  TextEditingController _descriptionController = TextEditingController();
+
   String phone = '';
   String zipcode = '';
   double? latitude;
@@ -29,10 +37,8 @@ class _CompanyCreateStepOneState extends State<CompanyCreateStepOne> {
   String description = '';
 
   bool isProcessable = false;
-  bool isPhoneFilled = false;
-  bool isCompanyNameFilled = false;
-  bool isAddressFilled = true;
-  bool isDetailedAddressFilled = false;
+
+  UserBusiness? userBusiness;
 
   var args;
 
@@ -48,29 +54,20 @@ class _CompanyCreateStepOneState extends State<CompanyCreateStepOne> {
           setState(() {
             userBusinessCategoryId = args['userBusinessCategoryId'];
             imageFile = args['imageFile'];
+            userBusiness = args['userBusiness'];
+
+            if (userBusiness != null) {
+              _nameController.text = userBusiness!.name;
+              _descriptionController.text = userBusiness!.description ?? '';
+              address1 = userBusiness!.address1 ?? '';
+              _address2Controller.text = userBusiness!.address2 ?? '';
+              _phoneController.text = userBusiness!.phone ?? '';
+              isProcessable = true;
+            }
           });
         }
       }
     });
-  }
-
-  void _showPopup(BuildContext context) {
-    showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text('주소검색'),
-            content: Text('주소모달 내용'),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: Text('확인'),
-              ),
-            ],
-          );
-        });
   }
 
   @override
@@ -93,78 +90,88 @@ class _CompanyCreateStepOneState extends State<CompanyCreateStepOne> {
               arguments: {
                 'userBusinessCategoryId': userBusinessCategoryId,
                 'imageFile': imageFile,
-                'name': name,
-                'phone': phone,
+                'name': _nameController.text,
+                'phone': _phoneController.text,
                 'address1': address1,
-                'address2': address2,
-                'description': description,
+                'address2': _address2Controller.text,
+                'description': _descriptionController.text,
+                'userBusiness': userBusiness,
               });
         },
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Text(
-              //   isCompanyNameFilled
-              //       ? (isAddressFilled
-              //           ? (isDetailedAddressFilled
-              //               ? '다음을 눌러 업체등록을 완성해주세요'
-              //               : '상세주소를 입력 해주세요')
-              //           : '주소를 입력 해주세요')
-              //       : '업체명을 입력 해주세요',
-              //   style: TextStyle(
-              //     fontSize: 17.0,
-              //     fontWeight: FontWeight.w600,
-              //     color: Colors.black,
-              //   ),
-              // ),
-              // SizedBox(
-              //   height: 40.0,
-              // ),
               Column(
                 children: [
-                  JoinTextFormField(
-                    label: '업체명',
-                    hintText: '업체명을 입력해주세요',
-                    onChanged: (String value) {
-                      setState(() {
-                        name = value;
-                        isCompanyNameFilled = value.isNotEmpty;
-                        isProcessable = isCompanyNameFilled &&
-                            isAddressFilled &&
-                            isDetailedAddressFilled;
-                      });
-                    },
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 10.0),
+                        child: Text(
+                          '업체명',
+                          style: SettingStyle.NORMAL_TEXT_STYLE,
+                        ),
+                      ),
+                      TextField(
+                        controller: _nameController,
+                        decoration: SettingStyle.INPUT_STYLE.copyWith(
+                          hintText: '업체명을 입력해주세요',
+                        ),
+                        onChanged: (String value) {
+                          _checkValidation();
+                        },
+                      ),
+                    ],
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 10.0,
                   ),
-                  JoinTextFormField(
-                    label: '한줄소개',
-                    hintText: '한 줄 소개를 입력해주세요',
-                    onChanged: (String value) {
-                      setState(() {
-                        description = value;
-                      });
-                    },
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 10.0),
+                        child: Text(
+                          '한줄소개',
+                          style: SettingStyle.NORMAL_TEXT_STYLE,
+                        ),
+                      ),
+                      TextField(
+                        controller: _descriptionController,
+                        decoration: SettingStyle.INPUT_STYLE.copyWith(
+                          hintText: '한 줄 소개를 입력해주세요',
+                        ),
+                        onChanged: (String value) {
+                          _checkValidation();
+                        },
+                      ),
+                    ],
                   ),
                   _buildAddressSearchBtn(context),
                   SizedBox(
                     height: 10.0,
                   ),
-                  JoinTextFormField(
-                    label: '연락처',
-                    hintText: '연락처를 입력해주세요',
-                    onChanged: (String value) {
-                      setState(() {
-                        phone = value;
-                        isPhoneFilled = value.isNotEmpty;
-                        isProcessable = isCompanyNameFilled &&
-                            isAddressFilled &&
-                            isPhoneFilled &&
-                            isDetailedAddressFilled;
-                      });
-                    },
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 10.0),
+                        child: Text(
+                          '연락처',
+                          style: SettingStyle.NORMAL_TEXT_STYLE,
+                        ),
+                      ),
+                      TextField(
+                        controller: _phoneController,
+                        keyboardType: TextInputType.number,
+                        decoration: SettingStyle.INPUT_STYLE.copyWith(
+                          hintText: '연락처를 입력해주세요',
+                        ),
+                        onChanged: (String value) {_checkValidation();},
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -173,8 +180,6 @@ class _CompanyCreateStepOneState extends State<CompanyCreateStepOne> {
         ),
       ),
     );
-
-
   }
 
   Column _buildAddressSearchBtn(BuildContext context) {
@@ -185,6 +190,7 @@ class _CompanyCreateStepOneState extends State<CompanyCreateStepOne> {
           padding: const EdgeInsets.symmetric(vertical: 10.0),
           child: Text(
             '주소',
+            style: SettingStyle.NORMAL_TEXT_STYLE,
           ),
         ),
         GestureDetector(
@@ -209,8 +215,9 @@ class _CompanyCreateStepOneState extends State<CompanyCreateStepOne> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        address1 ?? '여기를 눌러 주소 검색',
-                        style: TextStyle(color: BODY_TEXT_COLOR),
+                        address1 != '' ? address1 : '주소 검색을 해주세요.',
+                        style: SettingStyle.NORMAL_TEXT_STYLE
+                            .copyWith(color: HexColor('#666666'), fontSize: 16),
                       ),
                       Icon(
                         Icons.search,
@@ -221,32 +228,40 @@ class _CompanyCreateStepOneState extends State<CompanyCreateStepOne> {
                 )),
           ),
         ),
-        JoinTextFormField(
-          label: '상세주소',
-          hintText: '상세주소를 입력 해주세요',
-          onChanged: (String value) {
-            setState(() {
-              address2 = value;
-              isDetailedAddressFilled = value.isNotEmpty;
-              isProcessable = isCompanyNameFilled &&
-                  isAddressFilled &&
-                  isDetailedAddressFilled;
-            });
-          },
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 10.0),
+              child: Text(
+                '상세주소',
+                style: SettingStyle.NORMAL_TEXT_STYLE,
+              ),
+            ),
+            TextField(
+              controller: _address2Controller,
+              decoration: SettingStyle.INPUT_STYLE.copyWith(
+                hintText: '상세주소를 입력해주세요',
+              ),
+              onChanged: (String value) {_checkValidation();},
+            ),
+          ],
         ),
       ],
     );
   }
+
   void _searchEvent() {
     Navigator.pushNamed(context, '/address/search').then((value) {
       if (value != null) {
         String valueStr = value as String;
         var jsonBody = json.decode(valueStr);
-        SearchAddressResult searchAddressResult = SearchAddressResult.fromJSON(jsonBody);
+        SearchAddressResult searchAddressResult =
+            SearchAddressResult.fromJSON(jsonBody);
         setState(() {
           address1 = searchAddressResult.addr;
           zipcode = searchAddressResult.zonecode;
-
+          _checkValidation();
           // latitude = double.parse(searchAddressResult.lat);
           // longitude = double.parse(searchAddressResult.lon);
         });
@@ -254,4 +269,20 @@ class _CompanyCreateStepOneState extends State<CompanyCreateStepOne> {
     });
   }
 
+  void _checkValidation() {
+    if (_nameController.text != '' &&
+      _descriptionController.text != '' &&
+      address1 != '' &&
+      _address2Controller.text != '' &&
+      _phoneController.text != ''
+    ) {
+      setState(() {
+        isProcessable = true;
+      });
+    } else {
+      setState(() {
+        isProcessable = false;
+      });
+    }
+  }
 }

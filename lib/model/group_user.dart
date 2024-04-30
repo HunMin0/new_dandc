@@ -1,3 +1,4 @@
+import 'package:Deal_Connect/model/group.dart';
 import 'package:Deal_Connect/model/user.dart';
 
 class GroupUser {
@@ -9,8 +10,9 @@ class GroupUser {
   final bool? is_approved;
   final bool? is_deleted;
   final String? return_reason;
-  final String? processed_at;
+  final String? approved_at;
   final User? has_user;
+  final Group? has_group;
 
   GroupUser({
     required this.id,
@@ -21,12 +23,14 @@ class GroupUser {
     this.is_approved,
     this.is_deleted,
     this.return_reason,
-    this.processed_at,
+    this.approved_at,
     this.has_user,
+    this.has_group,
   });
 
   factory GroupUser.fromJSON(Map<String, dynamic> json) {
     var has_user = json['has_user'] != null ? User.fromJSON(json['has_user']) : null;
+    var has_group = json['has_group'] != null ? Group.fromJSON(json['has_group']) : null;
 
 
     return GroupUser(
@@ -38,8 +42,9 @@ class GroupUser {
       is_deleted: json['is_deleted'],
       return_reason: json['return_reason'],
       total_trade_amount: json['total_trade_amount'],
-      processed_at: json['processed_at'],
+      approved_at: json['approved_at'],
       has_user: has_user,
+      has_group: has_group,
     );
   }
 }

@@ -1,4 +1,3 @@
-import 'dart:ffi';
 import 'package:Deal_Connect/model/file.dart';
 import 'package:Deal_Connect/model/user.dart';
 import 'package:Deal_Connect/model/user_business.dart';
@@ -103,5 +102,33 @@ class Trade {
       has_request_user: has_request_user,
       has_receipt_image: has_receipt_image,
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'request_user_id': request_user_id,
+      'response_user_id': response_user_id,
+      'buy_user_id': buy_user_id,
+      'business_owner_id': business_owner_id,
+      'user_business_id': user_business_id,
+      'trade_status': trade_status,
+      'trade_type': trade_type,
+      'price': price,
+      'trade_services': trade_services,
+      'receipt_file_id': receipt_file_id,
+      'user_description': user_description,
+      'business_user_description': business_user_description,
+      'partner_return_reason': partner_return_reason,
+      'traded_at': traded_at,
+      'created_at': created_at,
+      'updated_at': updated_at,
+      'processed_at': processed_at,
+      'has_business_owner': has_business_owner?.toJson(),
+      'has_buy_user': has_buy_user?.toJson(),
+      'has_business': has_business?.toJson(),
+      'has_request_user': has_request_user?.toJson(),
+      'has_receipt_image': has_receipt_image?.toJson(),
+    };
   }
 }

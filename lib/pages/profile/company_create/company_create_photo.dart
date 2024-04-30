@@ -55,21 +55,8 @@ class _CompanyCreatePhotoState extends State<CompanyCreatePhoto> {
             userBusinessCategoryId = args['userBusinessCategoryId'];
             userBusinessId = args['userBusinessId'];
             storeName = args['storeName'];
-          });
-        }
-        if (userBusinessId != null) {
-          await getUserBusiness(userBusinessId!).then((response) {
-            if (response.status == 'success') {
-              UserBusiness resultData = UserBusiness.fromJSON(response.data);
-              if (resultData != null) {
-                setState(() {
-                  userBusiness = resultData;
-                });
-              }
-            } else {
-              Fluttertoast.showToast(
-                  msg: '업체 정보를 받아오는 도중 오류가 발생했습니다.\n오류코드: 463');
-            }
+            userBusiness = args['userBusiness'];
+            isProcessable = true;
           });
         }
         setState(() {
@@ -121,6 +108,7 @@ class _CompanyCreatePhotoState extends State<CompanyCreatePhoto> {
               arguments: {
                 'userBusinessCategoryId': userBusinessCategoryId,
                 'imageFile': _pickedImage,
+                'userBusiness': userBusiness,
               });
         }
       },
@@ -251,45 +239,45 @@ class _CompanyCreatePhotoState extends State<CompanyCreatePhoto> {
                     ),
                   ),
           ),
-          SizedBox(
-            height: 20.0,
-          ),
-          if (_pickedImage == null)
-          Row(
-            children: [
-              InkWell(
-                borderRadius: BorderRadius.circular(20.0),
-                onTap: () {
-                  setState(() {
-                    checkState = !checkState;
-                    if (!checkState) {
-                      checkState = false;
-                    }
-                    isProcessable = checkState || (_pickedImage != null);
-                  });
-                },
-                child: _checkType(checkState: checkState),
-              ),
-              SizedBox(
-                width: 10.0,
-              ),
-              GestureDetector(
-                onTap: () {
-                  setState(() {
-                    checkState = !checkState;
-                    if (!checkState) {
-                      checkState = false;
-                    }
-                    isProcessable = checkState || (_pickedImage != null);
-                  });
-                },
-                child: _notImage(
-                  underText: '대표사진 다음에 등록하기',
-                  checkState: checkState,
-                ),
-              ),
-            ],
-          ),
+          // SizedBox(
+          //   height: 20.0,
+          // ),
+          // if (_pickedImage == null)
+          // Row(
+          //   children: [
+          //     InkWell(
+          //       borderRadius: BorderRadius.circular(20.0),
+          //       onTap: () {
+          //         setState(() {
+          //           checkState = !checkState;
+          //           if (!checkState) {
+          //             checkState = false;
+          //           }
+          //           isProcessable = checkState || (_pickedImage != null);
+          //         });
+          //       },
+          //       child: _checkType(checkState: checkState),
+          //     ),
+          //     SizedBox(
+          //       width: 10.0,
+          //     ),
+          //     GestureDetector(
+          //       onTap: () {
+          //         setState(() {
+          //           checkState = !checkState;
+          //           if (!checkState) {
+          //             checkState = false;
+          //           }
+          //           isProcessable = checkState || (_pickedImage != null);
+          //         });
+          //       },
+          //       child: _notImage(
+          //         underText: '대표사진 다음에 등록하기',
+          //         checkState: checkState,
+          //       ),
+          //     ),
+          //   ],
+          // ),
         ],
       ),
     );

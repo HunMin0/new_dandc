@@ -4,6 +4,8 @@ import 'package:Deal_Connect/components/layout/default_logo_layout.dart';
 import 'package:Deal_Connect/components/list_ranking_group_user_card.dart';
 import 'package:Deal_Connect/components/loading.dart';
 import 'package:Deal_Connect/components/no_items.dart';
+import 'package:Deal_Connect/model/group_rank.dart';
+import 'package:Deal_Connect/model/group_trade.dart';
 import 'package:Deal_Connect/model/group_user.dart';
 import 'package:Deal_Connect/utils/utils.dart';
 import 'package:flutter/cupertino.dart';
@@ -20,7 +22,7 @@ class GroupTradeIndex extends StatefulWidget {
 class _GroupTradeIndexState extends State<GroupTradeIndex> {
   bool _isLoading = true;
   var tradeHistoryDashboardData;
-  List<GroupUser>? groupRankingPartnerList = [];
+  List<GroupRank>? groupRankingPartnerList = [];
   int? groupId;
   String? groupName;
 
@@ -73,8 +75,8 @@ class _GroupTradeIndexState extends State<GroupTradeIndex> {
       if (response.status == 'success') {
         Iterable iterable = response.data;
 
-        List<GroupUser>? resData =
-        List<GroupUser>.from(iterable.map((e) => GroupUser.fromJSON(e)));
+        List<GroupRank>? resData =
+        List<GroupRank>.from(iterable.map((e) => GroupRank.fromJSON(e)));
 
         setState(() {
           groupRankingPartnerList = resData;
@@ -100,8 +102,8 @@ class _GroupTradeIndexState extends State<GroupTradeIndex> {
         }
       }
 
-      if (tradeHistoryDashboardData['totalCount'] != null) {
-        if (tradeHistoryDashboardData!['totalCount'] is String) {
+      if (tradeHistoryDashboardData['total_count'] != null) {
+        if (tradeHistoryDashboardData!['total_count'] is String) {
           totalCount = int.parse(tradeHistoryDashboardData!['total_count']);
         } else {
           totalCount = tradeHistoryDashboardData!['total_count'];
@@ -311,7 +313,7 @@ class _GroupTradeIndexState extends State<GroupTradeIndex> {
           SliverList(
             delegate: SliverChildBuilderDelegate(
                   (context, index) {
-                    GroupUser item = groupRankingPartnerList![index];
+                    GroupRank item = groupRankingPartnerList![index];
                 return ListRankingGroupUserCard(item: item, index: index);
               },
               childCount: groupRankingPartnerList!.length,

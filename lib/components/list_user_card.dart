@@ -18,8 +18,8 @@ class ListUserCard extends StatelessWidget {
     ImageProvider? businessThumbnailImage =
     AssetImage('assets/images/no-image.png');
 
-    if (item.has_user_profile?.has_profile_image != null) {
-      final profileImage = item.has_user_profile!.has_profile_image!;
+    if (item.profile?.has_profile_image != null) {
+      final profileImage = item.profile!.has_profile_image!;
       profileThumbnailImage = CachedNetworkImageProvider(
         Utils.getImageFilePath(profileImage),
       );
@@ -36,7 +36,7 @@ class ListUserCard extends StatelessWidget {
 
     return GestureDetector(
       onTap: () {
-        Navigator.pushNamed(context, '/profile', arguments: { 'user_id': item.id });
+        Navigator.pushNamed(context, '/profile', arguments: { 'userId': item.id });
       },
       child: Container(
         margin: const EdgeInsets.only(bottom: 12.0),

@@ -3,10 +3,7 @@ import 'package:Deal_Connect/components/layout/default_logo_layout.dart';
 import 'package:Deal_Connect/components/list_ranking_card.dart';
 import 'package:Deal_Connect/components/loading.dart';
 import 'package:Deal_Connect/components/no_items.dart';
-import 'package:Deal_Connect/db/group_ranking_data.dart';
-import 'package:Deal_Connect/db/ranking_data.dart';
 import 'package:Deal_Connect/model/partner.dart';
-import 'package:Deal_Connect/pages/profile/other_profile.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
@@ -30,20 +27,16 @@ class _HistoryRankingIndexState extends State<HistoryRankingIndex> {
   }
 
   void _initData() async {
-    getPartnersRanking()
-        .then((response) {
-      if (response.status == 'success') {
-        Iterable iterable = response.data;
-        List<Partner> dataList =
-            List<Partner>.from(iterable.map((e) => Partner.fromJSON(e)));
-        setState(() {
-          this.partnerRankingList = dataList;
-        });
-      }
-    });
-    setState(() {
-      _isLoading = false;
-    });
+    var response = await getPartnersRanking();
+    if (response.status == 'success' && mounted) {
+      Iterable iterable = response.data;
+      List<Partner> dataList =
+          List<Partner>.from(iterable.map((e) => Partner.fromJSON(e)));
+      setState(() {
+        this.partnerRankingList = dataList;
+        _isLoading = false;
+      });
+    }
   }
 
   @override
@@ -75,11 +68,9 @@ class _HistoryRankingIndexState extends State<HistoryRankingIndex> {
                       final item = partnerRankingList[index];
                       return GestureDetector(
                         onTap: () {
-                          Navigator.push(
-                            context,
-                            CupertinoPageRoute(
-                                builder: (context) => OtherProfileIndex()),
-                          );
+                          Navigator.pushNamed(
+                              context, '/profile/partner/info',
+                              arguments: {'userId': item!.user_id});
                         },
                         child: ListRankingCard(item: item, index: index),
                       );

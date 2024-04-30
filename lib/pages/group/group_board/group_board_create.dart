@@ -13,6 +13,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:hexcolor/hexcolor.dart';
 import 'package:image_picker/image_picker.dart';
 
 class GroupBoardCreate extends StatefulWidget {
@@ -24,7 +25,7 @@ class GroupBoardCreate extends StatefulWidget {
 
 class _GroupBoardCreateState extends State<GroupBoardCreate> {
   File? _pickedImage;
-  List <ImagePickerItem> boardImageList = [];
+  List<ImagePickerItem> boardImageList = [];
 
   TextEditingController _titleController = TextEditingController();
   TextEditingController _contentController = TextEditingController();
@@ -34,8 +35,9 @@ class _GroupBoardCreateState extends State<GroupBoardCreate> {
   String title = '';
   String content = '';
   bool _isLoading = true;
+  bool isDeleteImage = false;
   BoardWrite? boardWriteData;
-
+  List<String> imgUrls = [];
 
   var args;
 
@@ -44,7 +46,6 @@ class _GroupBoardCreateState extends State<GroupBoardCreate> {
     super.initState();
     _initData();
   }
-
 
   void _initData() async {
     final widgetsBinding = WidgetsBinding.instance;
@@ -84,27 +85,28 @@ class _GroupBoardCreateState extends State<GroupBoardCreate> {
     });
   }
 
-
   @override
   Widget build(BuildContext context) {
-    final bottomTextStyle = TextStyle(
+    final bottomTextStyle = const TextStyle(
       color: Color(0xFF232323),
       fontSize: 14.0,
       //fontWeight: FontWeight.w600
     );
 
 
-    List<String> imgUrls = [];
     if (boardWriteData != null) {
-      if (boardWriteData!.has_files != null && boardWriteData!.has_files!.isNotEmpty) {
-        imgUrls.addAll(boardWriteData!.has_files!.map((e) => Utils.getImageFilePath(e.has_file!)));
+      if (boardWriteData!.has_files != null &&
+          boardWriteData!.has_files!.isNotEmpty) {
+        setState(() {
+          imgUrls.addAll(boardWriteData!.has_files!
+              .map((e) => Utils.getImageFilePath(e.has_file!)));
+        });
       }
     }
 
-
     if (_isLoading) {
       // 로딩 중 인디케이터 표시
-      return Loading();
+      return const Loading();
     }
 
     return DefaultNextLayout(
@@ -114,14 +116,18 @@ class _GroupBoardCreateState extends State<GroupBoardCreate> {
         isCancel: false,
         isProcessable: true,
         bottomBar: true,
-        nextOnPressed: (){ boardWriteId != null ? _modify() : _submit(); },
-        prevOnPressed: (){},
+        nextOnPressed: () {
+          boardWriteId != null ? _modify() : _submit();
+        },
+        prevOnPressed: () {},
         child: SingleChildScrollView(
           child: GestureDetector(
+            behavior: HitTestBehavior.translucent,
             onTap: () {
               FocusScope.of(context).requestFocus(FocusNode());
             },
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 GestureDetector(
                   onTap: () {
@@ -150,19 +156,18 @@ class _GroupBoardCreateState extends State<GroupBoardCreate> {
                                       onTap: () {
                                         ImagePicker()
                                             .pickImage(
-                                            source: ImageSource.camera)
+                                                source: ImageSource.camera)
                                             .then((xfile) {
                                           if (xfile != null) {
                                             setState(() {
-                                              _pickedImage =
-                                                  File(xfile.path);
+                                              _pickedImage = File(xfile.path);
                                             });
                                           }
                                           Navigator.maybePop(context);
                                         });
                                       },
                                     ),
-                                    Divider(
+                                    const Divider(
                                       height: 1.0,
                                       color: Color(0xFFdddddd),
                                     ),
@@ -178,12 +183,11 @@ class _GroupBoardCreateState extends State<GroupBoardCreate> {
                                       onTap: () {
                                         ImagePicker()
                                             .pickImage(
-                                            source: ImageSource.gallery)
+                                                source: ImageSource.gallery)
                                             .then((xfile) {
                                           if (xfile != null) {
                                             setState(() {
-                                              _pickedImage =
-                                                  File(xfile.path);
+                                              _pickedImage = File(xfile.path);
                                             });
                                           }
                                           Navigator.maybePop(context);
@@ -199,61 +203,92 @@ class _GroupBoardCreateState extends State<GroupBoardCreate> {
                   },
                   child: _pickedImage == null
                       ? Container(
-                    width: double.infinity,
-                    height: 180.0,
-                    decoration: boardWriteId != null ? BoxDecoration(
-                      color: Color(0xFFF5F5F5),
-                      borderRadius: BorderRadius.all(
-                        Radius.circular(10.0),
-                      ),
-                      image: DecorationImage(
-                        image: CachedNetworkImageProvider(imgUrls[0])
-                      ),
-                    )
-                        : const BoxDecoration(
-                        color: Color(0xFFF5F5F5),
-                        borderRadius: BorderRadius.all(
-                          Radius.circular(10.0),
-                        ),
-                      ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.camera_alt,
-                          color: Color(0xFFD9D9D9),
-                          size: 60.0,
-                        ),
-                        Text(
-                          '이미지 등록 해주세요',
-                          style: TextStyle(color: Color(0xFFA2A2A2)),
-                        ),
-                      ],
-                    ),
-                  )
+                          width: double.infinity,
+                          height: 180.0,
+                          decoration: boardWriteId != null && imgUrls.isNotEmpty
+                              ? BoxDecoration(
+                                  color: const Color(0xFFF5F5F5),
+                                  borderRadius: const BorderRadius.all(
+                                    Radius.circular(10.0),
+                                  ),
+                                  image: DecorationImage(
+                                      image: CachedNetworkImageProvider(
+                                          imgUrls[0])),
+                                )
+                              : const BoxDecoration(
+                                  color: Color(0xFFF5F5F5),
+                                  borderRadius: BorderRadius.all(
+                                    Radius.circular(10.0),
+                                  ),
+                                ),
+                          child: const Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.camera_alt,
+                                color: Color(0xFFD9D9D9),
+                                size: 60.0,
+                              ),
+                              Text(
+                                '이미지 등록 해주세요',
+                                style: TextStyle(color: Color(0xFFA2A2A2)),
+                              ),
+                            ],
+                          ),
+                        )
                       : Container(
-                    width: double.infinity,
-                    height: 240.0,
-                    child: Image.file(
-                      _pickedImage!,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
+                          width: double.infinity,
+                          height: 240.0,
+                          child: Image.file(
+                            _pickedImage!,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
                 ),
-                SizedBox(
+                const SizedBox(
+                  height: 10,
+                ),
+                Container(
+                    width: double.infinity,
+                    child: GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          isDeleteImage = !isDeleteImage;
+                        });
+                      },
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Container(
+                            width: 15,
+                            height: 15,
+                            decoration: BoxDecoration(
+                              color: isDeleteImage ? SettingStyle.MAIN_COLOR : SettingStyle.GREY_COLOR,
+                              border: Border.all(color: HexColor("#f1f1f1"), width: 2)
+                            ),
+                          ),
+                          SizedBox(width: 10,),
+                          Text(
+                            "이미지 삭제",
+                            textAlign: TextAlign.right,
+                            style: SettingStyle.NORMAL_TEXT_STYLE
+                                .copyWith(color: SettingStyle.MAIN_COLOR),
+                          ),
+                        ],
+                      ),
+                    )),
+                const SizedBox(
                   height: 20,
                 ),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 10.0),
+                    const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 10.0),
                       child: Text(
                         '제목',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w400,
-                          fontSize: 13.0,
-                        ),
+                        style: SettingStyle.NORMAL_TEXT_STYLE,
                       ),
                     ),
                     TextField(
@@ -264,18 +299,17 @@ class _GroupBoardCreateState extends State<GroupBoardCreate> {
                     ),
                   ],
                 ),
-                SizedBox(height: 10,),
+                const SizedBox(
+                  height: 10,
+                ),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 10.0),
+                    const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 10.0),
                       child: Text(
-                        '제목',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w400,
-                          fontSize: 13.0,
-                        ),
+                        '내용',
+                        style: SettingStyle.NORMAL_TEXT_STYLE,
                       ),
                     ),
                     TextField(
@@ -287,15 +321,10 @@ class _GroupBoardCreateState extends State<GroupBoardCreate> {
                     ),
                   ],
                 ),
-                SizedBox(height: 10,),
-                // InputFileGrid(imageList: boardImageList, isAddable: false,),
               ],
             ),
           ),
-        )
-    );
-
-
+        ));
   }
 
   _submit() async {
@@ -305,11 +334,12 @@ class _GroupBoardCreateState extends State<GroupBoardCreate> {
       'group_id': groupId,
       'board_title': _titleController.text,
       'board_content': _contentController.text,
-    }, _pickedImage).then((response) async {
+    }, _pickedImage)
+        .then((response) async {
       CustomDialog.dismissProgressDialog();
 
       if (response.status == 'success') {
-          _showCompleteDialog(context);
+        _showCompleteDialog(context);
       } else {
         CustomDialog.showServerValidatorErrorMsg(response);
       }
@@ -319,11 +349,16 @@ class _GroupBoardCreateState extends State<GroupBoardCreate> {
   _modify() async {
     CustomDialog.showProgressDialog(context);
 
-    updateGroupBoardWrite(boardWriteId!, {
-      'group_id': groupId,
-      'board_title': _titleController.text,
-      'board_content': _contentController.text,
-    }, _pickedImage).then((response) async {
+    updateGroupBoardWrite(
+            boardWriteId!,
+            {
+              'group_id': groupId,
+              'is_delete_image': isDeleteImage,
+              'board_title': _titleController.text,
+              'board_content': _contentController.text,
+            },
+            _pickedImage)
+        .then((response) async {
       CustomDialog.dismissProgressDialog();
 
       if (response.status == 'success') {
@@ -351,7 +386,6 @@ class _GroupBoardCreateState extends State<GroupBoardCreate> {
       },
     );
   }
-
 
   Future<dynamic> buildShowModalBottomSheet(
       BuildContext context, TextStyle bottomTextStyle) {
@@ -389,7 +423,7 @@ class _GroupBoardCreateState extends State<GroupBoardCreate> {
                         });
                       },
                     ),
-                    Divider(
+                    const Divider(
                       height: 1.0,
                       color: Color(0xFFdddddd),
                     ),
@@ -421,7 +455,6 @@ class _GroupBoardCreateState extends State<GroupBoardCreate> {
           );
         });
   }
-
 
   @override
   void dispose() {

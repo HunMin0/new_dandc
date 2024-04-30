@@ -1,14 +1,10 @@
-import 'package:Deal_Connect/components/common_item/color_chip.dart';
-import 'package:Deal_Connect/components/common_item/grey_chip.dart';
 import 'package:Deal_Connect/components/common_item/stack_thumbnail.dart';
 import 'package:Deal_Connect/components/const/setting_style.dart';
 import 'package:Deal_Connect/model/group_trade.dart';
-import 'package:Deal_Connect/model/trade.dart';
 import 'package:Deal_Connect/utils/utils.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
-import 'package:intl/intl.dart';
 
 class ListGroupTradeCard extends StatelessWidget {
   GroupTrade item;
@@ -23,10 +19,10 @@ class ListGroupTradeCard extends StatelessWidget {
         const AssetImage('assets/images/no-image.png');
 
     if (item.has_business_owner != null &&
-        item.has_business_owner!.has_user_profile != null &&
-        item.has_business_owner!.has_user_profile!.has_profile_image != null) {
+        item.has_business_owner!.profile != null &&
+        item.has_business_owner!.profile!.has_profile_image != null) {
       final profileImage =
-          item.has_business_owner!.has_user_profile!.has_profile_image!;
+          item.has_business_owner!.profile!.has_profile_image!;
       profileThumbnailImage = CachedNetworkImageProvider(
         Utils.getImageFilePath(profileImage),
       );
@@ -75,7 +71,7 @@ class ListGroupTradeCard extends StatelessWidget {
                           ),
                           Spacer(),
                           if (item.has_trade != null)
-                            Text(item.has_trade!.traded_at!.substring(0, 16),
+                            Text(item.has_trade!.traded_at!.substring(0, 10),
                                 style: SettingStyle.SMALL_TEXT_STYLE),
                         ],
                       ),

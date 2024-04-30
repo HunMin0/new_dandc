@@ -1,10 +1,12 @@
+import 'package:Deal_Connect/api/business.dart';
 import 'package:Deal_Connect/api/categories.dart';
-import 'package:Deal_Connect/db/sector_type.dart';
 import 'package:Deal_Connect/components/layout/default_next_layout.dart';
 import 'package:Deal_Connect/model/category.dart';
+import 'package:Deal_Connect/model/user_business.dart';
 import 'package:Deal_Connect/utils/utils.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class CompanyCreateIndex extends StatefulWidget {
   const CompanyCreateIndex({super.key});
@@ -17,23 +19,74 @@ class _CompanyCreateIndexState extends State<CompanyCreateIndex> {
   int selectedIdx = -1;
   bool isProcessable = false;
   String selectedSectorName = "";
+  String? storeName;
   List<Category>? categories;
+  UserBusiness? userBusiness;
+  int? userBusinessId;
+  bool _isLoading = true;
+
+  var args;
 
   @override
   void initState() {
+    _initGetCategories();
+    _initData();
+    super.initState();
+  }
+
+  void _initData() async {
+    final widgetsBinding = WidgetsBinding.instance;
+    widgetsBinding?.addPostFrameCallback((callback) async {
+      if (ModalRoute.of(context)?.settings.arguments != null) {
+        setState(() {
+          args = ModalRoute.of(context)?.settings.arguments;
+        });
+
+        if (args != null) {
+          setState(() {
+            userBusinessId = args['userBusinessId'];
+            storeName = args['storeName'];
+          });
+        }
+        if (userBusinessId != null) {
+          await getUserBusiness(userBusinessId!).then((response) {
+            if (response.status == 'success') {
+              UserBusiness resultData = UserBusiness.fromJSON(response.data);
+              if (resultData != null) {
+                setState(() {
+                  userBusiness = resultData;
+                  if (userBusiness != null && userBusiness!.user_business_category_id != null) {
+                    selectedIdx = userBusiness!.user_business_category_id;
+                    selectedSectorName = userBusiness!.has_category!.name;
+                    isProcessable = true;
+                  }
+                });
+              }
+            } else {
+              Fluttertoast.showToast(
+                  msg: '업체 정보를 받아오는 도중 오류가 발생했습니다.\n오류코드: 463');
+            }
+          });
+        }
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    });
+  }
+
+  _initGetCategories() {
     getCategories().then((response) {
       if (response.status == 'success') {
         Iterable iterable = response.data;
         List<Category> list =
-            List<Category>.from(iterable.map((e) => Category.fromJSON(e)));
+        List<Category>.from(iterable.map((e) => Category.fromJSON(e)));
 
         setState(() {
           categories = list;
         });
       }
     });
-
-    super.initState();
   }
 
   @override
@@ -45,7 +98,7 @@ class _CompanyCreateIndexState extends State<CompanyCreateIndex> {
     );
 
     return DefaultNextLayout(
-      titleName: '업체등록',
+      titleName: storeName ?? '업체등록',
       isProcessable: isProcessable,
       bottomBar: true,
       prevTitle: '취소',
@@ -55,7 +108,7 @@ class _CompanyCreateIndexState extends State<CompanyCreateIndex> {
       },
       nextOnPressed: () {
         Navigator.pushNamed(context, '/profile/company/create/photo',
-            arguments: {'userBusinessCategoryId': selectedIdx});
+            arguments: {'userBusinessCategoryId': selectedIdx, 'userBusiness': userBusiness});
       },
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -102,7 +155,7 @@ class _CompanyCreateIndexState extends State<CompanyCreateIndex> {
         children: categories != null
             ? categories!.map((item) {
                 Widget thumbnailImage = Image.asset(
-                  'assets/images/camera_icon.png',
+                  'assets/images/no-image.png',
                   width: 55,
                   height: 55,
                   fit: BoxFit.cover,
@@ -133,31 +186,36 @@ class _CompanyCreateIndexState extends State<CompanyCreateIndex> {
                       }
                     });
                   },
-                  child: Container(
-                    child: Column(
-                      children: [
-                        Container(
-                          margin: EdgeInsets.only(bottom: 6.0),
-                          width: 70.0,
-                          height: 70.0,
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(15),
-                            child: SizedBox(
-                              width: 50,
-                              height: 50,
-                              child: thumbnailImage,
-                            ),
+                  child: Column(
+                    children: [
+                      Container(
+                        margin: EdgeInsets.only(bottom: 6.0),
+                        width: 70.0,
+                        height: 70.0,
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(15),
+                          child: SizedBox(
+                            width: 50,
+                            height: 50,
+                            child: thumbnailImage,
                           ),
                         ),
-                        Text(
+                      ),
+                      Flexible(
+                        child: Text(
                           item.name,
+                          textAlign: TextAlign.center,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
                           style: TextStyle(
+                            height: 1.1,
+                            fontSize: 12.0,
                               color: selectedIdx == item.id
                                   ? Color(0xFF75A8E4)
                                   : Colors.black),
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 );
               }).toList()

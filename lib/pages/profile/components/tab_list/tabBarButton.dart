@@ -1,3 +1,4 @@
+import 'package:Deal_Connect/components/const/setting_style.dart';
 import 'package:flutter/material.dart';
 
 class TabBarButton extends StatelessWidget {
@@ -16,8 +17,9 @@ class TabBarButton extends StatelessWidget {
       onPressed: onPressed,
       child: Text(
         btnTitle,
-        style: TextStyle(
-            color: Colors.white, fontSize: 14.0, fontWeight: FontWeight.w500),
+        style: SettingStyle.NORMAL_TEXT_STYLE.copyWith(
+          color: Colors.white
+        )
       ),
       style: ElevatedButton.styleFrom(
         minimumSize: Size(double.infinity, 48),

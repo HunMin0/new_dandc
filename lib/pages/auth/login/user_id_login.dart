@@ -1,7 +1,9 @@
 import 'package:Deal_Connect/Utils/custom_dialog.dart';
 import 'package:Deal_Connect/api/auth.dart';
+import 'package:Deal_Connect/components/const/setting_style.dart';
 import 'package:Deal_Connect/components/custom/custom_text_form_field.dart';
 import 'package:Deal_Connect/model/login_response_data.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
 
@@ -16,14 +18,17 @@ class UserIdLoginState extends State<UserIdLogin>{
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        iconTheme: const IconThemeData(color: Colors.white),
-        elevation: 0,
+    return MediaQuery(
+      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+      child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          iconTheme: const IconThemeData(color: Colors.white),
+          elevation: 0,
+        ),
+        backgroundColor: HexColor('#75a8e4'),
+        body: _UserIdLoginForm(context),
       ),
-      backgroundColor: HexColor('#75a8e4'),
-      body: _UserIdLoginForm(context),
     );
   }
 
@@ -31,6 +36,7 @@ class UserIdLoginState extends State<UserIdLogin>{
     final textStyle = TextStyle(
       color: Colors.white,
       fontSize: 14,
+      fontFamily: 'NotoSans'
     );
 
     return SafeArea(
@@ -52,14 +58,17 @@ class UserIdLoginState extends State<UserIdLogin>{
                     margin: const EdgeInsets.only(top: 0, bottom: 20.0),
                     child: Text(
                       '로그인',
-                      style: textStyle.copyWith(
+                      style: SettingStyle.NORMAL_TEXT_STYLE.copyWith(
                         fontSize: 30.0,
+                        color: Colors.white
                       ),
                     ),
                   ),
                   Text(
                     'Deal+Connect 서비스 이용을 위하여 회원님의\아이디를 입력 해주세요',
-                    style: textStyle,
+                    style: SettingStyle.NORMAL_TEXT_STYLE.copyWith(
+                      color: Colors.white
+                    ),
                   ),
                   SizedBox(height: 40.0,),
                   Container(
@@ -112,14 +121,32 @@ class UserIdLoginState extends State<UserIdLogin>{
                             loginResponseData.tokenType,
                             loginResponseData.accessToken
                         ).then((result) {
-                          Navigator.pushNamedAndRemoveUntil(context, '/home', (r) => false);
+                          if (!(loginResponseData.user.is_active)) {
+                            Navigator.pushNamedAndRemoveUntil(context, '/auth/withdraw', (r) => false);
+                          } else {
+                            refreshFcmToken().then((value) {});
+                            if (loginResponseData.user.is_agree_app_notification) {
+                              FirebaseMessaging.instance.subscribeToTopic('all')
+                                  .then((_) {
+                                print('사용자가 all 토픽을 구독하였습니다.');
+                              });
+                            }
+                            if (loginResponseData.user.is_agree_app_marketing) {
+                              FirebaseMessaging.instance.subscribeToTopic('marketing')
+                                  .then((_) {
+                                print('사용자가 marketing 토픽을 구독하였습니다.');
+                              });
+                            }
+                            Navigator.pushNamedAndRemoveUntil(
+                                context, '/home', (r) => false);
+                          }
                         });
                       } else {
                         CustomDialog.showServerValidatorErrorMsg(value);
                       }
                     });
                   },
-                  child: const Text('로그인',style: TextStyle(fontSize: 14.0, fontWeight: FontWeight.w500),),
+                  child: const Text('로그인',style: SettingStyle.NORMAL_TEXT_STYLE,),
                 ),
               )
             ],
@@ -128,4 +155,10 @@ class UserIdLoginState extends State<UserIdLogin>{
       ),
     );
   }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
 }

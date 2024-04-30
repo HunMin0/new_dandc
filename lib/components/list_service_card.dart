@@ -46,6 +46,7 @@ class ListServiceCard extends StatelessWidget {
             Text(
               item.name,
               style: TextStyle(fontWeight: FontWeight.bold),
+              overflow: TextOverflow.ellipsis,
             ),
           ],
         ),

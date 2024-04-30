@@ -1,7 +1,4 @@
 import 'package:Deal_Connect/components/layout/default_logo_layout.dart';
-import 'package:Deal_Connect/pages/group/group_manage/group_manage_info.dart';
-import 'package:Deal_Connect/pages/group/group_manage/group_manage_parnter.dart';
-import 'package:Deal_Connect/pages/group/group_search/group_search_index.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
@@ -15,7 +12,6 @@ class GroupManageIndex extends StatefulWidget {
 
 class _GroupManageIndexState extends State<GroupManageIndex> {
   int? groupId;
-  String? groupName;
 
   var args;
 
@@ -33,7 +29,6 @@ class _GroupManageIndexState extends State<GroupManageIndex> {
         if (args != null) {
           setState(() {
             groupId = args['groupId'];
-            groupName = args['groupName'];
           });
         }
       }
@@ -47,7 +42,7 @@ class _GroupManageIndexState extends State<GroupManageIndex> {
         color: Colors.black, fontSize: 20, fontWeight: FontWeight.bold);
 
     return DefaultLogoLayout(
-      titleName: groupName,
+      titleName: '그룹관리',
       isNotInnerPadding: 'true',
       child: Padding(
         padding: const EdgeInsets.all(15.0),
@@ -71,7 +66,6 @@ class _GroupManageIndexState extends State<GroupManageIndex> {
                       Navigator.pushNamed(context, '/group/edit',
                           arguments: {
                             "groupId": groupId,
-                            "groupName": groupName
                           });
                     },
                     child: Stack(
@@ -118,7 +112,6 @@ class _GroupManageIndexState extends State<GroupManageIndex> {
                       Navigator.pushNamed(context, '/group/manage/partner',
                           arguments: {
                             "groupId": groupId,
-                            "groupName": groupName
                           });
                     },
                     child: Stack(

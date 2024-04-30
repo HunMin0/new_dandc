@@ -1,24 +1,176 @@
 import 'dart:convert';
 
+import 'package:Deal_Connect/components/const/setting_style.dart';
 import 'package:Deal_Connect/model/response_data.dart';
+
 // ignore: unnecessary_import
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:hexcolor/hexcolor.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:sn_progress_dialog/progress_dialog.dart';
 
 class CustomDialog {
   static bool isProgress = false;
   static ProgressDialog? pd;
 
+  static showShareDialog(BuildContext context, String title, String url) {
+    showModalBottomSheet(
+        backgroundColor: Colors.white,
+        showDragHandle: false,
+        context: context,
+        builder: (_) {
+          return MediaQuery(
+            data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+            child: Container(
+              width: double.infinity,
+              height: 230,
+              padding: EdgeInsets.only(bottom: 20.0),
+              decoration: BoxDecoration(
+                color: HexColor("FFFFFF"),
+                borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(10.0),
+                    topRight: Radius.circular(10.0)),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 15.0, vertical: 15.0),
+                    child: Row(
+                      children: [
+                        Text("공유하기",
+                            style: SettingStyle.NORMAL_TEXT_STYLE
+                                .copyWith(fontWeight: FontWeight.bold)),
+                        Spacer(),
+                        GestureDetector(
+                            onTap: () {
+                              Navigator.pop(context);
+                            },
+                            child: Icon(
+                              CupertinoIcons.xmark,
+                              color: HexColor("#222222"),
+                              size: 25,
+                            )),
+                      ],
+                    ),
+                  ),
+                  Divider(
+                    thickness: 1,
+                    height: 1,
+                    color: HexColor("#DDDDDD"),
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  Expanded(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Spacer(),
+                        // Column(
+                        //   crossAxisAlignment: CrossAxisAlignment.center,
+                        //   children: [
+                        //     Container(
+                        //       width: 50,
+                        //       height: 50,
+                        //       decoration: BoxDecoration(
+                        //         color: HexColor("#FEE500"),
+                        //         borderRadius:
+                        //             BorderRadius.all(Radius.circular(50)),
+                        //       ),
+                        //       child: Icon(
+                        //         CupertinoIcons.chat_bubble_fill,
+                        //         color: HexColor("#222222"),
+                        //         size: 30,
+                        //       ),
+                        //     ),
+                        //     SizedBox(
+                        //       height: 10,
+                        //     ),
+                        //     Text("카카오톡")
+                        //   ],
+                        // ),
+                        // Spacer(),
+                        GestureDetector(
+                          onTap: () {
+                            Clipboard.setData(ClipboardData(text: url)).then((_) {
+                              Fluttertoast.showToast(msg: '복사되었습니다.');
+                            });
+                          },
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Container(
+                                  width: 50,
+                                  height: 50,
+                                  decoration: BoxDecoration(
+                                    color: SettingStyle.GREY_COLOR,
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(50)),
+                                  ),
+                                  child: Icon(
+                                    CupertinoIcons.link,
+                                    color: HexColor("#222222"),
+                                    size: 30,
+                                  )),
+                              SizedBox(
+                                height: 10,
+                              ),
+                              Text("URL 복사")
+                            ],
+                          ),
+                        ),
+                        Spacer(),
+                        GestureDetector(
+                          onTap: () {
+                            Share.share(url, subject: url);
+                          },
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Container(
+                                  width: 50,
+                                  height: 50,
+                                  decoration: BoxDecoration(
+                                    color: SettingStyle.GREY_COLOR,
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(50)),
+                                  ),
+                                  child: Icon(
+                                    CupertinoIcons.ellipsis,
+                                    color: HexColor("#222222"),
+                                    size: 30,
+                                  )),
+                              SizedBox(
+                                height: 10,
+                              ),
+                              Text("더보기")
+                            ],
+                          ),
+                        ),
+                        Spacer(),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        });
+  }
+
   static showLoaderDialog(BuildContext context, String msg) {
     AlertDialog alert = AlertDialog(
       content: new Row(
         children: [
-          CircularProgressIndicator(),
+          const CircularProgressIndicator(),
           Container(
-            margin: EdgeInsets.only(left: 7),
+            margin: const EdgeInsets.only(left: 7),
             child: Text(msg != null ? msg : "Loading..."),
           )
         ],
@@ -27,7 +179,7 @@ class CustomDialog {
 
     showDialog(
       context: context,
-      builder: (BuildContext context){
+      builder: (BuildContext context) {
         return alert;
       },
     );
@@ -39,23 +191,27 @@ class CustomDialog {
     required String msg,
   }) {
     AlertDialog alert = AlertDialog(
-      shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10.0)),
-      title: title != null && title.isNotEmpty ? Column(
-        children: <Widget>[
-          new Text(title),
-        ],
-      ) : Container(),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
+      title: title != null && title.isNotEmpty
+          ? Column(
+              children: <Widget>[
+                new Text(title),
+              ],
+            )
+          : Container(),
       //
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: <Widget>[
-          Text(
-            msg,
-            textAlign: TextAlign.center,
-          ),
-        ],
+      content: MediaQuery(
+        data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: <Widget>[
+            Text(
+              msg,
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
       ),
       actions: <Widget>[
         new TextButton(
@@ -69,13 +225,13 @@ class CustomDialog {
 
     return showDialog(
       context: context,
-      builder: (BuildContext context){
+      builder: (BuildContext context) {
         return alert;
       },
     );
   }
 
-  static showLoginDialog ({
+  static showLoginDialog({
     required BuildContext context,
     required VoidCallback onLoginBtnClick,
   }) {
@@ -85,8 +241,7 @@ class CustomDialog {
         leftBtnText: "취소",
         rightBtnText: "확인",
         onLeftBtnClick: () {},
-        onRightBtnClick: onLoginBtnClick
-    );
+        onRightBtnClick: onLoginBtnClick);
   }
 
   static showDoubleBtnDialog({
@@ -99,113 +254,121 @@ class CustomDialog {
     required VoidCallback onRightBtnClick,
   }) {
     AlertDialog alert = AlertDialog(
-      contentPadding: EdgeInsets.all(0),
-      shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10.0)),
-      title: title != null && title.isNotEmpty ? Column(
-        children: <Widget>[
-          new Text(title),
-        ],
-      ) : Container(),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: <Widget>[
-          Container(
-            margin: EdgeInsets.only(bottom: 20),
-            child: Text(
-              msg,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
+      contentPadding: const EdgeInsets.all(0),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
+      title: title != null && title.isNotEmpty
+          ? Column(
+              children: <Widget>[
+                new Text(title),
+              ],
+            )
+          : Container(),
+      content: MediaQuery(
+        data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: <Widget>[
+            Container(
+              width: double.infinity,
+              margin: const EdgeInsets.only(bottom: 20),
+              child: Text(
+                msg,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  overflow: TextOverflow.ellipsis
+                ),
               ),
             ),
-          ),
-          Container(
-            child: Row(
-              children: [
-                Expanded(
-                  flex: 1,
-                  child: TextButton(
-                    onPressed: () {
-                      onLeftBtnClick();
-                      Navigator.pop(context);
-                    },
-                    child: Container(
-                      width: MediaQuery.of(context).size.width,
-                      decoration: BoxDecoration(
-                          border: Border(
-                            top: BorderSide(
-                              color: HexColor('#d8d8db'),
-                            ),
-                            right: BorderSide(
-                              color: HexColor('#d8d8db'),
-                            ),
-                          )
-                      ),
-                      padding: EdgeInsets.symmetric(vertical: 15),
-                      child: Text(
-                        leftBtnText != null && leftBtnText.isNotEmpty ? leftBtnText : '닫기',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                          color: HexColor('#acacac'),
+            Container(
+              child: Row(
+                children: [
+                  Expanded(
+                    flex: 1,
+                    child: TextButton(
+                      onPressed: () {
+                        onLeftBtnClick();
+                        Navigator.pop(context);
+                      },
+                      child: Container(
+                        width: MediaQuery.of(context).size.width,
+                        decoration: BoxDecoration(
+                            border: Border(
+                          top: BorderSide(
+                            color: HexColor('#d8d8db'),
+                          ),
+                          right: BorderSide(
+                            color: HexColor('#d8d8db'),
+                          ),
+                        )),
+                        padding: const EdgeInsets.symmetric(vertical: 15),
+                        child: Text(
+                          leftBtnText != null && leftBtnText.isNotEmpty
+                              ? leftBtnText
+                              : '닫기',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: HexColor('#acacac'),
+                          ),
+                          textAlign: TextAlign.center,
                         ),
-                        textAlign: TextAlign.center,
                       ),
-                    ),
-                    style: TextButton.styleFrom(
-                      minimumSize: Size.zero,
-                      padding: EdgeInsets.zero,
-                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      style: TextButton.styleFrom(
+                        minimumSize: Size.zero,
+                        padding: EdgeInsets.zero,
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      ),
                     ),
                   ),
-                ),
-                Expanded(
-                  flex: 1,
-                  child: TextButton(
-                    onPressed: () {
-                      onRightBtnClick();
-                      Navigator.pop(context);
-                    },
-                    child: Container(
-                      width: MediaQuery.of(context).size.width,
-                      decoration: BoxDecoration(
-                          border: Border(
-                            top: BorderSide(
-                              color: HexColor('#d8d8db'),
-                            ),
-                          )
-                      ),
-                      padding: EdgeInsets.symmetric(vertical: 15),
-                      child: Text(
-                        rightBtnText != null && rightBtnText.isNotEmpty ? rightBtnText : '닫기',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                          color: HexColor('#355ebd'),
+                  Expanded(
+                    flex: 1,
+                    child: TextButton(
+                      onPressed: () {
+                        onRightBtnClick();
+                        Navigator.pop(context);
+                      },
+                      child: Container(
+                        width: MediaQuery.of(context).size.width,
+                        decoration: BoxDecoration(
+                            border: Border(
+                          top: BorderSide(
+                            color: HexColor('#d8d8db'),
+                          ),
+                        )),
+                        padding: const EdgeInsets.symmetric(vertical: 15),
+                        child: Text(
+                          rightBtnText != null && rightBtnText.isNotEmpty
+                              ? rightBtnText
+                              : '닫기',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: HexColor('#355ebd'),
+                          ),
+                          textAlign: TextAlign.center,
                         ),
-                        textAlign: TextAlign.center,
                       ),
-                    ),
-                    style: TextButton.styleFrom(
-                      minimumSize: Size.zero,
-                      padding: EdgeInsets.zero,
-                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      style: TextButton.styleFrom(
+                        minimumSize: Size.zero,
+                        padding: EdgeInsets.zero,
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      ),
                     ),
                   ),
-                ),
-              ],
-            ),
-          )
-        ],
+                ],
+              ),
+            )
+          ],
+        ),
       ),
     );
 
     return showDialog(
       context: context,
-      builder: (BuildContext context){
+      builder: (BuildContext context) {
         return alert;
       },
     );
@@ -213,15 +376,14 @@ class CustomDialog {
 
   static getThumbnailChangeDialog(BuildContext context) {
     return AlertDialog(
-      shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10.0)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
       title: Column(
         children: <Widget>[
           new Text("이미지 수정"),
         ],
       ),
       //
-      content: Column(
+      content: const Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -289,7 +451,7 @@ class CustomDialog {
       } else if (response.statusCode == 426) {
         Fluttertoast.showToast(msg: '일치하는 사용자 계정이 없습니다.');
       } else if (response.statusCode == 427) {
-        Fluttertoast.showToast(msg: '토큰이 만료되었습니다.');
+        //Fluttertoast.showToast(msg: '토큰이 만료되었습니다.');
       } else {
         Fluttertoast.showToast(msg: response.message);
       }

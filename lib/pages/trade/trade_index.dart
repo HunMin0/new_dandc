@@ -1,3 +1,4 @@
+import 'package:Deal_Connect/components/const/setting_style.dart';
 import 'package:Deal_Connect/components/layout/default_basic_layout.dart';
 import 'package:Deal_Connect/pages/group/group_search/group_search_index.dart';
 import 'package:Deal_Connect/pages/trade/trade_buy/trade_buy_index.dart';
@@ -22,7 +23,7 @@ class TradeIndex extends StatelessWidget {
     );
 
     final textStyle = const TextStyle(
-        color: Colors.black, fontSize: 17, fontWeight: FontWeight.bold);
+        color: Colors.black, fontSize: 16, fontWeight: FontWeight.bold);
 
     return DefaultBasicLayout(
       child: SingleChildScrollView(
@@ -34,7 +35,7 @@ class TradeIndex extends StatelessWidget {
             children: [
               Text(
                 '거래를 등록하고 파트너와\n거래내역을 쌓아보세요',
-                style: textStyle,
+                style: SettingStyle.TITLE_STYLE,
               ),
               const SizedBox(
                 height: 50.0,
@@ -179,13 +180,52 @@ class TradeIndex extends StatelessWidget {
                   Expanded(child: Text("거래내역 등록하시면, 파트너의 승인 이후 거래내역에 저장됩니다.")),
                 ],
               ),
-              SizedBox(height: 20.0,),
+              SizedBox(
+                height: 20.0,
+              ),
               Row(
                 children: [
                   Expanded(
                     child: ElevatedButton(
                       style: boxStyle,
-                      onPressed: () {},
+                      onPressed: () {
+                        showModalBottomSheet(
+                          backgroundColor: Colors.white,
+                          showDragHandle: false,
+                          context: context,
+                          builder: (_) {
+                            return MediaQuery(
+                              data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+                              child: Container(
+                                width: double.infinity,
+                                padding: EdgeInsets.all(13.0),
+                                child: Column(
+                                  children: [
+                                    const Text("거래 추가 기능 사용 설명",
+                                        style: SettingStyle.TITLE_STYLE),
+                                    Spacer(),
+                                    Row(
+                                      children: [
+                                        Expanded(
+                                          child: ElevatedButton(
+                                              style: boxStyle,
+                                              onPressed: () {
+                                                Navigator.pop(context);
+                                              },
+                                              child: Text(
+                                                '닫기',
+                                                style: textStyle.copyWith(color: Colors.white),
+                                              )),
+                                        ),
+                                      ],
+                                    )
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
+                        );
+                      },
                       child: Text(
                         '거래 추가 기능 사용 설명',
                         style: textStyle.copyWith(color: Colors.white),

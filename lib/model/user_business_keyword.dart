@@ -1,5 +1,3 @@
-import 'package:Deal_Connect/model/file.dart';
-
 class UserBusinessKeyword {
   final int id;
   final int user_business_id;
@@ -18,5 +16,13 @@ class UserBusinessKeyword {
       user_business_id: json['user_business_id'],
       keyword: json['keyword'],
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'user_business_id': user_business_id,
+      'keyword': keyword,
+    };
   }
 }

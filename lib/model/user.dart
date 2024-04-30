@@ -20,7 +20,7 @@ class User {
   final String? sns_type;
   final String? email;
   final String? phone;
-  final UserProfile? has_user_profile;
+  final UserProfile? profile;
   final List<UserKeyword>? has_keywords;
   final UserBusiness? main_business;
 
@@ -37,7 +37,7 @@ class User {
     required this.is_agree_marketing,
     required this.is_agree_app_notification,
     required this.is_agree_app_marketing,
-    this.has_user_profile,
+    this.profile,
     this.main_business,
 
     this.has_keywords,
@@ -55,8 +55,7 @@ class User {
       has_keywords = list;
     }
 
-
-    var has_user_profile = json['has_user_profile'] != null ? UserProfile.fromJSON(json['has_user_profile']) : null;
+    var profile = json['profile'] != null ? UserProfile.fromJSON(json['profile']) : null;
     var main_business = json['main_business'] != null ? UserBusiness.fromJSON(json['main_business']) : null;
 
     return User(
@@ -66,11 +65,11 @@ class User {
       email: json['email'],
       phone: json['phone'],
       level: json['level'],
-      is_partner: json['is_partner'],
-      is_partner_of: json['is_partner_of'],
-      is_active: json['is_active'],
+      is_partner: json['is_partner'] ?? 0,
+      is_partner_of: json['is_partner_of'] ?? 0,
+      is_active: json['is_active'] ?? false,
       sns_type: json['sns_type'],
-      has_user_profile: has_user_profile,
+      profile: profile,
       main_business: main_business,
       has_keywords: has_keywords,
       is_agree_service: json['is_agree_service'] ?? false,
@@ -91,6 +90,9 @@ class User {
       'is_active': is_active,
       'sns_type': sns_type,
       'level': level,
+      'main_business': main_business?.toJson(),
+      'has_keywords': has_keywords?.map((keyword) => keyword.toJson()).toList(),
+      'profile': profile?.toJson(),
       'is_agree_service': is_agree_service,
       'is_agree_personal': is_agree_personal,
       'is_agree_marketing': is_agree_marketing,
